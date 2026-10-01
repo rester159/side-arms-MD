@@ -1,0 +1,21 @@
+# Source-only: never commit ROMs or anything derived from them
+rom/
+*.rom
+*.bin
+res/generated/
+src/gen/
+inc/gen/
+reference/
+reports/
+out/
+dist/
+.venv/
+.local/
+__pycache__/
+*.wav
+*.png
+*.zip
+*.out
+*.o
+*.lst
+src/rom_header.c.bak

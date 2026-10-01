@@ -1,0 +1,18 @@
+#!/bin/sh
+# Rebuild every C source of the game (ours and the generated ones) and fail on any compiler
+# warning in them (SGDK's own sources are not rebuilt). usage: tools/check
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$root"
+make assets > /dev/null
+touch src/*.c src/gen/*.c src/sound/*.c
+log=$(mktemp)
+make 2>&1 | tee "$log" > /dev/null || { echo "BUILD FAILED"; grep -E "error" "$log" | head -20; rm -f "$log"; exit 1; }
+warnings=$(sed 's/\x1b\[[0-9;]*[mK]//g' "$log" | grep -E "^(src|inc)/.*warning:" || true)
+rm -f "$log"
+if [ -n "$warnings" ]; then
+    echo "$warnings"
+    echo "check: $(echo "$warnings" | wc -l | tr -d ' ') warning(s)"
+    exit 1
+fi
+echo "check: clean build, no warnings in src/ inc/"

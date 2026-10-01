@@ -1,0 +1,1314 @@
+; Side Arms MD - native Genesis sound driver (Z80; YM2612 music, SN76489 SFX)
+;
+; Original design for the Genesis (docs/sound_port.md). The arcade sound program is only used as a
+; behavioural spec (docs/re/sound.md); where a rule of it is reproduced the arcade address is cited
+; as "spec $xxxx". The data is compiled by tools/build_sound.py into two 32 KB banks read through the
+; Z80 bank window: bank M = command table, F-number tables, duration table, patches, music streams;
+; bank S = SFX frame lists.
+;
+; Why on the Z80: the music runs on its own 248.9 Hz clock (YM2612 Timer A), independent of the
+; 60/50 Hz video and of game lag frames; the YM2612/PSG writes never need the 68000 or its bus; the
+; 68000 only drops command bytes into a FIFO (sound_command()).
+;
+; Per tick: take one command, step the music (only the highest active priority set), step the SFX
+; (highest active slot per virtual SSG chip), build the two SSG register images, reduce them to the PSG.
+
+YM0         EQU     $4000           ; YM2612 status / part I address ($4002 part II)
+PSGPORT     EQU     $7F11
+BANKREG     EQU     $6000
+
+; ---- bank M layout (tools/build_sound.py)
+CMDTAB      EQU     $8000           ; 64 x {kind, arg, ptr lo, ptr hi}
+NTAB_NTSC   EQU     $8100           ; 97 x {block<<3 | fnum hi, fnum lo}, index = note number
+NTAB_PAL    EQU     $8200
+DURTAB      EQU     $8300           ; 256 x {ticks to next event (2), key-off tick or 0 (2)}
+PATCHES     EQU     $8700           ; 32 x 32: values for $30,$34..$8C, $B0, key-on slot mask
+OP_PATCH    EQU     $7D             ; stream: 0 rest / 1..96 note (+$80 triplet) + duration index,
+OP_JUMP     EQU     $7E             ;         $7D patch, $7E jump lo hi, $7F end
+OP_END      EQU     $7F
+
+; ---- RAM
+RAM         EQU     $1400
+TICK        EQU     RAM+$00         ; tick counter (the test probe watches this address)
+LASTSET     EQU     RAM+$01         ; set that played on the last music tick ($FF none)
+SKIP        EQU     RAM+$02         ; skip the next music step (set by a song start)
+PDIRTY      EQU     RAM+$03         ; patches must be reloaded on the next music step
+SUBT        EQU     RAM+$04         ; Timer A half periods not consumed yet
+CURBANK     EQU     RAM+$05         ; 0 = M, 1 = S, $FF unknown
+NOTETAB     EQU     RAM+$06         ; region F-number table
+PSGMUL      EQU     RAM+$08         ; 27 NTSC / 29 PAL
+BANKM       EQU     RAM+$09         ; bank number of bank M (S = M + 1)
+IMG1        EQU     RAM+$10         ; -> 11 SSG register values of virtual chip 1 / 2
+IMG2        EQU     RAM+$12
+PSGIDLE     EQU     RAM+$14
+NVOL        EQU     RAM+$15
+NPER        EQU     RAM+$16
+T3MODE      EQU     RAM+$17
+NCTL        EQU     RAM+$18
+PICKS       EQU     RAM+$20         ; 3 x {voice, volume}
+VVOL        EQU     RAM+$28         ; 6 tone volumes
+WANT        EQU     RAM+$30         ; wanted PSG state: N0..N2, att0..att3
+PSH         EQU     RAM+$40         ; PSG shadow (+10 noise control)
+NCACHE      EQU     RAM+$50         ; 6 x {TP, N}
+SHAD1       EQU     RAM+$70         ; SSG images (11 bytes)
+SHAD2       EQU     RAM+$80
+CHAN        EQU     RAM+$100        ; 4 sets x 6 channels x 16 bytes
+SLOT        EQU     RAM+$280        ; 10 SFX slots x 32 bytes: chip 1 prio 0-4, chip 2 prio 0-4
+
+; channel record
+CH_FLAGS    EQU     0               ; b0 active, b1 current event is a triplet
+CH_PTR      EQU     1               ; stream pointer (2)
+CH_CNT      EQU     3               ; ticks to the next event (2)
+CH_KOFF     EQU     5               ; ticks to key-off, 0 = none (2)
+CH_PATCH    EQU     7
+CH_KEY      EQU     8               ; key-on byte (slot mask | channel code)
+CH_CODE     EQU     9               ; YM2612 channel code 0-2 / 4-6
+CH_PART     EQU     10              ; 0 = part I, 2 = part II
+CH_OFS      EQU     11              ; register offset 0-2
+; SFX slot record
+SL_ACT      EQU     0
+SL_PTR      EQU     1               ; next frame (2)
+SL_WAIT     EQU     3               ; ticks left in the frame (2)
+SL_NOISE    EQU     5               ; noise period x 8
+SL_NSL      EQU     6               ; noise slide (every 4th tick)
+SL_MIX      EQU     7               ; SSG mixer image (active low)
+SL_VOICE    EQU     8               ; 3 x 6: TP x16 (2), tone slide, volume x16, volume slide, -
+
+; ---- 68000 mailbox (src/sound/sound.c)
+MBOX        EQU     $1F00
+MB_GO       EQU     MBOX+$00
+MB_REGION   EQU     MBOX+$01
+MB_BANK     EQU     MBOX+$02
+MB_WR       EQU     MBOX+$04
+MB_RD       EQU     MBOX+$05
+MB_READY    EQU     MBOX+$07
+MB_RING     EQU     MBOX+$10
+
+DRVSIZE     EQU     $1400
+
+            ORG     $0000
+            di
+            ld      sp,MBOX
+            im      1
+            jp      init
+
+            BLOCK   $0038-$
+            reti                    ; interrupts stay disabled
+
+; ===================================================================== init
+init
+.wgo        ld      a,(MB_GO)
+            or      a
+            jr      z,.wgo
+            ld      hl,RAM              ; clear RAM state
+            ld      de,RAM+1
+            ld      bc,$07FF
+            ld      (hl),0
+            ldir
+            ld      hl,(MB_BANK)
+            ld      (BANKM),hl
+            ld      a,$FF
+            ld      (CURBANK),a
+            ld      (LASTSET),a
+            ; region: F-number table, PSG divider, Timer A half period (107 / 106 x 144 clocks)
+            ld      a,(MB_REGION)
+            or      a
+            jr      nz,.pal
+            ld      hl,NTAB_NTSC
+            ld      a,27
+            ld      bc,(917>>2)*256+(917&3)
+            jr      .rg
+.pal        ld      hl,NTAB_PAL
+            ld      a,29
+            ld      bc,(918>>2)*256+(918&3)
+.rg         ld      (NOTETAB),hl
+            ld      (PSGMUL),a
+            ; static channel fields of the 24 records
+            ld      ix,CHAN
+            ld      e,4
+.set        ld      hl,CHCODES
+            ld      d,6
+.ch         ld      a,(hl)
+            ld      (ix+CH_CODE),a
+            inc     hl
+            ld      a,(hl)
+            ld      (ix+CH_PART),a
+            inc     hl
+            ld      a,(hl)
+            ld      (ix+CH_OFS),a
+            inc     hl
+            push    de
+            ld      de,16
+            add     ix,de
+            pop     de
+            dec     d
+            jr      nz,.ch
+            dec     e
+            jr      nz,.set
+            ; YM2612: LFO off, timers off / ch3 normal, DAC off, Timer A period
+            ld      e,0
+            ld      d,0
+            ld      a,$22
+            call    ymwf
+            ld      a,$27
+            call    ymwf
+            ld      a,$2B
+            call    ymwf
+            ld      d,b
+            ld      a,$24
+            call    ymwf
+            ld      d,c
+            ld      a,$25
+            call    ymwf
+            ld      e,0
+            call    .part
+            ld      e,2
+            call    .part
+            call    silence
+            ld      e,0
+            ld      a,$27               ; load + enable Timer A
+            ld      d,$05
+            call    ymwf
+            ; PSG off, shadows invalid
+            ld      hl,PSGOFF
+            ld      b,4
+.po         ld      a,(hl)
+            ld      (PSGPORT),a
+            inc     hl
+            djnz    .po
+            ld      hl,PSH
+            ld      b,$30
+.ps         ld      (hl),$FF
+            inc     hl
+            djnz    .ps
+            ld      hl,SILENT
+            ld      (IMG1),hl
+            ld      (IMG2),hl
+            ld      a,$80
+            ld      (MB_READY),a
+            jp      main
+.part       ld      a,$B4               ; pan L+R, SSG-EG off
+            ld      d,$C0
+            call    ymwf
+            inc     a
+            call    ymwf
+            inc     a
+            call    ymwf
+            ld      a,$90
+            ld      d,0
+            ld      b,16
+.eg         call    ymwf
+            inc     a
+            djnz    .eg
+            ret
+
+CHCODES     DB      0,0,0, 1,0,1, 2,0,2, 4,2,0, 5,2,1, 6,2,2   ; arcade chip 1 ch0-2 -> part I, chip 2 -> part II
+PSGOFF      DB      $9F,$BF,$DF,$FF
+SILENT      DB      0,0,0,0,0,0,0,$FF,0,0,0       ; SSG image of a chip with no SFX (mixer all off)
+
+; ================================================================ main loop
+main
+.wt         call    poll
+            ld      a,(SUBT)
+            sub     2
+            jr      c,.wt
+            ld      (SUBT),a
+            ld      hl,TICK
+            inc     (hl)
+            call    command
+            call    music
+            call    sfx
+            call    sfxout
+            call    psgmap
+            jp      main
+
+; Timer A flag -> ack ($27 = $15: reset flag, keep running) and count a half period.
+; Called often enough (< 2 ms apart) that no overflow is missed. Preserves all but af.
+poll        ld      a,(YM0)
+            rrca
+            ret     nc
+.b          ld      a,(YM0)
+            add     a,a
+            jr      c,.b
+            ld      a,$27
+            ld      (YM0),a
+            ld      a,$15
+            ld      (YM0+1),a
+            ld      a,(SUBT)
+            inc     a
+            ld      (SUBT),a
+            ret
+
+; YM2612 write: e = part (0 / 2), a = register, d = data. ymw also polls the timer. Preserve all.
+ymw         push    af
+            call    poll
+            pop     af
+ymwf        push    af
+.b          ld      a,(YM0)
+            add     a,a
+            jr      c,.b
+            pop     af
+            push    hl
+            ld      h,YM0>>8
+            ld      l,e
+            ld      (hl),a
+            inc     l
+            ld      (hl),d
+            pop     hl
+            ret
+
+; select bank M / S (9 serial writes to $6000) if not current. Preserves all.
+bank_m      push    af
+            xor     a
+            jr      bank_set
+bank_s      push    af
+            ld      a,1
+bank_set    push    hl
+            ld      hl,CURBANK
+            cp      (hl)
+            jr      z,.done
+            ld      (hl),a
+            push    bc
+            ld      hl,(BANKM)
+            or      a
+            jr      z,.w
+            inc     hl
+.w          ld      c,h
+            ld      a,l
+            ld      hl,BANKREG
+            ld      b,8
+.b          ld      (hl),a
+            rrca
+            djnz    .b
+            ld      (hl),c
+            pop     bc
+.done       pop     hl
+            pop     af
+            ret
+
+; ============================================================== commands
+; One FIFO entry per tick, like one latch read per arcade tick (spec $00A9). The 68000 side models
+; the latch, so every entry is executed.
+command     ld      a,(MB_RD)
+            ld      c,a
+            ld      a,(MB_WR)
+            cp      c
+            ret     z
+            ld      b,0
+            ld      hl,MB_RING
+            add     hl,bc
+            ld      a,c
+            inc     a
+            and     $0F
+            ld      (MB_RD),a
+            ld      a,(hl)
+            cp      $FF
+            ret     z
+            and     $3F                 ; spec $00B8
+            call    bank_m
+            ld      l,a
+            ld      h,0
+            add     hl,hl
+            add     hl,hl
+            ld      de,CMDTAB
+            add     hl,de
+            ld      a,(hl)
+            inc     hl
+            ld      c,(hl)
+            inc     hl
+            ld      e,(hl)
+            inc     hl
+            ld      d,(hl)
+            or      a
+            jr      z,.all
+            dec     a
+            jp      z,sfx_stop
+            dec     a
+            jp      z,mus_stop
+            dec     a
+            jp      z,sfx_start
+            dec     a
+            jp      z,mus_start
+            ret
+.all        call    sfx_stop            ; spec $013B
+            jp      mus_stop
+
+; ================================================================== music
+; ix = channel record of set a, channel 0
+setix       ld      l,a
+            ld      h,0
+            add     hl,hl
+            ld      de,SETBASE
+            add     hl,de
+            ld      a,(hl)
+            inc     hl
+            ld      h,(hl)
+            ld      l,a
+            push    hl
+            pop     ix
+            ret
+SETBASE     DW      CHAN, CHAN+$60, CHAN+$C0, CHAN+$120
+
+; start song: c = priority set 0-3, de = header {6 x {stream, patch}} in bank M (spec $01F2)
+mus_start   ld      a,c
+            push    de
+            call    setix
+            pop     hl
+            ld      b,6
+.c          ld      a,(hl)
+            inc     hl
+            ld      (ix+CH_PTR),a
+            ld      a,(hl)
+            inc     hl
+            ld      (ix+CH_PTR+1),a
+            ld      a,(hl)
+            inc     hl
+            ld      (ix+CH_PATCH),a
+            ld      (ix+CH_FLAGS),1
+            ld      (ix+CH_CNT),1       ; first event on the first step
+            ld      (ix+CH_CNT+1),0
+            ld      (ix+CH_KOFF),0
+            ld      (ix+CH_KOFF+1),0
+            ld      de,16
+            add     ix,de
+            djnz    .c
+            call    silence             ; a start always silences and reloads patches (spec $022D)
+            ld      a,1
+            ld      (SKIP),a            ; and skips one music step (spec $0230, $0289)
+            ret
+
+; stop all music (spec $015C): every channel of every set off, silence
+mus_stop    ld      hl,CHAN
+            ld      de,16
+            ld      b,24
+.c          ld      (hl),0
+            add     hl,de
+            djnz    .c
+; TL $7F on every operator, key-off on all 6 channels, patches reloaded at the next step (spec $0182)
+silence     call    poll
+            ld      e,0
+            call    .tl
+            ld      e,2
+            call    .tl
+            ld      e,0
+            ld      a,$28
+            ld      hl,CHCODES
+            ld      b,6
+.k          ld      d,(hl)
+            call    ymwf
+            inc     hl
+            inc     hl
+            inc     hl
+            djnz    .k
+            ld      a,1
+            ld      (PDIRTY),a
+            ret
+.tl         ld      a,$40               ; $40-$4D like spec $0191 (the 4th operator TL of the
+            ld      d,$7F               ; third channel, $4E, is left alone there too)
+            ld      b,14
+.t          ld      c,a
+            and     3
+            cp      3
+            ld      a,c
+            call    nz,ymwf
+            inc     a
+            djnz    .t
+            ret
+
+; music step: only the highest set whose channel 0 is active plays, lower ones keep their position
+; (spec $0236). A change of the playing set silences and steps nothing this tick (spec $027D).
+music       ld      a,(CHAN+$120)
+            ld      c,3
+            rra
+            jr      c,.f
+            ld      a,(CHAN+$C0)
+            dec     c
+            rra
+            jr      c,.f
+            ld      a,(CHAN+$60)
+            dec     c
+            rra
+            jr      c,.f
+            ld      a,(CHAN)
+            dec     c
+            rra
+            ret     nc
+.f          ld      a,(LASTSET)
+            cp      c
+            jr      z,.same
+            ld      a,c
+            ld      (LASTSET),a
+            jp      silence
+.same       ld      a,(SKIP)
+            or      a
+            jr      z,.run
+            xor     a
+            ld      (SKIP),a
+            ret
+.run        call    bank_m
+            ld      a,c
+            call    setix
+            ld      b,6
+.ch         push    bc
+            call    poll
+            ld      a,(PDIRTY)
+            or      a
+            call    nz,loadpatch        ; after a silence every channel gets its patch back (spec $02B5)
+            ld      a,(ix+CH_FLAGS)
+            rra
+            call    c,chan_tick
+            pop     bc
+            ld      de,16
+            add     ix,de
+            djnz    .ch
+            xor     a
+            ld      (PDIRTY),a
+            ret
+
+; one channel tick: one step, two on odd ticks while a triplet event plays (spec $030A)
+chan_tick   ld      b,1
+            bit     1,(ix+CH_FLAGS)
+            jr      z,.s
+            ld      a,(TICK)
+            rra
+            jr      nc,.s
+            inc     b
+.s          push    bc
+            call    step
+            pop     bc
+            ret     c                   ; channel ended
+            djnz    .s
+            ret
+
+; step: count down to the next event; else count down to key-off. Returns C if the channel ended.
+step        ld      l,(ix+CH_CNT)
+            ld      h,(ix+CH_CNT+1)
+            dec     hl
+            ld      (ix+CH_CNT),l
+            ld      (ix+CH_CNT+1),h
+            ld      a,h
+            or      l
+            jr      z,event
+            ld      l,(ix+CH_KOFF)
+            ld      h,(ix+CH_KOFF+1)
+            ld      a,h
+            or      l
+            ret     z
+            dec     hl
+            ld      (ix+CH_KOFF),l
+            ld      (ix+CH_KOFF+1),h
+            ld      a,h
+            or      l
+            ret     nz
+            ld      e,0
+            ld      a,$28               ; key-off
+            ld      d,(ix+CH_CODE)
+            call    ymw
+            or      a
+            ret
+
+; read the next event of the stream
+event       ld      l,(ix+CH_PTR)
+            ld      h,(ix+CH_PTR+1)
+.op         ld      a,(hl)
+            inc     hl
+            cp      OP_PATCH
+            jr      z,.patch
+            cp      OP_JUMP
+            jr      z,.jump
+            cp      OP_END
+            jr      z,.end
+            ld      c,a                 ; note / rest (+$80 triplet)
+            ld      a,(hl)
+            inc     hl
+            ld      (ix+CH_PTR),l
+            ld      (ix+CH_PTR+1),h
+            ld      l,a
+            ld      h,0
+            add     hl,hl
+            add     hl,hl
+            ld      de,DURTAB
+            add     hl,de
+            ld      a,(hl)
+            ld      (ix+CH_CNT),a
+            inc     hl
+            ld      a,(hl)
+            ld      (ix+CH_CNT+1),a
+            inc     hl
+            ld      a,(hl)
+            ld      (ix+CH_KOFF),a
+            inc     hl
+            ld      a,(hl)
+            ld      (ix+CH_KOFF+1),a
+            ld      a,(ix+CH_FLAGS)
+            and     $FD
+            bit     7,c
+            jr      z,.nt
+            or      2
+.nt         ld      (ix+CH_FLAGS),a
+            ld      a,c
+            and     $7F
+            ret     z                   ; rest: nothing is written
+            add     a,a
+            ld      l,a
+            ld      h,0
+            ld      de,(NOTETAB)
+            add     hl,de
+            ld      e,(ix+CH_PART)
+            ld      a,(ix+CH_OFS)
+            add     a,$A4
+            ld      d,(hl)
+            call    ymw
+            inc     hl
+            sub     4
+            ld      d,(hl)
+            call    ymw
+            ld      e,0
+            ld      a,$28               ; key-on (no retrigger if the slot is still on: legato)
+            ld      d,(ix+CH_KEY)
+            call    ymw
+            or      a
+            ret
+.patch      ld      a,(hl)
+            inc     hl
+            ld      (ix+CH_PATCH),a
+            push    hl
+            call    loadpatch           ; a patch change takes effect at once (spec $03AA)
+            pop     hl
+            jr      .op
+.jump       ld      a,(hl)
+            inc     hl
+            ld      h,(hl)
+            ld      l,a
+            jr      .op
+.end        ld      (ix+CH_FLAGS),0     ; channel off; on channel 0 this ends the set (spec $04FB, $0236)
+            scf
+            ret
+
+; load the channel's patch: 24 operator registers, FB/ALG, key-on byte
+loadpatch   call    poll
+            ld      a,(ix+CH_PATCH)
+            ld      l,a
+            ld      h,0
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl
+            ld      de,PATCHES
+            add     hl,de
+            ld      e,(ix+CH_PART)
+            ld      a,(ix+CH_OFS)
+            add     a,$30
+            ld      b,24
+.r          ld      d,(hl)
+            call    ymwf
+            add     a,4
+            inc     hl
+            djnz    .r
+            add     a,$20               ; $B0 + channel
+            ld      d,(hl)
+            call    ymwf
+            inc     hl
+            ld      a,(hl)
+            add     a,(ix+CH_CODE)
+            ld      (ix+CH_KEY),a
+            ret
+
+; ==================================================================== SFX
+; ix = slot a (0-9)
+slotix      ld      l,a
+            ld      h,0
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl
+            ld      de,SLOT
+            add     hl,de
+            push    hl
+            pop     ix
+            ret
+
+; start SFX: c = slot, de = frame list (bank S). A busy slot restarts; voice fields are kept, the
+; mixer is reset (spec $09EC).
+sfx_start   ld      a,c
+            push    de
+            call    slotix
+            pop     de
+            ld      (ix+SL_ACT),1
+            ld      (ix+SL_PTR),e
+            ld      (ix+SL_PTR+1),d
+            ld      (ix+SL_WAIT),0
+            ld      (ix+SL_WAIT+1),0
+            ld      (ix+SL_MIX),$FF
+            ret
+
+sfx_stop    ld      hl,SLOT             ; spec $0141
+            ld      de,32
+            ld      b,10
+.c          ld      (hl),0
+            add     hl,de
+            djnz    .c
+            ret
+
+; per virtual chip only the highest active slot runs (spec $05D5)
+sfx         ld      ix,SLOT+4*32
+            call    .chip
+            ld      ix,SLOT+9*32
+.chip       ld      b,5
+            ld      de,-32
+.f          ld      a,(ix+SL_ACT)
+            or      a
+            jr      nz,slot_tick
+            add     ix,de
+            djnz    .f
+            ret
+
+; frame countdown; a new frame is read when it reaches 0 and that tick has no slides (spec $064C)
+slot_tick   call    poll
+            call    bank_s
+            ld      l,(ix+SL_WAIT)
+            ld      h,(ix+SL_WAIT+1)
+            ld      a,h
+            or      l
+            jr      z,.read
+            dec     hl
+            ld      (ix+SL_WAIT),l
+            ld      (ix+SL_WAIT+1),h
+            jp      slides
+.read       call    frame
+            ld      a,(ix+SL_ACT)
+            or      a
+            ret     z
+            ld      l,(ix+SL_WAIT)
+            ld      h,(ix+SL_WAIT+1)
+            dec     hl
+            ld      (ix+SL_WAIT),l
+            ld      (ix+SL_WAIT+1),h
+            ret
+
+frame       ld      l,(ix+SL_PTR)
+            ld      h,(ix+SL_PTR+1)
+            ld      a,(hl)
+            inc     hl
+            bit     7,a
+            jr      z,.go
+            ld      (ix+SL_ACT),0       ; end
+            ret
+.go         ld      c,a
+            ld      a,(hl)
+            ld      (ix+SL_WAIT),a
+            inc     hl
+            ld      a,(hl)
+            ld      (ix+SL_WAIT+1),a
+            inc     hl
+            push    ix
+            pop     iy
+            ld      de,SL_VOICE
+            add     iy,de
+            ld      b,1                 ; mixer tone bit of the voice
+.v          rr      c
+            jr      nc,.nt
+            ld      e,(hl)              ; tone: period (0 off, $FFFF keep), slide
+            inc     hl
+            ld      d,(hl)
+            inc     hl
+            ld      a,(hl)
+            inc     hl
+            ld      (iy+2),a
+            ld      a,d
+            and     e
+            inc     a
+            jr      z,.nt
+            ld      a,d
+            or      e
+            jr      z,.off
+            ex      de,hl
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl
+            ld      (iy+0),l
+            ld      (iy+1),h
+            ex      de,hl
+            ld      a,b
+            cpl
+            and     (ix+SL_MIX)
+            ld      (ix+SL_MIX),a
+            jr      .nt
+.off        ld      (iy+0),0
+            ld      (iy+1),0
+            ld      a,b
+            or      (ix+SL_MIX)
+            ld      (ix+SL_MIX),a
+.nt         rr      c
+            jr      nc,.nv
+            ld      a,(hl)              ; volume ($FF keep), slide
+            inc     hl
+            cp      $FF
+            jr      z,.vk
+            add     a,a
+            add     a,a
+            add     a,a
+            add     a,a
+            ld      (iy+3),a
+.vk         ld      a,(hl)
+            inc     hl
+            ld      (iy+4),a
+.nv         ld      de,6
+            add     iy,de
+            sla     b
+            bit     3,b
+            jr      z,.v
+            rr      c
+            jr      nc,.done
+            ld      a,(hl)              ; noise: period ($FF keep), mixer noise bits, slide
+            inc     hl
+            cp      $FF
+            jr      z,.nk
+            add     a,a
+            add     a,a
+            add     a,a
+            ld      (ix+SL_NOISE),a
+.nk         ld      e,(hl)
+            inc     hl
+            ld      a,(ix+SL_MIX)
+            and     $C7
+            or      e
+            ld      (ix+SL_MIX),a
+            ld      a,(hl)
+            inc     hl
+            ld      (ix+SL_NSL),a
+.done       ld      (ix+SL_PTR),l
+            ld      (ix+SL_PTR+1),h
+            ret
+
+; tone slides every tick (period x16 += slide), volume / noise slides every 4th tick (spec $0662)
+slides      push    ix
+            pop     iy
+            ld      de,SL_VOICE
+            add     iy,de
+            ld      b,3
+.t          ld      a,(iy+2)
+            or      a
+            jr      z,.n
+            ld      l,(iy+0)
+            ld      h,(iy+1)
+            ld      e,a
+            ld      d,0
+            bit     7,a
+            jr      z,.p
+            dec     d
+.p          add     hl,de
+            ld      (iy+0),l
+            ld      (iy+1),h
+.n          ld      de,6
+            add     iy,de
+            djnz    .t
+            ld      a,(TICK)
+            and     3
+            ret     nz
+            push    ix
+            pop     iy
+            ld      de,SL_VOICE
+            add     iy,de
+            ld      b,3
+.v          ld      a,(iy+3)
+            add     a,(iy+4)
+            ld      (iy+3),a
+            ld      de,6
+            add     iy,de
+            djnz    .v
+            ld      a,(ix+SL_NOISE)
+            add     a,(ix+SL_NSL)
+            ld      (ix+SL_NOISE),a
+            ret
+
+; per virtual chip: the highest active slot stops every lower slot (spec $0A7B; no SFX of the data
+; repeats forever, so all lower slots stop) and provides the SSG register image
+sfxout      ld      ix,SLOT+4*32
+            ld      iy,SHAD1
+            call    .chip
+            ld      (IMG1),hl
+            ld      ix,SLOT+9*32
+            ld      iy,SHAD2
+            call    .chip
+            ld      (IMG2),hl
+            ret
+.chip       ld      b,5
+            ld      de,-32
+.f          ld      a,(ix+SL_ACT)
+            or      a
+            jr      nz,.act
+            add     ix,de
+            djnz    .f
+            ld      hl,SILENT
+            ret
+.act        push    ix
+            dec     b
+            jr      z,.img
+.k          add     ix,de
+            ld      (ix+SL_ACT),0
+            djnz    .k
+.img        pop     ix
+            push    ix
+            pop     hl
+            ld      de,SL_VOICE
+            add     hl,de
+            push    iy
+            pop     de
+            ld      b,3
+.i          ld      a,(hl)              ; period = TP x16 >> 4
+            and     $F0
+            ld      c,a
+            inc     hl
+            ld      a,(hl)
+            and     $0F
+            or      c
+            rrca
+            rrca
+            rrca
+            rrca
+            ld      (de),a
+            inc     de
+            ld      a,(hl)
+            rrca
+            rrca
+            rrca
+            rrca
+            and     $0F
+            ld      (de),a
+            inc     de
+            ld      a,l
+            add     a,5
+            ld      l,a
+            jr      nc,.i2
+            inc     h
+.i2         djnz    .i
+            ld      a,(ix+SL_NOISE)
+            rrca
+            rrca
+            rrca
+            and     $1F
+            ld      (de),a
+            inc     de
+            ld      a,(ix+SL_MIX)
+            ld      (de),a
+            inc     de
+            ld      a,(ix+SL_VOICE+3)
+            call    .v4
+            ld      a,(ix+SL_VOICE+9)
+            call    .v4
+            ld      a,(ix+SL_VOICE+15)
+            call    .v4
+            push    iy
+            pop     hl
+            ret
+.v4         rrca
+            rrca
+            rrca
+            rrca
+            and     $0F
+            ld      (de),a
+            inc     de
+            ret
+
+; ============================================================ SSG -> PSG
+; Virtual voices in tie order chip 2 A,B,C, chip 1 A,B,C; the 3 loudest tone voices -> PSG tone 0-2,
+; the louder chip's noise -> PSG noise (bright noise clocked by tone 3). tools/sound_model.py
+; implements the same reduction for verification.
+psgmap      call    poll
+            ld      hl,(IMG1)           ; nothing to do while both chips stay silent
+            ld      de,SILENT
+            or      a
+            sbc     hl,de
+            jr      nz,.busy
+            ld      hl,(IMG2)
+            sbc     hl,de
+            jr      nz,.busy
+            ld      a,(PSGIDLE)
+            or      a
+            ret     nz
+            inc     a
+            jr      .go
+.busy       xor     a
+.go         ld      (PSGIDLE),a
+            ; tone volumes (0 if the tone is off in the mixer) + per chip noise loudness
+            ld      hl,(IMG2)
+            ld      de,VVOL
+            call    .vv
+            ld      a,b
+            ld      (NVOL),a
+            ld      hl,(IMG1)
+            call    .vv
+            ; noise source: louder chip, tie -> chip 2
+            ld      a,(NVOL)
+            cp      b
+            ld      hl,(IMG2)
+            jr      nc,.n1
+            ld      a,b
+            ld      (NVOL),a
+            ld      hl,(IMG1)
+.n1         ld      de,6
+            add     hl,de
+            ld      a,(hl)
+            and     $1F
+            ld      (NPER),a
+            ; 3 loudest tone voices, ties -> lower index: stable insertion into PICKS (same result
+            ; as taking the first maximum three times)
+            ld      de,$00FF
+            ld      (PICKS),de
+            ld      (PICKS+2),de
+            ld      (PICKS+4),de
+            ld      hl,VVOL
+            ld      c,0
+            ld      e,0                 ; volume of the 3rd pick
+.sel        ld      a,(hl)
+            cp      e
+            jr      z,.sn
+            jr      c,.sn
+            ld      b,a
+            ld      a,(PICKS+1)
+            cp      b
+            jr      c,.i1
+            ld      a,(PICKS+3)
+            cp      b
+            jr      c,.i2
+            ld      a,c
+            ld      (PICKS+4),a
+            ld      a,b
+            ld      (PICKS+5),a
+            jr      .upd
+.i1         ld      de,(PICKS+2)
+            ld      (PICKS+4),de
+            ld      de,(PICKS)
+            ld      (PICKS+2),de
+            ld      a,c
+            ld      (PICKS),a
+            ld      a,b
+            ld      (PICKS+1),a
+            jr      .upd
+.i2         ld      de,(PICKS+2)
+            ld      (PICKS+4),de
+            ld      a,c
+            ld      (PICKS+2),a
+            ld      a,b
+            ld      (PICKS+3),a
+.upd        ld      a,(PICKS+5)
+            ld      e,a
+.sn         inc     hl
+            inc     c
+            ld      a,c
+            cp      6
+            jr      nz,.sel
+            call    poll
+            ; noise mode
+            xor     a
+            ld      (T3MODE),a
+            ld      a,(NVOL)
+            or      a
+            jr      z,.nodone
+            ld      a,(NPER)
+            cp      13
+            jr      c,.bright
+            cp      26
+            ld      a,$E4               ; white, /512
+            jr      c,.nset
+            inc     a                   ; white, /1024
+            jr      .nset
+.bright     ld      a,(PICKS+5)         ; vol of the 3rd tone
+            or      a
+            jr      z,.t3
+            ld      b,a
+            ld      a,(NVOL)
+            cp      b
+            ld      a,$E4
+            jr      c,.nset
+.t3         ld      a,1
+            ld      (T3MODE),a
+            ld      a,$FF
+            ld      (PICKS+4),a         ; tone 3 becomes the noise clock: drop the 3rd tone
+            ld      a,$E7               ; white, tone 3 rate
+.nset       ld      (NCTL),a
+.nodone     ld      hl,PICKS
+            ld      de,WANT
+            call    .chan
+            ld      (WANT+6),a
+            ld      hl,PICKS+2
+            ld      de,WANT+2
+            call    .chan
+            ld      (WANT+7),a
+            ld      hl,PICKS+4
+            ld      de,WANT+4
+            call    .chan
+            ld      (WANT+8),a
+            ld      a,(T3MODE)
+            or      a
+            jr      z,.nt3
+            ld      a,(NPER)
+            ld      l,a
+            ld      h,0
+            call    tpn
+            ld      (WANT+4),hl
+.nt3        ld      a,(NVOL)
+            call    att
+            ld      (WANT+9),a
+            ; ---- write what changed
+            call    poll
+            ld      ix,WANT
+            ld      iy,PSH
+            ld      c,$80               ; tone latch, channel 0
+            ld      b,3
+.wt         ld      a,(ix+$00)
+            cp      (iy+$00)
+            jr      nz,.tw
+            ld      a,(ix+$01)
+            cp      (iy+$01)
+            jr      z,.ts
+.tw         ld      a,(ix+$00)
+            ld      (iy+$00),a
+            ld      e,a
+            ld      a,(ix+$01)
+            ld      (iy+$01),a
+            ld      d,a
+            ld      a,e
+            and     $0F
+            or      c
+            ld      (PSGPORT),a
+            ld      a,e
+            rrca
+            rrca
+            rrca
+            rrca
+            and     $0F
+            ld      e,a
+            ld      a,d
+            rlca
+            rlca
+            rlca
+            rlca
+            and     $30
+            or      e
+            ld      (PSGPORT),a
+.ts         inc     ix
+            inc     ix
+            inc     iy
+            inc     iy
+            ld      a,c
+            add     a,$20
+            ld      c,a
+            djnz    .wt
+            ; noise control, only while the noise is audible (a write resets the LFSR)
+            ld      a,(NVOL)
+            or      a
+            jr      z,.atts
+            ld      a,(NCTL)
+            ld      hl,PSH+10
+            cp      (hl)
+            jr      z,.atts
+            ld      (hl),a
+            ld      (PSGPORT),a
+.atts       ld      hl,WANT+6
+            ld      de,PSH+6
+            ld      c,$90
+            ld      b,4
+.wa         ld      a,(de)
+            cp      (hl)
+            jr      z,.as
+            ld      a,(hl)
+            ld      (de),a
+            or      c
+            ld      (PSGPORT),a
+.as         inc     hl
+            inc     de
+            ld      a,c
+            add     a,$20
+            ld      c,a
+            djnz    .wa
+            ret
+
+; hl -> 11 SSG regs, de -> VVOL out (3 entries appended). Returns b = loudest volume among the
+; noise-enabled channels of this chip.
+.vv         push    hl
+            ld      bc,7
+            add     hl,bc
+            ld      c,(hl)              ; mixer (active low: b0-2 tone off, b3-5 noise off)
+            ld      b,0
+            inc     hl                  ; reg 8
+            ld      a,(hl)
+            and     $0F
+            bit     3,c
+            jr      nz,.xa
+            cp      b
+            jr      c,.xa
+            ld      b,a
+.xa         bit     0,c
+            jr      z,.ya
+            xor     a
+.ya         ld      (de),a
+            inc     de
+            inc     hl
+            ld      a,(hl)
+            and     $0F
+            bit     4,c
+            jr      nz,.xb
+            cp      b
+            jr      c,.xb
+            ld      b,a
+.xb         bit     1,c
+            jr      z,.yb
+            xor     a
+.yb         ld      (de),a
+            inc     de
+            inc     hl
+            ld      a,(hl)
+            and     $0F
+            bit     5,c
+            jr      nz,.xc
+            cp      b
+            jr      c,.xc
+            ld      b,a
+.xc         bit     2,c
+            jr      z,.yc
+            xor     a
+.yc         ld      (de),a
+            inc     de
+            pop     hl
+            ret
+
+; hl -> pick {voice index or $FF, volume}, de -> WANT N slot. Stores N (unless no voice) and
+; returns a = attenuation. N is cached per voice (NCACHE) while its period does not change.
+.chan       ld      a,(hl)
+            cp      $FF
+            jr      nz,.c1
+            ld      a,15
+            ret
+.c1         inc     hl
+            ld      c,(hl)
+            push    bc
+            push    de
+            ld      b,a
+            cp      3                   ; voices 0-2 = chip 2 A-C, 3-5 = chip 1 A-C
+            ld      hl,(IMG2)
+            jr      c,.c2
+            sub     3
+            ld      hl,(IMG1)
+.c2         add     a,a
+            add     a,l
+            ld      l,a
+            jr      nc,.c3
+            inc     h
+.c3         ld      e,(hl)
+            inc     hl
+            ld      a,(hl)
+            and     $0F
+            ld      d,a                 ; de = TP
+            ld      a,b
+            add     a,a
+            add     a,a
+            add     a,NCACHE&$FF
+            ld      l,a
+            ld      h,NCACHE>>8
+            ld      a,(hl)
+            cp      e
+            jr      nz,.miss
+            inc     hl
+            ld      a,(hl)
+            cp      d
+            jr      nz,.miss2
+            inc     hl
+            ld      e,(hl)
+            inc     hl
+            ld      d,(hl)
+            jr      .have
+.miss2      dec     hl
+.miss       ld      (hl),e
+            inc     hl
+            ld      (hl),d
+            inc     hl
+            push    hl
+            ex      de,hl
+            call    tpn
+            ex      de,hl
+            pop     hl
+            ld      (hl),e
+            inc     hl
+            ld      (hl),d
+.have       pop     hl
+            ld      (hl),e
+            inc     hl
+            ld      (hl),d
+            pop     bc
+            ld      a,c
+            jp      att
+
+; hl = SSG period (12 bit) -> hl = PSG N (1..1023): N = TP - round(TP*mul/256), halved while > 1023
+; (mul 27 NTSC = 16+8+2+1, 29 PAL = 16+8+4+1). TP 0 counts as 1, like the SSG.
+tpn         ld      a,h
+            or      l
+            jr      nz,.nz
+            inc     l
+.nz         push    hl                  ; TP
+            ld      b,h
+            ld      c,l
+            add     hl,hl               ; TP*2
+            ld      a,(PSGMUL)
+            cp      29
+            jr      nz,.m2
+            add     hl,hl               ; TP*4
+.m2         add     hl,bc               ; TP*3 / TP*5
+            ex      de,hl
+            ld      h,b
+            ld      l,c
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl               ; TP*8
+            add     hl,de               ; TP*11 / TP*13 (< 65536)
+            ex      de,hl
+            ld      h,b
+            ld      l,c
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl               ; TP*16
+            ld      a,0
+            add     hl,de               ; TP*27 / TP*29 in a:hl
+            adc     a,a
+            ld      c,a
+            ld      a,l                 ; q = (a:hl + $80) >> 8
+            add     a,$80
+            ld      a,h
+            adc     a,0
+            ld      l,a
+            ld      a,c
+            adc     a,0
+            ld      h,a
+            ex      de,hl
+            pop     hl
+            or      a
+            sbc     hl,de               ; N = TP - q
+.o          ld      a,h
+            cp      4
+            jr      c,.ok
+            inc     hl
+            srl     h
+            rr      l
+            jr      .o
+.ok         or      l
+            ret     nz
+            inc     l
+            ret
+
+att         and     $0F                 ; a = SSG volume 0..15 -> PSG attenuation
+            ld      hl,ATTTAB
+            add     a,l
+            ld      l,a
+            jr      nc,.n
+            inc     h
+.n          ld      a,(hl)
+            ret
+ATTTAB      DB      15,14,14,14,14,14,14,12,11,9,8,6,5,3,2,0
+
+DRVEND
+            BLOCK   DRVSIZE-$

@@ -1,0 +1,4 @@
+out/
+src/_sound/
+src/rom_header.c
+inc/

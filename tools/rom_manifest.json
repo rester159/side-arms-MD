@@ -1,0 +1,168 @@
+{
+ "set": "sidearms",
+ "files": [
+  {
+   "path": "63s081.3j",
+   "size": 32,
+   "sha256": "d857b3ad12002a0282982a65673ba27aed58e7a615152238011e871d1279f799",
+   "region": "proms"
+  },
+  {
+   "path": "63s141.11h",
+   "size": 256,
+   "sha256": "0b45888f68870a3c35a56ab54f590ef8c769a91a02fbb4c15f623a073f30e037",
+   "region": "proms"
+  },
+  {
+   "path": "63s141.15h",
+   "size": 256,
+   "sha256": "9906199eb0f824bd4d7d77b92c159bab595790a1c0ad30d2689f3c290224a15c",
+   "region": "proms"
+  },
+  {
+   "path": "63s141.16h",
+   "size": 256,
+   "sha256": "53a695c1d87b77925480e148804bb3d801067584e2cbb4ae61b55a4e884018bc",
+   "region": "proms"
+  },
+  {
+   "path": "a_04k.rom",
+   "size": 32768,
+   "sha256": "becd5717fac31c8e3d29e65a4216685f920c3f293abd5cbf54ebac6dbac5062f",
+   "region": "audiocpu"
+  },
+  {
+   "path": "a_10j.rom",
+   "size": 16384,
+   "sha256": "589b3393f4b6be192ebe7a1cb3df7158c455accf0bfa83e6fb404fc0cc513dc1",
+   "region": "fgtiles"
+  },
+  {
+   "path": "a_12e.rom",
+   "size": 32768,
+   "sha256": "765d7005c4c4efa024f1ab4320892167e51d5f429337f3b0f561a5092e28b7d0",
+   "region": "maincpu"
+  },
+  {
+   "path": "a_14e.rom",
+   "size": 32768,
+   "sha256": "d212a3c9ed1f69b12fb38bb9357be2993455fc5143da9777ce27f980570ea6c8",
+   "region": "maincpu"
+  },
+  {
+   "path": "b_03d.rom",
+   "size": 32768,
+   "sha256": "e9544e8487fe9e9384669ce5300c8c39086172c656777dd97494669cd2e0c76f",
+   "region": "bgmap"
+  },
+  {
+   "path": "b_11a.rom",
+   "size": 32768,
+   "sha256": "44e1b15ce67caf082e5b233599ff92c2aed6d1d373e68e9d3dfecef52a70d085",
+   "region": "sprites"
+  },
+  {
+   "path": "b_11b.rom",
+   "size": 32768,
+   "sha256": "509a793d70c3acd8a1283a7184c50a353e3ead79101ed12dfa9dcc3eea9c951e",
+   "region": "sprites"
+  },
+  {
+   "path": "b_11j.rom",
+   "size": 32768,
+   "sha256": "d5f52f8b42af24f05b6f7e46366bd95fa6a42d7a9fa569a235b72ae98c3e98ae",
+   "region": "starfield"
+  },
+  {
+   "path": "b_12a.rom",
+   "size": 32768,
+   "sha256": "93a7174b205d497f9c59d4b61123ad171ded6c196d857ef886e45758b062da3a",
+   "region": "sprites"
+  },
+  {
+   "path": "b_12b.rom",
+   "size": 32768,
+   "sha256": "a3c76654e0adfdeffbccfc4b165c89b526e9cd5e6a0dbd9939ee4cdca99b6315",
+   "region": "sprites"
+  },
+  {
+   "path": "b_13a.rom",
+   "size": 32768,
+   "sha256": "c40c5dcbc1efc0eaa30871db3d1eee9d7e96ae64d11fc7c359788e8d86dee6b3",
+   "region": "sprites"
+  },
+  {
+   "path": "b_13b.rom",
+   "size": 32768,
+   "sha256": "2619adb45c4a702fd484f82ac6e3526dd12856bee236c22740c97b07bc72ba37",
+   "region": "sprites"
+  },
+  {
+   "path": "b_13d.rom",
+   "size": 32768,
+   "sha256": "4c5effc2469c2fa3f42a087a2bc18d2f0a92439541ec68848b539ceaecb0c57b",
+   "region": "bgtiles"
+  },
+  {
+   "path": "b_13e.rom",
+   "size": 32768,
+   "sha256": "ca0613af69de11ef14e3898570d9dd618651c4d6b56a40c09b222166fd2ce8f2",
+   "region": "bgtiles"
+  },
+  {
+   "path": "b_13f.rom",
+   "size": 32768,
+   "sha256": "805304584bc5760e4e2ebb6c58af4509f755e0edd15f1e1aea8b9c12055edee9",
+   "region": "bgtiles"
+  },
+  {
+   "path": "b_13g.rom",
+   "size": 32768,
+   "sha256": "6fca72f3e11163bec882b68e26e24bbdcbd8807b314c464ca278860fc072d48f",
+   "region": "bgtiles"
+  },
+  {
+   "path": "b_14a.rom",
+   "size": 32768,
+   "sha256": "1a8a163db0c49b52dcbcceec0beb65b8f991943bd0d469a60f13c8a9a2a62da8",
+   "region": "sprites"
+  },
+  {
+   "path": "b_14b.rom",
+   "size": 32768,
+   "sha256": "f11a9dfbba2e208c25e7c57c3496de72f35a99064ff953e51ef33068e2749822",
+   "region": "sprites"
+  },
+  {
+   "path": "b_14d.rom",
+   "size": 32768,
+   "sha256": "26718dc533ec8f6df2a06f696d07947ef3ab77509c025afda1abfb65e5780867",
+   "region": "bgtiles"
+  },
+  {
+   "path": "b_14e.rom",
+   "size": 32768,
+   "sha256": "216db6d4f7a6a6b167449714f1a6a07dce88937f7785fe210d3c114dd335d3da",
+   "region": "bgtiles"
+  },
+  {
+   "path": "b_14f.rom",
+   "size": 32768,
+   "sha256": "75e0c3f8cc62cd1237325adecd51ef88381b3b19886c027e29a4121bd9432d85",
+   "region": "bgtiles"
+  },
+  {
+   "path": "b_14g.rom",
+   "size": 32768,
+   "sha256": "9cb08dac0d34ce4814af4a8cf4ecd074f55ba66ae40643e7a73672253f430be4",
+   "region": "bgtiles"
+  },
+  {
+   "path": "sa03.bin",
+   "size": 32768,
+   "sha256": "6aadb9e18ac8dddbf02ce76a6d7c2dcd27f031e1bcdc08469fe3ed6775479106",
+   "region": "maincpu"
+  }
+ ],
+ "aggregate_sha256": "0409d7b25e7a9ee36a7b151c2326cd9082e5608bf3515fbed1da89c47aa7f42a"
+}
