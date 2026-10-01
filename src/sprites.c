@@ -1,4 +1,5 @@
 #include "sprites.h"
+#include "palette.h"
 #include "video.h"
 #include "gen/assets.h"
 
@@ -57,7 +58,7 @@ void spr_init(void)
 {
     cache_reset(&small, SMALL_SLOTS);
     cache_reset(&big, BIG_SLOTS);
-    PAL_setColors(32, sprite_pal, 32, DMA_QUEUE);
+    pal_load(32, sprite_pal, 32);
     VDP_resetSprites();
 }
 
@@ -69,12 +70,9 @@ void spr_begin(void)
     nfallback = 0;
 }
 
-/* 16x16 pattern for (code, colour): ROM bank entry, or a runtime remap. */
-static const u8 *pattern_src(u16 code, u8 colour)
+/* Runtime remap through the arcade colour's LUT (palette sprite_lut[256 + colour]). */
+static const u8 *remap(u16 code, u8 colour)
 {
-    code &= 0x7FF;
-    u16 e = spr_bank_index[code | (colour << 11)];
-    if (e) return spr_bank + (u32)(e - 1) * 128;
     if (nfallback >= 4) return NULL;
     spr_dbg_remap_key[spr_dbg_remap & 63] = code | (colour << 11);
     spr_dbg_remap++;
@@ -83,6 +81,17 @@ static const u8 *pattern_src(u16 code, u8 colour)
     u8 *dst = fallback[nfallback++];
     for (u16 i = 0; i < 128; i++) dst[i] = l[src[i]];
     return dst;
+}
+
+/* 16x16 pattern for (code, colour): ROM bank entry (each pattern carries its
+ * own palette choice in bit 15 of the index), or a runtime remap. */
+static const u8 *pattern_src(u16 code, u8 colour, u8 *pal)
+{
+    code &= 0x7FF;
+    u16 e = spr_bank_index[code | (colour << 11)];
+    if (e) { *pal = e >> 15; return spr_bank + (u32)((e & 0x7FFF) - 1) * 128; }
+    *pal = sprite_lut[256 + colour] & 1;
+    return remap(code, colour);
 }
 
 /* Victim slot (clock hand, skipping slots drawn this frame), or NONE. */
@@ -96,10 +105,10 @@ static u16 victim(Cache *c)
     return NONE;
 }
 
-static void claim(Cache *c, u16 s, u16 code, u16 key, u8 colour)
+static void claim(Cache *c, u16 s, u16 code, u16 key, u8 pal)
 {
     c->key[s] = key; c->used[s] = stamp;
-    c->attr[s] = TILE_ATTR_FULL(PAL2 + (sprite_lut[256 + colour] & 1), 1, 0, 0, slot_tile(c, s));
+    c->attr[s] = TILE_ATTR_FULL(PAL2 + (pal & 1), 1, 0, 0, slot_tile(c, s));
     u8 *w = c->idx[code];
     w[1] = w[0]; w[0] = s + 1;
 }
@@ -110,9 +119,10 @@ static u16 small_miss(u16 code, u8 colour, u16 key)
     if (budget < 128) return 0;
     u16 s = victim(&small);
     if (s == NONE) return 0;
-    const u8 *src = pattern_src(code, colour);
+    u8 pal;
+    const u8 *src = pattern_src(code, colour, &pal);
     if (!src) return 0;
-    claim(&small, s, code, key, colour);
+    claim(&small, s, code, key, pal);
     DMA_queueDmaFast(DMA_VRAM, (void *)src, (VRAM_SPR_TILE + s * 4) * 32, 64, 2);
     budget -= 128; uploads++;
     return small.attr[s];
@@ -122,16 +132,20 @@ static u16 big_miss(u16 code, u8 colour, u16 key)
 {
     if (budget < 512) return 0;
     u16 blk = spr_big_index[key];
+    u8 pal = blk >> 15;                 /* the block's own palette choice */
+    blk &= 0x7FFF;
     const u8 *tl = NULL, *tr = NULL, *bl = NULL, *br = NULL;
     if (!blk) {
-        /* no pre-built block: four cells, 8 transfers */
-        tl = pattern_src(code, colour); tr = pattern_src(code + 1, colour);
-        bl = pattern_src(code + 8, colour); br = pattern_src(code + 9, colour);
+        /* no pre-built block: four cells sharing the colour's fallback palette, 8 transfers */
+        if (nfallback) return 0;
+        pal = sprite_lut[256 + colour] & 1;
+        tl = remap(code, colour); tr = remap(code + 1, colour);
+        bl = remap(code + 8, colour); br = remap(code + 9, colour);
         if (!tl || !tr || !bl || !br) return 0;
     }
     u16 s = victim(&big);
     if (s == NONE) return 0;
-    claim(&big, s, code, key, colour);
+    claim(&big, s, code, key, pal);
     u16 dst = slot_tile(&big, s) * 32;
     if (blk) {
         DMA_queueDmaFast(DMA_VRAM, (void *)(spr_big + (u32)(blk - 1) * 512), dst, 256, 2);

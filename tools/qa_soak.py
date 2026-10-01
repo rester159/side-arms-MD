@@ -61,10 +61,10 @@ class Bot:
         self.edge = [0, 0]
         self.fc = None
         self.players = players
-        if players == 2:                # pad 2 Start: join through the real flow (NAMING timeout)
-            for f in range(8):
+        if players == 2:                # pad 2 Start: join through the real flow (NAMING timeout);
+            for f in range(32):         # Arcade mode: the first Start inserts the coin
                 self.keep_alive(1)
-                self.pad(0, IN['S'] if f < 4 else 0); r.run(1)
+                self.pad(0, IN['S'] if f < 4 or 16 <= f < 20 else 0); r.run(1)
             for f in range(900):
                 self.keep_alive(1)
                 self.pad(0, 0); r.run(1)

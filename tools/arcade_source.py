@@ -55,10 +55,12 @@ def decode_chars(rom):
     out = np.zeros((a.shape[0], 8, 8), np.uint8)
     for x in range(8):
         byte = a[:, :, x >> 2]
-        bit = 3 - (x & 3)  # MAME bit offset 0 = MSB
-        p1 = (byte >> (bit + 4)) & 1   # plane at offset 0 -> MSB of pen
-        p0 = (byte >> bit) & 1         # plane at offset 4 -> LSB
-        out[:, :, x] = (p1 << 1) | p0
+        bit = 3 - (x & 3)  # MAME bit offset 0 = byte MSB
+        # planeoffset {4, 0}: the first plane listed is the pen's MSB and sits
+        # at bit offset 4 (mask 0x08 >> x); the LSB plane is at offset 0 (0x80 >> x)
+        msb = (byte >> bit) & 1
+        lsb = (byte >> (bit + 4)) & 1
+        out[:, :, x] = (msb << 1) | lsb
     return out
 
 

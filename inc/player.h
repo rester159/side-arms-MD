@@ -68,7 +68,8 @@ void shot_hit(Player *p, Shot *s);              /* a shot hit an enemy: explode 
 /* Scoring / options */
 extern u32 hi_score;                /* $E600, default 100000 (ranking $0B34) */
 extern u16 extend_setting;           /* DSW0 bits 4-5: 0 = 100000 once (arcade default), 1 = every 100000
-                                       to 500000, 2 = every 150000 to 600000, 3 = every 200000 to 600000 */
+                                       to 500000, 2 = every 150000 to 600000, 3 = every 200000 to 600000;
+                                       4 = none (Home option, not arcade) */
 extern bool score_enabled;          /* arcade $E010: FALSE in the attract demo (no score, $2272) */
 
 /* Combined "Side Arms" robot (combined.c) */

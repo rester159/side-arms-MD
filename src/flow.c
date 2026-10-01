@@ -1,22 +1,97 @@
+#include "palette.h"
 #include "game.h"
 #include "hud.h"
 #include "flow.h"
 #include "gen/frontend.h"
 
-/* Top-level flow: boot -> mode select (Arcade / Home) -> settings -> the
- * arcade attract loop (flow_attract.c) and game (flow_game.c).
+/* Top-level flow: boot screen (Arcade / Home, flow_menu.c) -> Arcade: INSERT COIN screen and the
+ * arcade attract loop (flow_attract.c); Home: the Home screen and its options (flow_menu.c);
+ * both -> the game (flow_game.c). Settings and the ranking live in SRAM (below).
  * docs/frontend.md; arcade flow docs/re/flow_player.md §2. */
 
 GameConfig game_cfg;
+DipSettings dip_cfg;
+HomeSettings home_cfg;
 FlowState flow_state;
 u8 credits;
 RankEntry ranking[5];
 
 const u32 *game_extend_table(void) { return fe_extend_tables[game_cfg.bonus & 3]; }
-s8 game_rank_offset(void) { return fe_rank_offset[game_cfg.difficulty & 7]; }
 
-/* ---- ranking ($E680, 5 x {score, name}; insertion $1C02) + SRAM ------------------ */
-#define SRAM_MAGIC 0x53415231UL      /* "SAR1" */
+s8 game_rank_offset(void)
+{
+    u8 d = game_cfg.difficulty;
+    if (d == DIFF_EASY) return fe_rank_offset[0] - 1;
+    if (d == DIFF_HARD) return fe_rank_offset[7] + 1;
+    return fe_rank_offset[d & 7];
+}
+
+/* B0:$80CA-$812F: music $21-$29 -> stage 0-8, $36 -> 9; $E050 = $813C[stage * 8 + difficulty] */
+u8 game_bullet_speed(u8 music, u8 dflt)
+{
+    u16 k = music == 0x36 ? 9 : (u16)(music - 0x21);
+    if (k > 9) return dflt;
+    u8 d = game_cfg.difficulty;
+    if (d == DIFF_EASY) return 3;                       /* the slowest level (enemies.c: 3-6) */
+    if (d == DIFF_HARD) { u8 v = fe_bullet_speed[k * 8 + 7] + 1; return v > 6 ? 6 : v; }
+    return fe_bullet_speed[k * 8 + (d & 7)];
+}
+
+void flow_apply_config(void)
+{
+    if (game_cfg.mode == MODE_ARCADE) {
+        game_cfg.difficulty = dip_cfg.difficulty;
+        game_cfg.lives = dip_cfg.lives_b ? FE_LIVES_B : FE_LIVES_A;
+        game_cfg.bonus = dip_cfg.bonus;
+        game_cfg.allow_continue = dip_cfg.cont;
+        game_cfg.cont = dip_cfg.cont ? CONT_LIMITED : CONT_OFF;
+        game_cfg.demo_sounds = dip_cfg.demo_sounds;
+    } else {
+        game_cfg.difficulty = home_cfg.difficulty;
+        game_cfg.lives = home_cfg.lives;
+        game_cfg.bonus = home_cfg.bonus;
+        game_cfg.cont = home_cfg.cont;
+        game_cfg.allow_continue = home_cfg.cont != CONT_OFF;
+        game_cfg.demo_sounds = TRUE;
+    }
+    extend_setting = game_cfg.bonus;    /* player.c bonus-life table (DSW0 bits 4-5) */
+    pal_set_mode(game_cfg.color);
+    credits = 0;
+}
+
+static void settings_defaults(void)
+{
+    dip_cfg.difficulty = 3;                 /* "4 (normal)" */
+    dip_cfg.lives_b = 0;                    /* 3 */
+    dip_cfg.bonus = 0;                      /* MAME default: 100000 once */
+    dip_cfg.cont = TRUE;
+    dip_cfg.demo_sounds = TRUE;
+    home_cfg.difficulty = 3;
+    home_cfg.lives = 3;
+    home_cfg.bonus = 0;
+    home_cfg.cont = CONT_LIMITED;
+    home_cfg.credits = 3;
+    game_cfg.mode = MODE_ARCADE;
+    game_cfg.color = COLOR_VIVID;
+    input_defaults(&pad_cfg);
+}
+
+/* ---- SRAM ---------------------------------------------------------------------------------- *
+ * Cartridge SRAM (header "RA", $200001, odd bytes), byte offsets:
+ *   0-3   magic: "SAR1" (v1, ranking only) or "SAR2" (v2)
+ *   4-38  ranking: 5 x {score u32, 3 arcade char codes}            (same in v1 and v2)
+ *   39    ranking checksum                                          (same in v1 and v2)
+ *   40-60 v2 settings: version (SET_VERSION), DIP x5, Home x5, COLOR, last mode, controls x8
+ *   61    settings checksum
+ * A v1 save keeps its ranking (settings take their defaults and are written as v2 on the next
+ * save); a bad checksum, an unknown settings version or an out-of-range value resets that block. */
+#define SRAM_MAGIC_V1 0x53415231UL      /* "SAR1" */
+#define SRAM_MAGIC    0x53415232UL      /* "SAR2" */
+#define RANK_OFS      4
+#define RANK_LEN      (5 * 7)
+#define SET_OFS       (RANK_OFS + RANK_LEN + 1)
+#define SET_VERSION   1
+#define SET_LEN       21
 
 static u8 sram_sum(const u8 *b, u16 n)
 {
@@ -25,39 +100,66 @@ static u8 sram_sum(const u8 *b, u16 n)
     return s;
 }
 
-static void ranking_save(void)
+/* settings block <-> bytes; each value with its count (valid range 0..count-1, +min) */
+static u8 *const SET_VAL[SET_LEN - 1] = {
+    &dip_cfg.difficulty, &dip_cfg.lives_b, &dip_cfg.bonus, &dip_cfg.cont, &dip_cfg.demo_sounds,
+    &home_cfg.difficulty, &home_cfg.lives, &home_cfg.bonus, &home_cfg.cont, &home_cfg.credits,
+    &game_cfg.color, &game_cfg.mode,
+    &pad_cfg.button[0], &pad_cfg.button[1], &pad_cfg.button[2],
+    &pad_cfg.extra[0], &pad_cfg.extra[1], &pad_cfg.extra[2], &pad_cfg.autofire[0], &pad_cfg.autofire[1],
+};
+static const u8 SET_MIN[SET_LEN - 1] = { 0, 0, 0, 0, 0,  0, 1, 0, 0, 1,  0, 0,  0, 0, 0, 0, 0, 0, 0, 0 };
+static const u8 SET_MAX[SET_LEN - 1] = { 7, 1, 3, 1, 1,  9, 7, 4, 2, 9,  1, 1,  5, 5, 5,
+                                         XB_COUNT - 1, XB_COUNT - 1, XB_COUNT - 1, 1, 1 };
+
+static void sram_save(void)
 {
-    u8 buf[5 * 7];
+    u8 rb[RANK_LEN], sb[SET_LEN];
     for (u16 i = 0; i < 5; i++) {
         u32 v = ranking[i].score;
-        buf[i * 7 + 0] = v >> 24; buf[i * 7 + 1] = v >> 16; buf[i * 7 + 2] = v >> 8; buf[i * 7 + 3] = v;
-        memcpy(buf + i * 7 + 4, ranking[i].name, 3);
+        rb[i * 7 + 0] = v >> 24; rb[i * 7 + 1] = v >> 16; rb[i * 7 + 2] = v >> 8; rb[i * 7 + 3] = v;
+        memcpy(rb + i * 7 + 4, ranking[i].name, 3);
     }
+    sb[0] = SET_VERSION;
+    for (u16 i = 0; i < SET_LEN - 1; i++) sb[1 + i] = *SET_VAL[i];
     SRAM_enable();
     SRAM_writeLong(0, SRAM_MAGIC);
-    for (u16 i = 0; i < sizeof(buf); i++) SRAM_writeByte(4 + i, buf[i]);
-    SRAM_writeByte(4 + sizeof(buf), sram_sum(buf, sizeof(buf)));
+    for (u16 i = 0; i < RANK_LEN; i++) SRAM_writeByte(RANK_OFS + i, rb[i]);
+    SRAM_writeByte(RANK_OFS + RANK_LEN, sram_sum(rb, RANK_LEN));
+    for (u16 i = 0; i < SET_LEN; i++) SRAM_writeByte(SET_OFS + i, sb[i]);
+    SRAM_writeByte(SET_OFS + SET_LEN, sram_sum(sb, SET_LEN));
     SRAM_disable();
 }
 
-static void ranking_load(void)
+void settings_save(void) { sram_save(); }
+
+void sram_load(void)
 {
-    u8 buf[5 * 7];
+    u8 rb[RANK_LEN], sb[SET_LEN];
     for (u16 i = 0; i < 5; i++) {
         ranking[i].score = fe_default_ranking[i].score;
         memcpy(ranking[i].name, fe_default_ranking[i].name, 3);
     }
+    settings_defaults();
     SRAM_enableRO();
-    bool ok = SRAM_readLong(0) == SRAM_MAGIC;
-    for (u16 i = 0; ok && i < sizeof(buf); i++) buf[i] = SRAM_readByte(4 + i);
-    ok = ok && SRAM_readByte(4 + sizeof(buf)) == sram_sum(buf, sizeof(buf));
+    u32 magic = SRAM_readLong(0);
+    bool v2 = magic == SRAM_MAGIC;
+    bool rank_ok = v2 || magic == SRAM_MAGIC_V1;
+    for (u16 i = 0; rank_ok && i < RANK_LEN; i++) rb[i] = SRAM_readByte(RANK_OFS + i);
+    rank_ok = rank_ok && SRAM_readByte(RANK_OFS + RANK_LEN) == sram_sum(rb, RANK_LEN);
+    for (u16 i = 0; v2 && i < SET_LEN; i++) sb[i] = SRAM_readByte(SET_OFS + i);
+    bool set_ok = v2 && sb[0] == SET_VERSION && SRAM_readByte(SET_OFS + SET_LEN) == sram_sum(sb, SET_LEN);
     SRAM_disable();
-    if (ok)
+    for (u16 i = 0; set_ok && i < SET_LEN - 1; i++)
+        if (sb[1 + i] < SET_MIN[i] || sb[1 + i] > SET_MAX[i]) set_ok = FALSE;
+    if (rank_ok)
         for (u16 i = 0; i < 5; i++) {
-            const u8 *b = buf + i * 7;
+            const u8 *b = rb + i * 7;
             ranking[i].score = ((u32)b[0] << 24) | ((u32)b[1] << 16) | ((u16)b[2] << 8) | b[3];
             memcpy(ranking[i].name, b + 4, 3);
         }
+    if (set_ok)
+        for (u16 i = 0; i < SET_LEN - 1; i++) *SET_VAL[i] = sb[1 + i];
     hi_score = ranking[0].score;     /* $E600 = top ranking score */
 }
 
@@ -69,152 +171,8 @@ u8 ranking_insert(u32 score, const u8 name[3])
     while (i > 0 && score > ranking[i - 1].score) { ranking[i] = ranking[i - 1]; i--; }
     ranking[i].score = score;
     memcpy(ranking[i].name, name, 3);
-    ranking_save();
+    sram_save();
     return i + 1;
-}
-
-/* ---- mode select / settings -------------------------------------------------- */
-static u8 cursor;
-
-typedef struct { const char *label; u8 *val; u8 count; const char *const *names; } Option;
-
-static const char *const DIFF_ARC[8] = { "1 EASIEST", "2", "3", "4 NORMAL", "5", "6", "7", "8 HARDEST" };
-static const char *const DIFF_HOME[4] = { "EASY", "NORMAL", "HARD", "HARDEST" };
-static const u8 DIFF_HOME_VAL[4] = { 1, 3, 5, 7 };
-static const char *const BONUS[4] = { "100K ONLY", "EVERY 100K", "150K 300K 450K", "200K 400K 600K" };
-static const char *const ONOFF[2] = { "OFF", "ON" };
-static const char *const LIVES_ARC[2] = { "3", "5" };
-static const char *const LIVES_HOME[7] = { "1", "2", "3", "4", "5", "6", "7" };
-static u8 opt_diff, opt_lives, opt_bonus, opt_cont, opt_demo;
-
-static const Option OPTS_ARCADE[] = {
-    { "DIFFICULTY", &opt_diff, 8, DIFF_ARC }, { "LIVES", &opt_lives, 2, LIVES_ARC },
-    { "BONUS LIFE", &opt_bonus, 4, BONUS }, { "CONTINUE", &opt_cont, 2, ONOFF },
-    { "DEMO SOUNDS", &opt_demo, 2, ONOFF },
-};
-static const Option OPTS_HOME[] = {
-    { "DIFFICULTY", &opt_diff, 4, DIFF_HOME }, { "LIVES", &opt_lives, 7, LIVES_HOME },
-    { "BONUS LIFE", &opt_bonus, 4, BONUS },
-};
-
-#define SEL_ROW   14
-#define OPT_ROW   7
-
-static void select_draw(void)
-{
-    static const char *const ITEM[2] = { "ARCADE", "HOME" };
-    static const char *const DESC[2] = { "ORIGINAL FLOW WITH CREDITS", " FREE PLAY  -  OPTIONS  " };
-    for (u16 i = 0; i < 2; i++) {
-        hud_text(14, SEL_ROW + i * 2, 0, cursor == i ? ">" : " ");
-        hud_text(16, SEL_ROW + i * 2, cursor == i ? 4 : 0, ITEM[i]);
-    }
-    hud_blank(0, SEL_ROW + 5, 40);
-    hud_text(7, SEL_ROW + 5, 2, DESC[cursor]);
-}
-
-static void select_enter(void)
-{
-    hud_sprites(FALSE);
-    hud_panel_off();
-    hud_screen_reset();
-    hud_clear(HUD_ROWS_ALL);
-    scene_off();
-    video_set_layers(FALSE, TRUE);
-    hud_logo(TRUE, HUD_LOGO_TILE);
-    cursor = game_cfg.mode;
-    select_draw();
-    hud_text(7, 23, 0, "PORTED BY RESTER 159, 2026");
-    hud_string(FE_STR_COPYRIGHT, -1, -1);
-}
-
-static void select_update(void)
-{
-    u8 in = pad[0].pressed | pad[1].pressed;
-    if (in & (IN_UP | IN_DOWN)) { cursor ^= 1; select_draw(); }
-    if (in & (IN_START | IN_FIRE_L | IN_FIRE_R)) {
-        game_cfg.mode = cursor;
-        flow_goto(FS_SETUP);
-    }
-}
-
-static const Option *opts(u16 *n)
-{
-    if (game_cfg.mode == MODE_ARCADE) { *n = sizeof(OPTS_ARCADE) / sizeof(Option); return OPTS_ARCADE; }
-    *n = sizeof(OPTS_HOME) / sizeof(Option); return OPTS_HOME;
-}
-
-static void setup_draw(void)
-{
-    u16 n;
-    const Option *o = opts(&n);
-    for (u16 i = 0; i < n; i++) {
-        s16 row = OPT_ROW + i * 2;
-        hud_blank(0, row, 40);
-        hud_text(2, row, 0, cursor == i ? ">" : " ");
-        hud_text(4, row, cursor == i ? 4 : 0, o[i].label);
-        hud_text(18, row, cursor == i ? 4 : 2, o[i].names[*o[i].val]);
-    }
-    s16 row = OPT_ROW + n * 2 + 1;
-    hud_text(2, row, 0, cursor == n ? ">" : " ");
-    hud_text(4, row, cursor == n ? 4 : 0, "START GAME");
-}
-
-static void setup_enter(void)
-{
-    hud_screen_reset();
-    hud_clear(HUD_ROWS_ALL);
-    cursor = 0;
-    if (game_cfg.mode == MODE_ARCADE) {
-        opt_diff = game_cfg.difficulty; opt_lives = game_cfg.lives == FE_LIVES_B;
-        opt_bonus = game_cfg.bonus; opt_cont = game_cfg.allow_continue; opt_demo = game_cfg.demo_sounds;
-        hud_text(14, 3, 4, "DIP SWITCHES");
-    } else {
-        opt_diff = game_cfg.difficulty >= 6 ? 3 : game_cfg.difficulty >= 4 ? 2 : game_cfg.difficulty >= 2 ? 1 : 0;
-        opt_lives = game_cfg.lives >= 1 && game_cfg.lives <= 7 ? game_cfg.lives - 1 : 2;
-        opt_bonus = game_cfg.bonus;
-        hud_text(16, 3, 4, "OPTIONS");
-    }
-    hud_text(4, 24, 2, "UP DOWN SELECT  LEFT RIGHT SET");
-    setup_draw();
-}
-
-static void setup_apply(void)
-{
-    if (game_cfg.mode == MODE_ARCADE) {
-        game_cfg.difficulty = opt_diff;
-        game_cfg.lives = opt_lives ? FE_LIVES_B : FE_LIVES_A;
-        game_cfg.bonus = opt_bonus;
-        game_cfg.allow_continue = opt_cont;
-        game_cfg.demo_sounds = opt_demo;
-    } else {
-        game_cfg.difficulty = DIFF_HOME_VAL[opt_diff];
-        game_cfg.lives = opt_lives + 1;
-        game_cfg.bonus = opt_bonus;
-        game_cfg.allow_continue = TRUE;       /* free continues */
-        game_cfg.demo_sounds = TRUE;
-    }
-    extend_setting = game_cfg.bonus;    /* player.c bonus-life table (DSW0 bits 4-5) */
-    credits = 0;
-}
-
-static void setup_update(void)
-{
-    u16 n;
-    const Option *o = opts(&n);
-    u8 in = pad[0].pressed | pad[1].pressed;
-    if (in & IN_UP) { cursor = cursor ? cursor - 1 : n; setup_draw(); }
-    if (in & IN_DOWN) { cursor = cursor < n ? cursor + 1 : 0; setup_draw(); }
-    if (cursor < n && (in & (IN_LEFT | IN_RIGHT | IN_FIRE_L | IN_FIRE_R))) {
-        u8 *v = o[cursor].val;
-        if (in & IN_LEFT) *v = *v ? *v - 1 : o[cursor].count - 1;
-        else *v = *v + 1 < o[cursor].count ? *v + 1 : 0;
-        setup_draw();
-    }
-    if ((in & IN_START) || (cursor == n && (in & (IN_FIRE_L | IN_FIRE_R)))) {
-        setup_apply();
-        flow_goto(FS_WARNING);
-    }
-    if (in & IN_WEAPON) flow_goto(FS_SELECT);
 }
 
 /* ---- dispatch ------------------------------------------------------------------ */
@@ -222,34 +180,33 @@ void flow_goto(FlowState s)
 {
     flow_state = s;
     switch (s) {
-    case FS_SELECT:  select_enter(); break;
-    case FS_SETUP:   setup_enter(); break;
-    case FS_WARNING: flow_warning_enter(); break;
-    case FS_TITLE:   flow_title_enter(); break;
-    case FS_DEMO:    flow_demo_enter(); break;
-    case FS_CREDIT:  flow_credit_enter(); break;
-    case FS_INTRO:   flow_intro_enter(); break;
-    case FS_PLAY:    break;
+    case FS_SELECT:   menu_select_enter(); break;
+    case FS_SETUP:    menu_setup_enter(); break;
+    case FS_CONTROLS: menu_controls_enter(); break;
+    case FS_SOUND:    menu_sound_enter(); break;
+    case FS_COIN:     flow_coin_enter(); break;
+    case FS_HOME:     menu_home_enter(); break;
+    case FS_WARNING:  flow_warning_enter(); break;
+    case FS_TITLE:    flow_title_enter(); break;
+    case FS_DEMO:     flow_demo_enter(); break;
+    case FS_CREDIT:   flow_credit_enter(); break;
+    case FS_INTRO:    flow_intro_enter(); break;
+    case FS_PLAY:     break;
     }
 }
 
 void flow_init(void)
 {
-    game_cfg.mode = MODE_ARCADE;
-    game_cfg.difficulty = 3;                /* "4 (normal)" */
-    game_cfg.lives = FE_LIVES_A;
-    game_cfg.bonus = 0;                     /* MAME default: 100000 once */
-    game_cfg.allow_continue = TRUE;
-    game_cfg.demo_sounds = TRUE;
     hud_init();
-    ranking_load();
+    sram_load();
+    flow_apply_config();
     flow_game_reset();
     flow_goto(FS_SELECT);
 }
 
 void flow_update(void)
 {
-    /* soft reset: A+B+C+Start on pad 1 -> mode select */
+    /* soft reset: A+B+C+Start on pad 1 -> boot screen */
     if ((pad[0].held & (IN_FIRE_L | IN_FIRE_R | IN_WEAPON | IN_START)) == (IN_FIRE_L | IN_FIRE_R | IN_WEAPON | IN_START)
         && pad[0].pressed && flow_state != FS_SELECT) {
         sound_play(0x00);
@@ -258,14 +215,18 @@ void flow_update(void)
         return;
     }
     switch (flow_state) {
-    case FS_SELECT:  select_update(); break;
-    case FS_SETUP:   setup_update(); break;
-    case FS_WARNING: flow_warning_update(); break;
-    case FS_TITLE:   flow_title_update(); break;
-    case FS_DEMO:    flow_demo_update(); break;
-    case FS_CREDIT:  flow_credit_update(); break;
-    case FS_INTRO:   flow_intro_update(); break;
-    case FS_PLAY:    flow_play_update(); break;
+    case FS_SELECT:   menu_select_update(); break;
+    case FS_SETUP:    menu_setup_update(); break;
+    case FS_CONTROLS: menu_controls_update(); break;
+    case FS_SOUND:    menu_sound_update(); break;
+    case FS_COIN:     flow_coin_update(); break;
+    case FS_HOME:     menu_home_update(); break;
+    case FS_WARNING:  flow_warning_update(); break;
+    case FS_TITLE:    flow_title_update(); break;
+    case FS_DEMO:     flow_demo_update(); break;
+    case FS_CREDIT:   flow_credit_update(); break;
+    case FS_INTRO:    flow_intro_update(); break;
+    case FS_PLAY:     flow_play_update(); break;
     }
 }
 

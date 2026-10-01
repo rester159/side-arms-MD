@@ -143,21 +143,6 @@ header.append('extern const Zone zones[ZONE_COUNT];')
 
 # ---------------------------------------------------------------- sprites
 spr = decode_sprites(src.region('sprites'))
-usage = json.loads((ROOT / 'tools/sprite_palette_usage.json').read_text()) if (ROOT / 'tools/sprite_palette_usage.json').exists() else {}
-sblocks = []
-for c in range(16):
-    wgt = usage.get(str(c), 1)
-    sblocks.append({MD[512 + c * 16 + p]: wgt for p in range(15)})
-# PAL3 also carries the HUD/text colours (window plane text uses PAL3).
-# Each text colour later picks PAL2 or PAL3, so both carry seeded text colours.
-TXT_SEED3 = [to_md(c) for c in [(1, 1, 1), (15, 15, 15), (15, 0, 0), (0, 12, 15), (0, 0, 14), (14, 14, 0)]]
-TXT_SEED2 = [to_md(c) for c in [(0, 14, 0), (15, 10, 0), (15, 0, 15), (0, 6, 10), (7, 6, 0), (12, 12, 0)]]
-spals, sassign = fit(sblocks, 2, 15, fixed=[TXT_SEED2, TXT_SEED3])
-sprite_lut = bytearray()
-for c in range(16):
-    pal = spals[sassign[c]]
-    sprite_lut += bytes([0 if p == 15 else 1 + nearest(MD[512 + c * 16 + p], pal) for p in range(16)])
-sprite_lut += bytes([int(a) for a in sassign])  # 16 bytes: genesis palette (0/1 -> PAL2/PAL3)
 # raw pens, Genesis 2x2 sprite order (column-major): tiles (0,0),(0,1),(1,0),(1,1) as (x,y)
 raw = bytearray()
 for n in range(len(spr)):
@@ -165,29 +150,17 @@ for n in range(len(spr)):
         for ty in range(2):
             raw += tile_bytes(spr[n][ty * 8:ty * 8 + 8, tx * 8:tx * 8 + 8])
 emit('sprite_pens', bytes(raw), comment='2048 x 128, arcade pens 0-15 ')
-emit('sprite_lut', bytes(sprite_lut), comment='16 colors x16 pens + 16 pal sel ')
-# pen-pair byte LUT per arcade colour (two pixels per byte) for runtime remap
-pair = bytearray()
-for c in range(16):
-    pl = sprite_lut[c * 16:c * 16 + 16]
-    for b in range(256):
-        pair.append((pl[b >> 4] << 4) | pl[b & 15])
-emit('sprite_pair_lut', bytes(pair), comment='16 colours x 256 ')
-swords = []
-for p in spals:
-    swords += [0] + [md_word(c) for c in p] + [0] * (15 - len(p))
-emit('sprite_pal', be16(swords), 'u16', 'PAL2+PAL3 ')
+usage = json.loads((ROOT / 'tools/sprite_palette_usage.json').read_text()) if (ROOT / 'tools/sprite_palette_usage.json').exists() else {}
 
 # ---------------------------------------------------------------- player tables
 # (before the sprite bank: it lists every sprite the player module draws)
 import subprocess
 subprocess.run([sys.executable, str(ROOT / 'tools/build_player.py')], check=True)
 
-# ---------------------------------------------------------------- sprite pattern bank
-# Every (code, colour) pair the game can show, pre-converted to Genesis tiles in
-# its palette, so the runtime only DMAs. Pairs come from the extracted behaviour
-# tables (templates, motion scripts, metasprite frames, player data); composites
-# are expanded (2x2: c, c+1, c+8, c+9). Missing pairs fall back to a runtime remap.
+# ---------------------------------------------------------------- sprite pattern set
+# Every (code, colour) pair the game can show. Pairs come from the extracted behaviour
+# tables (templates, motion scripts, metasprite frames, player data); composites are
+# expanded (2x2: c, c+1, c+8, c+9). Missing pairs fall back to a runtime remap.
 def _walk(o, out):
     if isinstance(o, dict):
         code = o.get('code'); col = o.get('color', o.get('colour'))
@@ -216,49 +189,93 @@ if obs.exists():
         for c in range(code & ~15, (code & ~15) + 16):
             expanded.add((c, col))
 keys = sorted(c | (col << 11) for c, col in expanded)
-bank = bytearray()
-for k in keys:
-    code, col = k & 0x7FF, k >> 11
-    pl = sprite_lut[col * 16:col * 16 + 16]
-    src_t = raw[code * 128:code * 128 + 128]
-    bank += bytes((pl[b >> 4] << 4) | pl[b & 15] for b in src_t)
-emit('spr_bank_keys', be16(keys), 'u16', 'sorted code | colour << 11 ')
-emit('spr_bank', bytes(bank), comment='pre-converted 16x16 patterns ')
-header.append(f'#define SPR_BANK_COUNT {len(keys)}')
-print('sprite bank:', len(keys), 'patterns', len(bank) // 1024, 'KB')
-# Direct lookup (no search at run time): entry + 1 for key = code | colour << 11, 0 = not in the bank.
-index = [0] * 32768
-for i, k in enumerate(keys):
-    index[k] = i + 1
-emit('spr_bank_index', be16(index), 'u16', 'code | colour << 11 -> spr_bank entry + 1 ')
-# 32x32 composites (cells c, c+1, c+8, c+9) pre-interleaved in the Genesis 4x4 sprite order
-# (column-major: each 32-px column = top cell column + bottom cell column), so a 32x32 upload is
-# one 512-byte DMA instead of eight. Built for every 2x2-aligned code (c & 9 == 0: the arcade's
-# 2x2 objects use codes c, c+1, c+8, c+9 with c even and bit 3 clear) whose four cells are in the
-# bank, plus any pair the behaviour tables name; other composites still work through the cells.
 keyset = set(keys)
+# 32x32 composites (cells c, c+1, c+8, c+9), built for every 2x2-aligned code (c & 9 == 0)
+# whose four cells are in the set, plus any pair the behaviour tables name.
 big_set = {(c, col) for c, col in pairs if all((((c + a) & 0x7FF) | (col << 11)) in keyset for a in (0, 1, 8, 9))}
 for k in keys:
     c, col = k & 0x7FF, k >> 11
     if not (c & 9) and all((((c + a) & 0x7FF) | (col << 11)) in keyset for a in (1, 8, 9)):
         big_set.add((c, col))
 big_keys = sorted(c | (col << 11) for c, col in big_set)
+
+# ---------------------------------------------------------------- sprite palettes
+# PAL2/PAL3 are fitted to the patterns actually drawn (pixel histograms of every
+# 16x16 cell and 32x32 composite, weighted by how often the arcade colour is used)
+# and each pattern then uses whichever palette represents it better. Both palettes
+# also carry seeded HUD/text colours (window-plane text picks PAL2 or PAL3 per colour).
+TXT_SEED3 = [to_md(c) for c in [(1, 1, 1), (15, 15, 15), (15, 0, 0), (0, 12, 15), (0, 0, 14), (14, 14, 0)]]
+TXT_SEED2 = [to_md(c) for c in [(0, 14, 0), (15, 10, 0), (15, 0, 15), (0, 6, 10), (7, 6, 0), (12, 12, 0)]]
+def _hist(codes, col):
+    h = {}
+    for code in codes:
+        pens, n = np.unique(spr[code], return_counts=True)
+        for pen, cnt in zip(pens, n):
+            if pen != 15:
+                c = MD[512 + col * 16 + int(pen)]; h[c] = h.get(c, 0) + int(cnt)
+    w = max(1, usage.get(str(col), 1)) / 256.0
+    return {c: v * w for c, v in h.items()}
+blocks = [_hist([k & 0x7FF], k >> 11) for k in keys]
+blocks += [_hist([((k & 0x7FF) + a) & 0x7FF for a in (0, 1, 8, 9)], k >> 11) for k in big_keys]
+spals, assign = fit(blocks, 2, 15, fixed=[TXT_SEED2, TXT_SEED3])
+small_pal = [int(a) for a in assign[:len(keys)]]
+big_pal = [int(a) for a in assign[len(keys):]]
+# per arcade colour fallback (runtime remap, bosses, front end): the palette that fits its 15 colours best
+from quantize import _dist as _qdist
+sprite_lut = bytearray(); col_pal = []
+for c in range(16):
+    cols = [MD[512 + c * 16 + p] for p in range(15)]
+    errs = [float(_qdist(cols, np.array(spals[k])).min(1).sum()) for k in range(2)]
+    col_pal.append(int(np.argmin(errs)))
+for c in range(16):
+    pal = spals[col_pal[c]]
+    sprite_lut += bytes([0 if p == 15 else 1 + nearest(MD[512 + c * 16 + p], pal) for p in range(16)])
+sprite_lut += bytes(col_pal)    # 16 bytes: genesis palette (0/1 -> PAL2/PAL3)
+emit('sprite_lut', bytes(sprite_lut), comment='16 colors x16 pens + 16 pal sel ')
+pair = bytearray()
+for c in range(16):
+    pl = sprite_lut[c * 16:c * 16 + 16]
+    for b in range(256):
+        pair.append((pl[b >> 4] << 4) | pl[b & 15])
+emit('sprite_pair_lut', bytes(pair), comment='16 colours x 256 ')
+swords = []
+for p in spals:
+    swords += [0] + [md_word(c) for c in p] + [0] * (15 - len(p))
+emit('sprite_pal', be16(swords), 'u16', 'PAL2+PAL3 ')
+_lut_cache = {}
+def pen_lut(col, p):
+    if (col, p) not in _lut_cache:
+        _lut_cache[(col, p)] = [0 if q == 15 else 1 + nearest(MD[512 + col * 16 + q], spals[p]) for q in range(16)]
+    return _lut_cache[(col, p)]
+def convert(code, col, p):
+    pl = pen_lut(col, p)
+    return bytes((pl[b >> 4] << 4) | pl[b & 15] for b in raw[code * 128:code * 128 + 128])
+
+# ---------------------------------------------------------------- sprite pattern bank
+bank = bytearray()
+index = [0] * 32768
+for i, k in enumerate(keys):
+    bank += convert(k & 0x7FF, k >> 11, small_pal[i])
+    index[k] = (i + 1) | (small_pal[i] << 15)       # bit 15: PAL3
+emit('spr_bank_keys', be16(keys), 'u16', 'sorted code | colour << 11 ')
+emit('spr_bank', bytes(bank), comment='pre-converted 16x16 patterns ')
+header.append(f'#define SPR_BANK_COUNT {len(keys)}')
+print('sprite bank:', len(keys), 'patterns', len(bank) // 1024, 'KB')
+emit('spr_bank_index', be16(index), 'u16', 'code | colour << 11 -> spr_bank entry + 1, b15 = PAL3 ')
+# 32x32 composites pre-interleaved in the Genesis 4x4 sprite order (column-major: each
+# 32-px column = top cell column + bottom cell column): one 512-byte DMA per upload.
+# All four cells use the block's own palette choice.
 big = bytearray()
 big_index = [0] * 32768
-for k in big_keys:
-    code, col = k & 0x7FF, k >> 11
-    cells = []
-    for add in (0, 1, 8, 9):
-        ck = ((code + add) & 0x7FF) | (col << 11)
-        e = index[ck] - 1
-        cells.append(bank[e * 128:e * 128 + 128])
-    tl, tr, bl, br = cells
+for i, k in enumerate(big_keys):
+    code, col, p = k & 0x7FF, k >> 11, big_pal[i]
+    tl, tr, bl, br = (convert((code + a) & 0x7FF, col, p) for a in (0, 1, 8, 9))
     for colx in range(4):
         top, bot = (tl, bl) if colx < 2 else (tr, br)
         h = (colx & 1) * 64
         big += top[h:h + 64] + bot[h:h + 64]
-    big_index[k] = len(big) // 512
-emit('spr_big_index', be16(big_index), 'u16', 'code | colour << 11 -> spr_big block + 1 ')
+    big_index[k] = (len(big) // 512) | (p << 15)
+emit('spr_big_index', be16(big_index), 'u16', 'code | colour << 11 -> spr_big block + 1, b15 = PAL3 ')
 emit('spr_big', bytes(big), comment='pre-interleaved 32x32 composites, 512 bytes each ')
 print('sprite 32x32 blocks:', len(big_keys), len(big) // 1024, 'KB')
 
@@ -295,6 +312,25 @@ subprocess.run([sys.executable, str(ROOT / 'tools/build_enemies.py')], check=Tru
 # bosses (needs sprite_lut/sprite_pens and the zone palettes above): tools/build_bosses.py
 subprocess.run([sys.executable, str(ROOT / 'tools/build_bosses.py')], check=True)
 emit('terrain', (GEN / 'terrain.bin').read_bytes(), comment='256x256 bits, 16x16 world cells ')
+
+# ---------------------------------------------------------------- colour mode "VIVID"
+# Optional display mode (front-end COLOR option): every Genesis colour is mapped to a
+# more saturated, slightly brighter one. Index = BBBGGGRRR (3 bits each, see palette.c).
+# Neutral greys stay neutral and nothing gets darker.
+import colorsys
+vivid = []
+for w in range(512):
+    r, g, b = (w & 7), (w >> 3) & 7, (w >> 6) & 7
+    h, sat, v = colorsys.rgb_to_hsv(r / 7, g / 7, b / 7)
+    if sat > 0.05:
+        sat = min(1.0, sat * 1.40)
+    v = min(1.0, v * 1.15) if v > 0 else 0
+    nr, ng, nb = colorsys.hsv_to_rgb(h, sat, v)
+    q = [max(o, int(round(n * 7))) if sat <= 0.05 else int(round(n * 7)) for n, o in ((nr, r), (ng, g), (nb, b))]
+    if max(q) < max(r, g, b):
+        q = [r, g, b]
+    vivid.append((q[2] << 9) | (q[1] << 5) | (q[0] << 1))
+emit('vivid_lut', be16(vivid), 'u16', 'Genesis colour >> 1 -> vivid colour ')
 
 # ---------------------------------------------------------------- outputs
 lines = ['/* Generated by tools/build_assets.py. */', '.section .rodata', '.align 2']

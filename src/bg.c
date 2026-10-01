@@ -1,4 +1,5 @@
 #include "bg.h"
+#include "palette.h"
 #include "video.h"
 #include "gen/assets.h"
 
@@ -82,7 +83,7 @@ void bg_set_zone(u16 z)
 {
     zone = &zones[z];
     flush_cache();
-    PAL_setColors(0, zone->pal, 32, DMA_QUEUE);
+    pal_load(0, zone->pal, 32);
 }
 
 static u8 acquire(u16 meta)

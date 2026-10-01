@@ -55,6 +55,10 @@ void hud_string_clear(u16 id, s16 col, s16 row);
 void hud_number(s16 col, s16 row, u8 colour, u32 v, u16 width);  /* right-aligned, leading blanks */
 void hud_score(s16 col, s16 row, u8 colour, u32 points);         /* arcade score format ($0627), 8 cells */
 void hud_logo(bool on, u16 vram_tile);      /* SIDE ARMS logo (rows 3-10); tiles uploaded at vram_tile */
+/* "MD" under the logo (Home Screen; built from the logo's own M and D, tools/build_frontend.py):
+ * FE_MD_COLS x FE_MD_ROWS cells at (col, row), tiles at vram_tile; cleared with its rows */
+void hud_md(s16 col, s16 row, u16 vram_tile);
+#define HUD_MD_TILE         1953            /* sprite area (32x32 set 2), free on front-end screens */
 
 /* Arcade text-layer position (64-col layer, visible cols 8-55, rows 2-29) ->
  * Genesis cell: (col - 12, row - 2), the 320-px view centred in the arcade's 384. */

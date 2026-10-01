@@ -41,7 +41,7 @@ This is a from-scratch Sega Genesis game, written for the Genesis hardware. It d
 | `sprites.c` | display list → SAT, pattern cache |
 | `bg.c`, `video.c` | planes, scroll, zones |
 | `sound/` | Z80 driver + 68k API `sound_command(id)` (ids follow the arcade command numbers) |
-| `input.c` | pads: A = fire left, B = fire right, C = weapon select, Start = start/coin |
+| `input.c` | pads → logical inputs: default A = fire left, B = fire right, C = weapon select, Start = start/coin; remapping, 6-button X/Y/Z, autofire (docs/frontend.md) |
 
 ## Rules for contributors
 

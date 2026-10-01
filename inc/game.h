@@ -10,8 +10,33 @@ enum {
     IN_START = 0x80,
 };
 typedef struct { u8 held, pressed; } Pad;
-extern Pad pad[2];
+extern Pad pad[2];                  /* logical game inputs (IN_*), after the control mapping */
 void input_update(void);
+
+/* Physical pad (SGDK BUTTON_* bits: A B C X Y Z MODE START + directions). Menus read these
+ * (A / C / Start = select, B = back), the game reads pad[]. */
+typedef struct { u16 held, pressed; } RawPad;
+extern RawPad pad_raw[2];
+extern bool pad_six[2];             /* a 6-button pad is plugged in (JOY_getJoypadType) */
+
+/* Control mapping (Home OPTIONS > CONTROLS, saved in SRAM; docs/frontend.md). */
+enum { PB_A, PB_B, PB_C, PB_X, PB_Y, PB_Z, PB_COUNT };          /* physical buttons */
+enum { ACT_FIRE_L, ACT_FIRE_R, ACT_WEAPON, ACT_COUNT };        /* remappable actions */
+enum {                              /* X / Y / Z extra functions (6-button pads) */
+    XB_NONE, XB_PREV, XB_NEXT,      /* previous / next owned weapon */
+    XB_BIT, XB_SG, XB_MBL, XB_3WAY, XB_AUTO,                  /* that weapon, if owned */
+    XB_LOCK,                        /* hold: fire towards the current facing without turning */
+    XB_COUNT
+};
+typedef struct {
+    u8 button[ACT_COUNT];           /* PB_* per action; X/Y/Z fall back to A/B/C on a 3-button pad */
+    u8 extra[3];                    /* XB_* for X, Y, Z */
+    u8 autofire[2];                 /* per fire button (left, right): held = repeated presses */
+} PadConfig;
+extern PadConfig pad_cfg;
+void input_defaults(PadConfig *c);
+void input_clear_requests(void);    /* drop pending X/Y/Z weapon requests (attract demo) */
+extern u8 pad_weapon_req[2];        /* XB_PREV..XB_AUTO pressed on X/Y/Z; consumed by weapon_select() */
 
 /* ---- camera / level (level.c) ------------------------------------------- */
 typedef enum { SCROLL_RUN, SCROLL_HALT } ScrollMode;

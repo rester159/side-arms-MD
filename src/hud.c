@@ -27,7 +27,15 @@ static volatile u16 win_reg;                /* register $12 value currently set 
  * The 28 interrupts of the general mode cost ~20 lines of 68000 time a frame. */
 static volatile u16 split_top, split_bot;   /* simple mode: top rows 0..top-1, bottom rows bot..27 */
 static volatile bool split_simple;
-static bool split_valid;                    /* split_* computed for win_mask */
+static bool split_valid;                    /* next_* computed for frame_mask */
+/* The row mask and split of the next frame: computed by hud_frame() during the frame and
+ * applied by the VBlank interrupt, together with the nametable DMA of the same rows. (Applied at
+ * once, a cleared row would vanish one frame before its text and new text would show one frame
+ * late: blinking text measured 23 on / 13 off instead of 24 / 12.) */
+static u32 frame_mask;
+static volatile u32 next_mask;
+static volatile u16 next_top, next_bot;
+static volatile bool next_simple, next_ready;
 
 HINTERRUPT_CALLBACK hud_hint(void)
 {
@@ -48,6 +56,11 @@ HINTERRUPT_CALLBACK hud_hint(void)
 /* VBlank interrupt: the next frame's first window state and H-int spacing */
 static void hud_vint(void)
 {
+    if (next_ready) {
+        win_mask = next_mask;
+        split_top = next_top; split_bot = next_bot; split_simple = next_simple;
+        next_ready = FALSE;
+    }
     if (split_simple) {
         u16 top = split_top, bot = split_bot;
         win_reg = top;                                  /* up mode: rows 0..top-1 */
@@ -292,6 +305,19 @@ void hud_score(s16 col, s16 row, u8 colour, u32 points)
 static bool logo_on;
 #define LOGO_ROWS (0xFFUL << FE_LOGO_ROW)
 
+/* a pre-rendered block (map entries: 0 blank, else (tile + 1) | palette bit 13 | flips), its
+ * tiles uploaded at vram_tile */
+static void image(const u16 *m, u16 cols, u16 rows, s16 col, s16 row, const u8 *tiles, u16 ntiles, u16 vram_tile)
+{
+    DMA_queueDma(DMA_VRAM, (void *)tiles, vram_tile * 32, ntiles * 16, 2);
+    for (u16 r = 0; r < rows; r++)
+        for (u16 c = 0; c < cols; c++, m++) {
+            u16 e = *m;
+            put(col + c, row + r, e ? (0x8000 | ((2 + ((e >> 13) & 1)) << 13) | (e & 0x1800) |
+                                     ((e & 0x7FF) - 1 + vram_tile)) : 0);
+        }
+}
+
 void hud_logo(bool on, u16 vram_tile)
 {
     if (!on) {
@@ -299,15 +325,13 @@ void hud_logo(bool on, u16 vram_tile)
         logo_on = FALSE;
         return;
     }
-    DMA_queueDma(DMA_VRAM, (void *)fe_logo_tiles, vram_tile * 32, FE_LOGO_TILES * 16, 2);
-    const u16 *m = fe_logo_map;
-    for (u16 r = 0; r < 8; r++)
-        for (u16 c = 0; c < 32; c++, m++) {
-            u16 e = *m;
-            put(FE_LOGO_COL + c, FE_LOGO_ROW + r, e ? (0x8000 | ((2 + ((e >> 13) & 1)) << 13) | (e & 0x1800) |
-                                                    ((e & 0x7FF) - 1 + vram_tile)) : 0);
-        }
+    image(fe_logo_map, 32, 8, FE_LOGO_COL, FE_LOGO_ROW, fe_logo_tiles, FE_LOGO_TILES, vram_tile);
     logo_on = TRUE;
+}
+
+void hud_md(s16 col, s16 row, u16 vram_tile)
+{
+    image(fe_md_map, FE_MD_COLS, FE_MD_ROWS, col, row, fe_md_tiles, FE_MD_TILES, vram_tile);
 }
 
 void hud_screen_reset(void)
@@ -468,8 +492,8 @@ void hud_frame(void)
 {
     stage_flush();
     u32 m = forced | used_mask;
-    if (m != win_mask || !split_valid) {
-        win_mask = m;
+    if (m != frame_mask || !split_valid) {
+        frame_mask = m;
         /* top block + bottom block (possibly empty)? */
         u16 top = 0, bot = HUD_ROWS;
         while (top < HUD_ROWS && (m >> top) & 1) top++;
@@ -477,7 +501,7 @@ void hud_frame(void)
         bool simple = TRUE;
         for (u16 r = top; r < bot; r++) if ((m >> r) & 1) { simple = FALSE; break; }
         SYS_disableInts();
-        split_top = top; split_bot = bot; split_simple = simple;
+        next_mask = m; next_top = top; next_bot = bot; next_simple = simple; next_ready = TRUE;
         SYS_enableInts();
         split_valid = TRUE;
     }
@@ -495,6 +519,8 @@ void hud_init(void)
     memset(used, 0, sizeof(used));
     used_mask = 0;
     split_valid = FALSE;
+    frame_mask = 0;
+    next_ready = FALSE;
     memset(&cur, 0, sizeof(cur));
     forced = 0;
     sprites_on = FALSE;

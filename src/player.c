@@ -105,7 +105,7 @@ void player_add_score(Player *p, u32 points)
     p->score += points;
     if (p->score > SCORE_MAX) p->score = SCORE_MAX;
     if (p->score >= hi_score) hi_score = p->score;
-    if (p->score >= EXTEND_TABLES[extend_setting & 3][p->extend_idx]) {
+    if (extend_setting < 4 && p->score >= EXTEND_TABLES[extend_setting][p->extend_idx]) {   /* 4: NONE (Home option) */
         p->lives++;
         p->extend_idx++;
         sound_play(0x1D);

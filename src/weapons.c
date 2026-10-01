@@ -153,6 +153,27 @@ void weapon_select(Player *p)
 {
     if (!p->weapon) {
         for (u8 i = 1; i <= 5; i++) if (p->level[i]) { p->weapon = i; break; }
+        pad_weapon_req[p->id] = 0;
+        return;
+    }
+    /* Genesis 6-button extra (not in the arcade): X / Y / Z pick the previous / next owned
+     * weapon or a given one if owned, at once; same effects as a button-3 step */
+    u8 req = pad_weapon_req[p->id];
+    if (req) {
+        pad_weapon_req[p->id] = 0;
+        u8 w = p->weapon;
+        if (req == XB_PREV || req == XB_NEXT)
+            for (u8 n = 0; n < 5; n++) {
+                w = req == XB_NEXT ? (w == 5 ? 1 : w + 1) : (w == 1 ? 5 : w - 1);
+                if (p->level[w]) break;
+            }
+        else if (req >= XB_BIT && req <= XB_AUTO && p->level[req - XB_BIT + WPN_BIT]) w = req - XB_BIT + WPN_BIT;
+        if (w != p->weapon && p->level[w]) {
+            sound_play(0x1C);
+            p->weapon = w;
+            weapons_clear(p);
+            weapons_build_bits(p);
+        }
         return;
     }
     if (p->prev_held & IN_WEAPON) { p->select_latch = FALSE; return; }

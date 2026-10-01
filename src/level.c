@@ -24,6 +24,11 @@ volatile u16 dbg_warp;                  /* test hook: (section + 1) | (boss ordi
 static s8 latch_x, latch_y;             /* $E08A/$E08B */
 void enemy_spawn_event(u16 section, u16 index) __attribute__((weak));
 
+/* B0:$80CA: the stage music also loads $E050 from table $813C indexed by the difficulty; the
+ * level data carries the default-difficulty value, the front end applies the chosen one */
+u8 game_bullet_speed(u8 music, u8 dflt) __attribute__((weak));
+static u8 bullet_speed(const LevelEvent *e) { return game_bullet_speed ? game_bullet_speed(e->a, e->c) : e->c; }
+
 static s8 dir_of(u8 a) { return a == 0 ? 0 : a == 1 ? 1 : -1; }   /* $2001: 0 stop, 1 +1, else -1 */
 
 static void apply_dirs(void)
@@ -75,7 +80,7 @@ static bool fire(const LevelEvent *e)
 {
     switch (e->op) {
     case EV_TELEPORT: level.scroll_x = e->b; level.scroll_y = e->c; break;
-    case EV_MUSIC:    sound_play(e->a); if (e->c) level_bullet_speed = e->c; break;
+    case EV_MUSIC:    sound_play(e->a); if (e->c) level_bullet_speed = bullet_speed(e); break;
     /* B0:$80B3 / $809C also set $E040 ('H' / 'V'); stop and reverse ($80BE/$80C4, $80A7/$80AD) don't */
     case EV_DIR_X:    latch_x = dir_of(e->a); if (e->a == 1) level.vertical = FALSE; apply_dirs(); break;
     case EV_DIR_Y:    latch_y = dir_of(e->a); if (e->a == 1) level.vertical = TRUE; apply_dirs(); break;
@@ -117,7 +122,7 @@ void level_warp(u16 section, u16 boss)
         if (e->op == EV_DIR_X) latch_x = dir_of(e->a);
         else if (e->op == EV_DIR_Y) latch_y = dir_of(e->a);
         else if (e->op == EV_RANK) level.rank = e->a;
-        else if (e->op == EV_MUSIC && e->c) level_bullet_speed = e->c;
+        else if (e->op == EV_MUSIC && e->c) level_bullet_speed = bullet_speed(e);
         else if (e->op == EV_TELEPORT) { level.scroll_x = e->b; level.scroll_y = e->c; }
     }
     apply_dirs();

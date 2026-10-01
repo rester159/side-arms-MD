@@ -20,6 +20,7 @@ void enemy_spawn_record(u8 cmd, u16 target) __attribute__((weak));
 
 static u16 timer;
 static u8 phase;
+static u16 demo_idle;               /* INSERT COIN screen: frames without input */
 
 static void attract_panel(void)
 {
@@ -29,6 +30,85 @@ static void attract_panel(void)
     p.on = TRUE;
     p.hi = hi_score;
     hud_panel(&p);
+}
+
+/* ---- Arcade: INSERT COIN screen ---------------------------------------------------------------
+ * Entry of the Arcade mode: the title screen's city ($0C05) and logo ($0DF5) with the 1UP/HI row,
+ * the World set's own "INSERT COIN" text record ($0E94, colour 2; in the ROM but never drawn by
+ * its code) and the credit line of the credit screen (CREDIT $165F + the count, $15D4), both
+ * blinking with the arcade's text blink ($1545: 24 frames on, 12 off). A coin (Start, or C) goes
+ * to the credit screen at once, as the arcade's credit task does ($08DF -> $12AE). Idle for
+ * COIN_IDLE frames: the attract loop (WARNING ...). Up Up Down Down Left Right Left Right: chime
+ * (sound $1D) and the DIP-switch screen. */
+#define COIN_ROW    16
+#define COIN_COL    14
+#define COIN_IDLE   900
+#define BLINK_ON    24                  /* $1545: "THE BATTLE FOR SURVIVAL..." 24 f shown, 12 f off */
+#define BLINK_LEN   36
+
+static const u8 CODE[8] = { IN_UP, IN_UP, IN_DOWN, IN_DOWN, IN_LEFT, IN_RIGHT, IN_LEFT, IN_RIGHT };
+static u8 code_pos;
+static s8 blink_shown;
+
+static void coin_text(bool on)
+{
+    if (blink_shown == on) return;
+    blink_shown = on;
+    if (on) {
+        hud_string(FE_STR_INSERT_COIN, COIN_COL, COIN_ROW);
+        hud_string(FE_STR_CREDIT, -1, -1);
+        hud_number(21, 24, 4, credits, 3);              /* $D6A1, as the credit screen */
+    } else {
+        hud_string_clear(FE_STR_INSERT_COIN, COIN_COL, COIN_ROW);
+        hud_string_clear(FE_STR_CREDIT, -1, -1);
+        hud_blank(21, 24, 3);
+    }
+}
+
+void flow_coin_enter(void)
+{
+    hud_sprites(FALSE);
+    hud_panel_off();
+    hud_screen_reset();
+    hud_clear(HUD_ROWS_ALL);
+    video_set_layers(FALSE, TRUE);
+    scene_load_set(0);
+    scene_show(FE_SCENE_TITLE);
+    hud_logo(TRUE, HUD_LOGO_TILE);
+    attract_panel();
+    hud_string(FE_STR_COPYRIGHT, -1, -1);
+    blink_shown = -1;
+    coin_text(TRUE);
+    code_pos = 0;
+    timer = 0;                          /* blink phase */
+    phase = 0;
+    demo_idle = 0;
+}
+
+static bool secret_code(void)
+{
+    u8 d = (pad[0].pressed | pad[1].pressed) & (IN_UP | IN_DOWN | IN_LEFT | IN_RIGHT);
+    if (!d) return FALSE;
+    if (d == CODE[code_pos]) code_pos++;
+    else code_pos = d == IN_UP ? (code_pos >= 2 ? 2 : 1) : 0;    /* "UP UP" may restart it */
+    if (code_pos < 8) return FALSE;
+    code_pos = 0;
+    return TRUE;
+}
+
+void flow_coin_update(void)
+{
+    attract_panel();
+    if (flow_try_start(0) || flow_try_start(1)) return;
+    if (pad_raw[0].pressed | pad_raw[1].pressed) demo_idle = 0;
+    if (secret_code()) {
+        sound_play(0x1D);               /* chime: the bonus-life jingle */
+        flow_goto(FS_SETUP);
+        return;
+    }
+    coin_text(timer < BLINK_ON);
+    if (++timer == BLINK_LEN) timer = 0;
+    if (++demo_idle >= COIN_IDLE) flow_goto(FS_WARNING);
 }
 
 /* ---- WARNING ($0B84) --------------------------------------------------------- */
@@ -162,8 +242,14 @@ static void demo_end(void)
     scene_invalidate();
 }
 
+void flow_demo_abort(void)
+{
+    if (in_demo) demo_end();
+}
+
 static void demo_inputs(void)
 {
+    input_clear_requests();             /* real pads' X/Y/Z must not steer the demo players */
     /* B2:$802C: (value, frames) pairs; inputs are active-high with the same
      * bit layout as the port's pads (R L D U, buttons 1-3) */
     for (u16 i = 0; i < 2; i++) {

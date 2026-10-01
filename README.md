@@ -39,3 +39,32 @@ Requirements: SGDK at `~/mars/m68k-elf` (override with `GDK=`), Java, Python 3, 
 | static 1024-colour palette (ROM `B3:$8A37`) | quantized per zone; the colour fit is checked visually |
 
 Checks so far: BG scroll alignment against an arcade snapshot is pixel-exact (offset 0,0). Replayed arcade sprite RAM lands at identical positions.
+
+## Playing
+
+The boot screen offers two modes:
+
+- **ARCADE**: the arcade's flow. The INSERT COIN screen blinks INSERT COIN and the credit count;
+  **Start inserts a coin** (C too), then Start starts; with credits, Start lets player 2 join or
+  continue. Up Up Down Down Left Right Left Right on that screen plays a chime and opens the
+  **DIP switches** (difficulty 1-8, lives 3/5, bonus life, continue, demo sounds, COLOR; BACK or B
+  returns to the boot screen).
+- **HOME**: the Home screen (SIDE ARMS + MD): START GAME (3 credits by default), OPTIONS, BACK.
+  OPTIONS: difficulty (EASY, the arcade's levels 1-8, HARD), lives 1-7, bonus life (the four arcade
+  tables or none), continue (off / limited by credits / unlimited), credits 1-9, COLOR,
+  CONTROLS, SOUND TEST.
+
+Controls (default): **A** fire left, **B** fire right, **C** next weapon, **Start** start / coin.
+CONTROLS remaps the three actions to A/B/C (or X/Y/Z on a 6-button pad), sets X/Y/Z (6-button) to
+previous / next / a given weapon or LOCK FIRE (fires the way the ship faces without turning; default
+X = previous, Y = next, Z = lock), and switches autofire on per fire button (one shot every 4 frames,
+the arcade AUTO weapon's rate). Menus: B goes back. A+B+C+Start returns to the boot screen.
+
+The ranking and all settings are kept in battery SRAM.
+
+## Colour
+
+The arcade palette (4 bits per channel) is converted to the Genesis's 3 bits per channel. Each background zone gets two fitted palettes; sprite patterns each choose the better of two shared sprite palettes. The DIP-switch / options screens have a **COLOR** setting:
+
+- **ARCADE**: the converted arcade colours.
+- **VIVID** (default): every palette passes through a build-time table that raises saturation (×1.4) and brightness (×1.15), keeping greys neutral. It compensates for the Genesis's coarser colour steps and the darker output of common emulators.

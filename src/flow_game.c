@@ -65,13 +65,40 @@ static void begin_naming(u16 i)
     f->name[0] = f->name[1] = f->name[2] = CH_BAR;
 }
 
-static bool can_pay(u16 i)
+/* Arcade: a coin from pad C (on the attract / credit screens) or from Start when there is no
+ * credit ("Start adds a coin"). TRUE when this pad inserted one. */
+static bool arcade_coin(u16 i, bool c_too)
+{
+    if (game_cfg.mode != MODE_ARCADE) return FALSE;
+    bool c = (c_too && (pad_raw[i].pressed & BUTTON_C)) || ((pad[i].pressed & IN_START) && !credits);
+    if (c) coin();
+    return c;
+}
+
+/* Start pressed and paid for. Arcade: a credit is taken ($16B8); with none, Start inserts a coin
+ * instead (the next Start starts). Home: a new game is free (it fills the credits, new_game);
+ * a 2P join or a LIMITED continue takes a credit, an UNLIMITED continue is free. */
+static bool can_pay(u16 i, bool cont)
 {
     if (!(pad[i].pressed & IN_START)) return FALSE;
-    if (game_cfg.mode == MODE_HOME) return TRUE;        /* free play */
-    if (!credits) coin();                               /* Start = coin + start */
+    if (game_cfg.mode == MODE_HOME) {
+        if (!game_active) return TRUE;
+        if (cont && game_cfg.cont == CONT_UNLIMITED) return TRUE;
+        if (!credits) return FALSE;
+        credits--;
+        return TRUE;
+    }
+    if (arcade_coin(i, FALSE)) return FALSE;
     credits--;
     return TRUE;
+}
+
+/* continue offered when the player runs out of lives */
+static bool continue_offered(void)
+{
+    if (!game_cfg.allow_continue) return FALSE;
+    if (game_cfg.mode == MODE_HOME) return game_cfg.cont == CONT_UNLIMITED || credits;
+    return TRUE;                        /* arcade: a coin can still be inserted */
 }
 
 static void new_game(void)
@@ -82,20 +109,32 @@ static void new_game(void)
     intro_busy = TRUE;
     score_enabled = TRUE;
     extend_setting = game_cfg.bonus;
+    if (game_cfg.mode == MODE_HOME) credits = home_cfg.credits - 1;     /* the starter's credit */
 }
 
 /* Attract screens: TRUE when they must stop (a game started or the credit screen opened). */
 bool flow_try_start(u16 i)
 {
-    if (game_cfg.mode == MODE_ARCADE && (pad[i].pressed & IN_WEAPON)) {
-        coin();
-        if (flow_state != FS_CREDIT) { flow_goto(FS_CREDIT); return TRUE; }
+    if (game_cfg.mode == MODE_ARCADE) {
+        bool c = arcade_coin(i, TRUE);
+        /* $08DF: with credits the credit task opens the credit screen ($12AE) */
+        if (credits && flow_state != FS_CREDIT) { flow_demo_abort(); flow_goto(FS_CREDIT); return TRUE; }
+        if (c) return FALSE;
     }
-    if (!can_pay(i)) return FALSE;
+    if (!can_pay(i, FALSE)) return FALSE;
+    flow_demo_abort();                  /* before the next screen sets up its video */
     new_game();
     begin_naming(i);
     flow_goto(FS_INTRO);
     return TRUE;
+}
+
+/* Home screen START GAME: free start, the credits are filled (new_game) */
+void flow_home_start(u16 i)
+{
+    new_game();
+    begin_naming(i);
+    flow_goto(FS_INTRO);
 }
 
 /* ---- credit screen ($12AE) ----------------------------------------------------- */
@@ -188,7 +227,7 @@ static void player_flow(u16 i)
     Player *p = &players[i];
     switch (f->st) {
     case PS_IDLE:
-        if (game_active && can_pay(i)) begin_naming(i);   /* join ($16B8) */
+        if (game_active && can_pay(i, FALSE)) begin_naming(i);   /* join ($16B8) */
         break;
     case PS_NAMING:
         naming(i);
@@ -205,7 +244,7 @@ static void player_flow(u16 i)
         if (p->score > f->best) f->best = p->score;
         if (!player_out_of_lives(p)) break;
         /* $1A81: out of lives */
-        if (game_cfg.allow_continue) {
+        if (continue_offered()) {
             f->st = PS_CONTINUE; f->count = 10; f->timer = 60;
             sound_play(0x0E);           /* $1AE2 */
         } else {
@@ -216,7 +255,7 @@ static void player_flow(u16 i)
         break;
     case PS_CONTINUE:
         /* $1ACA: 10 -> 0, one step per 60 f (Start + credit polled every 6 f) */
-        if (can_pay(i)) {
+        if (can_pay(i, TRUE)) {
             /* $1B09: score cleared, lives refilled, respawn */
             player_continue(p, game_cfg.lives);
             f->st = PS_PLAYING;
@@ -249,7 +288,7 @@ static void players_flow(void)
     /* $1BD9: nobody playing, continuing or naming -> attract from the WARNING */
     if (game_active && pf[0].st == PS_IDLE && pf[1].st == PS_IDLE) {
         game_active = stage_running = FALSE;
-        flow_goto(FS_WARNING);
+        flow_goto(game_cfg.mode == MODE_HOME ? FS_HOME : FS_WARNING);
     }
 }
 
@@ -259,7 +298,7 @@ static void game_panel(void)
     memset(&hp, 0, sizeof(hp));
     hp.on = TRUE;
     hp.hi = hi_score;
-    hp.twoup = game_active || credits >= 2 || pf[1].st != PS_IDLE;
+    hp.twoup = game_active || flow_state == FS_CREDIT || pf[1].st != PS_IDLE;    /* $12AE sets $E010 */
     if (&boss_hud && boss_hud.active) hp.boss_bars = boss_hud.bars;
     for (u16 i = 0; i < 2; i++) {
         PFlow *f = &pf[i];
@@ -382,7 +421,7 @@ void flow_play_update(void)
             if (pf[i].st == PS_PLAYING || pf[i].st == PS_CONTINUE) ranking_insert(pf[i].best, pf[i].name);
         game_active = stage_running = FALSE;
         memset(pf, 0, sizeof(pf));
-        flow_goto(FS_WARNING);
+        flow_goto(game_cfg.mode == MODE_HOME ? FS_HOME : FS_WARNING);
         return;
     }
     game_panel();

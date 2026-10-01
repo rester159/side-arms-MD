@@ -134,7 +134,10 @@ STRINGS = [('warning', WARNING), ('rank_head', 0x0DFC), ('rank_ord', 0x0E16),
            ('copyright', 0x0E41 if REGION == 'A' else 0x0E6C), ('push_start', 0x160B),
            ('one_player', 0x1621), ('one_or_two', 0x1633), ('bonus', 0x1646), ('credit', 0x165F),
            ('battle', 0x166D), ('oneup', 0x06C3), ('hi', 0x06CB), ('twoup', 0x06D2),
-           ('naming', 0x1A16), ('continue', 0x1D4E), ('gameover', 0x1D6C)]
+           ('naming', 0x1A16), ('continue', 0x1D4E), ('gameover', 0x1D6C),
+           # "INSERT COIN" (attr 2): present in the World set's text records next to the logo
+           # record, but never drawn by its code; the port's Arcade coin screen shows it
+           ('insert_coin', 0x0E94)]
 str_codes = []
 cdata.append('const FeString fe_strings[FE_STRING_COUNT] = {')
 hdr_enum = []
@@ -170,6 +173,69 @@ header.append(f'#define FE_LOGO_TILES {len(lts.tiles)}')
 header.append(f"#define FE_LOGO_ROW {logo['row'] - 2}")
 header.append(f"#define FE_LOGO_COL {logo['col'] - 12}")
 print('logo:', len(lts.tiles), 'tiles')
+
+# ------------------------------------------------------------------ "MD" under the logo (Home Screen)
+# Not an arcade item: the letters M and D are cut out of the arcade logo's own art (the M of
+# "ARMS", the D of "SIDE"): each letter = its white/cyan body (flood fill from seed pixels inside
+# it) plus the logo's red outline pixels within 3 px of that body, so the strokes, outline and
+# the white->cyan gradient are the logo's. Put side by side, centred under the logo.
+lpx = np.zeros((64, 256), np.uint8)
+for i, c in enumerate(logo['codes']):
+    if not fblank[c]:
+        r_, c_ = divmod(i, 32)
+        lpx[r_ * 8:r_ * 8 + 8, c_ * 8:c_ * 8 + 8] = tile_px(glyph(c, logo['attr'] & 63)[0])
+LOGO_PAL = glyph(logo['codes'][0], logo['attr'] & 63)[1]
+RED = int(lpx[15, 100])                 # the outline pen (row 15: the red line over SIDE ARMS)
+assert RED and lpx[20, 90] not in (0, RED)
+
+
+def logo_letter(seeds, grow=3):
+    body = np.zeros(lpx.shape, bool)
+    stack = list(seeds)
+    while stack:
+        y, x = stack.pop()
+        if not (0 <= y < 64 and 0 <= x < 256) or body[y, x] or lpx[y, x] in (0, RED):
+            continue
+        body[y, x] = True
+        stack += [(y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)]
+    near = body.copy()
+    for _ in range(grow):
+        n = near.copy()
+        n[1:] |= near[:-1]; n[:-1] |= near[1:]; n[:, 1:] |= near[:, :-1]; n[:, :-1] |= near[:, 1:]
+        near = n
+    keep = body | (near & (lpx == RED))
+    ys, xs = np.where(body)
+    y0, y1 = ys.min() - 2, ys.max() + 3          # the logo's outline is 2 px above / below
+    ys, xs = np.where(keep[y0:y1])
+    return np.where(keep, lpx, 0)[y0:y1, xs.min():xs.max() + 1], y0
+
+
+md_m, my0 = logo_letter([(20, 185), (20, 200), (40, 190)])     # M of "ARMS"
+md_d, dy0 = logo_letter([(20, 90), (20, 100)])                 # D of "SIDE"
+assert 20 < md_m.shape[1] < 40 and 20 < md_d.shape[1] < 40, (md_m.shape, md_d.shape)
+top = min(my0, dy0)
+h = max(my0 + md_m.shape[0], dy0 + md_d.shape[0]) - top
+MD_COLS, MD_ROWS = 8, (h + 2 + 7) // 8
+canvas = np.zeros((MD_ROWS * 8, MD_COLS * 8), np.uint8)
+w = md_m.shape[1] + md_d.shape[1]
+ox = (MD_COLS * 8 - w) // 2
+for img, y0, x in ((md_m, my0, ox), (md_d, dy0, ox + md_m.shape[1])):
+    sub = canvas[1 + y0 - top:1 + y0 - top + img.shape[0], x:x + img.shape[1]]
+    sub[img > 0] = img[img > 0]
+mts = TileSet(); mmap = []
+for ty in range(MD_ROWS):
+    for tx in range(MD_COLS):
+        b = canvas[ty * 8:ty * 8 + 8, tx * 8:tx * 8 + 8]
+        if not b.any():
+            mmap.append(0); continue
+        idx, hf, vf = mts.add(px_tile(b))
+        mmap.append((idx + 1) | (LOGO_PAL << 13) | (vf << 12) | (hf << 11))
+emit('fe_md_tiles', b''.join(mts.tiles), comment=f'{len(mts.tiles)} tiles ')
+emit('fe_md_map', be16(mmap), 'u16', f'{MD_COLS}x{MD_ROWS}, same format as fe_logo_map ')
+header.append(f'#define FE_MD_TILES {len(mts.tiles)}')
+header.append(f'#define FE_MD_COLS {MD_COLS}')
+header.append(f'#define FE_MD_ROWS {MD_ROWS}')
+print('MD:', len(mts.tiles), 'tiles', MD_COLS, 'x', MD_ROWS)
 
 # ------------------------------------------------------------------ weapon bar glyphs ($19BE, $1E7C)
 BAR_COLOURS = [0x20, 0x25, 0x23, 0x24]     # none, owned, selected A, selected B
@@ -329,6 +395,10 @@ header.append(f'#define FE_LIVES_B {lives[1]}')
 diff = [v - 256 if v > 127 else v for v in M[0x8000 + 0x49:0x8000 + 0x49 + 8]]    # B0:$8049
 carr('s8', 'fe_rank_offset', diff)
 header.append('extern const s8 fe_rank_offset[8];   /* B0:$8049: rank $E017 = base + this[difficulty] */')
+# B0:$80CA-$812F: each stage music ($21-$29, $36) also loads the enemy bullet speed level $E050
+# from table $813C + 8 * stage, indexed by the difficulty (~DSW0 & 7)
+carr('u8', 'fe_bullet_speed', list(M[0x813C:0x813C + 80]))
+header.append('extern const u8 fe_bullet_speed[80];   /* B0:$813C: [stage music k * 8 + difficulty], k = $21.. -> 0.., $36 -> 9 */')
 
 # ------------------------------------------------------------------ attract demo
 DEMO_IN = [(0x9600, 0x9800), (0x9800, 0x9A00), (0x9A00, 0x9D00), (0x9D00, 0xA000)]

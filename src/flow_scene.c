@@ -1,4 +1,5 @@
 #include "game.h"
+#include "palette.h"
 #include "bg.h"
 #include "sprites.h"
 #include "flow.h"
@@ -51,7 +52,7 @@ void scene_update(void)
         DMA_queueDma(DMA_VRAM, (void *)(s->tiles + (u32)load_pos * 32), (VRAM_BG_TILE + load_pos) * 32, n * 16, 2);
         load_pos += n;
         if (load_pos >= s->count) {
-            PAL_setColors(0, s->pal, 32, DMA_QUEUE);
+            pal_load(0, s->pal, 32);
             loaded = loading; loading = -1;
         }
         return;                         /* maps wait for their tiles */

@@ -8,7 +8,8 @@ sys.path.insert(0,str(ROOT/'tools'));import zones
 zi=int(sys.argv[1]) if len(sys.argv)>1 else 0
 x0,y0,w,h=zones.ZONES[zi]['rect']
 tiles=np.frombuffer((G/f'zone{zi}_tiles.bin').read_bytes(),np.uint8)
-attr=(G/f'zone{zi}_attr.bin').read_bytes()
+_t=(G/f'zone{zi}_attr.bin').read_bytes()
+attr=[((_t[2*i]<<8)|_t[2*i+1]) for i in range(len(_t)//2)]   # nametable templates (0 = empty)
 m=struct.unpack(f'>{w*h}H',(G/f'zone{zi}_map.bin').read_bytes())
 pw=struct.unpack('>32H',(G/f'zone{zi}_pal.bin').read_bytes())
 def rgb(wd):
@@ -26,7 +27,7 @@ for r in range(h):
         e=m[r*w+c];mt=e&0xfff;hf=e>>14&1;vf=e>>15&1
         for sy in range(4):
             for sx in range(4):
-                i=mt*16+sy*4+sx;px=tile(i);p=attr[i]&1
+                i=mt*16+sy*4+sx;px=tile(i);p=(attr[i]>>13)&1
                 if hf:px=px[:,::-1]
                 if vf:px=px[::-1,:]
                 dx=(3-sx) if hf else sx;dy=(3-sy) if vf else sy
