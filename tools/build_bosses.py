@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from arcade_source import Source, ROOT, decode_bgtiles, bgmap_cells, palette_rgb
 from quantize import to_md, nearest
 import zones as zonecfg
+import parallax_split
 
 GEN = ROOT / 'res/generated'; SRC = ROOT / 'src/gen'; INC = ROOT / 'inc/gen'
 src = Source()
@@ -221,7 +222,7 @@ for wi, tab in enumerate((0x70D2, 0x70E2, 0x70F2)):
     WHEELS.append(ent)
 WHEEL_SECTION = [2, 4, 9]
 h.append('/* BG wheel bosses: scroll copies (arcade $70D2/$70E2/$70F2); copy 3 = next section start */')
-h.append('typedef struct { u16 copy_x[4], copy_y[4]; const BgFrames *frames; } WheelInfo;')
+h.append('typedef struct { u16 copy_x[4], copy_y[4]; const BgFrames *frames, *frames_home; } WheelInfo;   /* frames_home: Home, sockets filled (docs/parallax.md) */')
 h.append('extern const WheelInfo wheel_info[3];')
 winfo = []
 for wi, ent in enumerate(WHEELS):
@@ -236,58 +237,73 @@ for wi, ent in enumerate(WHEELS):
     pals = [[((wd >> 1) & 7, (wd >> 5) & 7, (wd >> 9) & 7) for wd in pal_words[p * 16 + 1:p * 16 + 16]] for p in range(2)]
     cx0, cy0 = (ent[0][0] + 96) >> 5, (ent[0][1] + 16) >> 5
     W, H = 11, 8
-    extra = []; emap = {}
-    maps = []
-    for k in range(3):
-        bx, by = (ent[k][0] + 96) >> 5, (ent[k][1] + 16) >> 5
-        for j in range(H):
-            for i in range(W):
-                cx, cy = (bx + i) & 127, (by + j) & 127
-                key = (int(code_m[cy, cx]), int(color_m[cy, cx]))
-                fl = int(flags_m[cy, cx])
-                if key in mid:
-                    m = mid[key]
-                else:
+
+    def frames(tag, fills):
+        """the 3 frames as a BgFrames; fills (Home): {code: mask} of the filled wheel sockets
+        (tools/parallax_split.py); a changed metatile becomes an extra one"""
+        extra = []; emap = {}
+        maps = []
+        for k in range(3):
+            bx, by = (ent[k][0] + 96) >> 5, (ent[k][1] + 16) >> 5
+            for j in range(H):
+                for i in range(W):
+                    cx, cy = (bx + i) & 127, (by + j) & 127
+                    cd, cl = int(code_m[cy, cx]), int(color_m[cy, cx])
+                    fl = int(flags_m[cy, cx])
+                    t = bgt[cd]
+                    if cd in fills:
+                        t = t.copy()
+                        t[fills[cd]] = min(range(15), key=lambda pen: sum(MD[cl * 16 + pen]))
+                    elif (cd, cl) in mid:
+                        maps.append(mid[(cd, cl)] | ((fl & 1) << 14) | ((fl & 2) << 14))
+                        continue
+                    key = (cd, cl, t.tobytes())
                     if key not in emap:
-                        emap[key] = len(metas) + len(extra); extra.append(key)
-                    m = emap[key]
-                maps.append(m | ((fl & 1) << 14) | ((fl & 2) << 14))
-    tiles = bytearray(); tmpl = []
-    for (cd, cl) in extra:
-        t = bgt[cd]
-        for sy in range(4):
-            for sx in range(4):
-                sub = t[sy * 8:sy * 8 + 8, sx * 8:sx * 8 + 8]
-                errs = []
-                for p in range(2):
-                    e = 0
-                    for pen in np.unique(sub):
-                        if pen == 15: continue
-                        col = np.array(MD[cl * 16 + int(pen)], float); pc = np.array(pals[p], float)
-                        e += ((pc - col) ** 2).sum(1).min() * int((sub == pen).sum())
-                    errs.append(e)
-                p = int(np.argmin(errs))
-                lk = {pen: (0 if pen == 15 else 1 + nearest(MD[cl * 16 + pen], pals[p])) for pen in range(16)}
-                px = np.vectorize(lk.get)(sub)
-                for row in px:
-                    for x in range(0, 8, 2):
-                        tiles.append((int(row[x]) << 4) | int(row[x + 1]))
-                tmpl.append(0 if not px.any() else (0x8000 | (p << 13) | (sy * 4 + sx)))
-    n = len(extra)
-    c.append(f'static const u16 wheel{wi}_maps[{len(maps)}] = {{')
-    for j in range(0, len(maps), W):
-        c.append('    ' + ', '.join(f'0x{v:04X}' for v in maps[j:j + W]) + ',')
-    c.append('};')
-    if n:
-        c.append(f'static const u8 wheel{wi}_tiles[{len(tiles)}] __attribute__((aligned(512))) = {{')
-        for j in range(0, len(tiles), 32):
-            c.append('    ' + ','.join(f'0x{x:02X}' for x in tiles[j:j + 32]) + ',')
+                        emap[key] = len(metas) + len(extra); extra.append((cl, t))
+                    maps.append(emap[key] | ((fl & 1) << 14) | ((fl & 2) << 14))
+        tiles = bytearray(); tmpl = []
+        for (cl, t) in extra:
+            for sy in range(4):
+                for sx in range(4):
+                    sub = t[sy * 8:sy * 8 + 8, sx * 8:sx * 8 + 8]
+                    errs = []
+                    for p in range(2):
+                        e = 0
+                        for pen in np.unique(sub):
+                            if pen == 15: continue
+                            col = np.array(MD[cl * 16 + int(pen)], float); pc = np.array(pals[p], float)
+                            e += ((pc - col) ** 2).sum(1).min() * int((sub == pen).sum())
+                        errs.append(e)
+                    p = int(np.argmin(errs))
+                    lk = {pen: (0 if pen == 15 else 1 + nearest(MD[cl * 16 + pen], pals[p])) for pen in range(16)}
+                    px = np.vectorize(lk.get)(sub)
+                    for row in px:
+                        for x in range(0, 8, 2):
+                            tiles.append((int(row[x]) << 4) | int(row[x + 1]))
+                    tmpl.append(0 if not px.any() else (0x8000 | (p << 13) | (sy * 4 + sx)))
+        n = len(extra)
+        c.append(f'static const u16 wheel{tag}_maps[{len(maps)}] = {{')
+        for j in range(0, len(maps), W):
+            c.append('    ' + ', '.join(f'0x{v:04X}' for v in maps[j:j + W]) + ',')
         c.append('};')
-        c.append(f'static const u16 wheel{wi}_tmpl[{len(tmpl)}] = {{ ' + ', '.join(f'0x{v:04X}' for v in tmpl) + ' };')
-    c.append(f'static const BgFrames wheel{wi}_frames = {{ {zi}, {cx0}, {cy0}, {W}, {H}, 3, wheel{wi}_maps, {n}, '
-             f'{"wheel%d_tiles" % wi if n else "NULL"}, {"wheel%d_tmpl" % wi if n else "NULL"} }};')
-    winfo.append(f'    {{ {{{", ".join(str(e[0]) for e in ent)}}}, {{{", ".join(str(e[1]) for e in ent)}}}, &wheel{wi}_frames }},')
-    print(f'wheel {wi + 1}: zone {zi} ({ZONES[zi]["name"]}), {len(set(m & 0xFFF for m in maps))} metatiles, {n} extra')
+        if n:
+            c.append(f'static const u8 wheel{tag}_tiles[{len(tiles)}] __attribute__((aligned(512))) = {{')
+            for j in range(0, len(tiles), 32):
+                c.append('    ' + ','.join(f'0x{x:02X}' for x in tiles[j:j + 32]) + ',')
+            c.append('};')
+            c.append(f'static const u16 wheel{tag}_tmpl[{len(tmpl)}] = {{ ' + ', '.join(f'0x{v:04X}' for v in tmpl) + ' };')
+        c.append(f'static const BgFrames wheel{tag}_frames = {{ {zi}, {cx0}, {cy0}, {W}, {H}, 3, wheel{tag}_maps, {n}, '
+                 f'{"wheel%s_tiles" % tag if n else "NULL"}, {"wheel%s_tmpl" % tag if n else "NULL"} }};')
+        print(f'wheel {wi + 1}{" (Home)" if fills else ""}: zone {zi} ({ZONES[zi]["name"]}), '
+              f'{len(set(m & 0xFFF for m in maps))} metatiles, {n} extra')
+        return f'&wheel{tag}_frames'
+
+    plain = frames(str(wi), {})
+    fills = parallax_split.wheel_fill()
+    used = {int(code_m[((e[1] + 16) >> 5) + j & 127, ((e[0] + 96) >> 5) + i & 127])
+            for e in ent[:3] for i in range(W) for j in range(H)}
+    home = frames(f'{wi}h', fills) if used & set(fills) else 'NULL'
+    winfo.append(f'    {{ {{{", ".join(str(e[0]) for e in ent)}}}, {{{", ".join(str(e[1]) for e in ent)}}}, {plain}, {home} }},')
 c.append('const WheelInfo wheel_info[3] = {'); c += winfo; c.append('};')
 
 orbit = []

@@ -100,6 +100,7 @@ static void head_dead(u16 k)
         explode(&f.seg[k], 0);
         explode(&f.seg[k + 1], 1);                      /* $69A2 + 5: one blank step first */
         explode(&f.seg[k + 2], 2);                      /* $699D + 5: two blank steps */
+        boss_defeated();
         ending_start();                                 /* task $3B8A */
         return;
     }

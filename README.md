@@ -24,6 +24,7 @@ Requirements: SGDK at `~/mars/m68k-elf` (override with `GDK=`), Java, Python 3, 
 | `tools/build_levels.py` | native level timelines + terrain map from the extracted data |
 | `tools/agent_build.sh NAME` | private snapshot build (parallel work) |
 | `tools/qa_soak.py` | QA bot: every section 1P/2P, dropped frames, hangs, contact sheets (`docs/qa.md`) |
+| `tools/build_parallax.py`, `tools/parallax_split.py`, `tools/parallax_check.py` | Home parallax tables, map analysis, soak/screenshots (`docs/parallax.md`) |
 | `tools/check` | rebuild all game sources, fail on any compiler warning |
 | `docs/re/` | reverse-engineering notes (hardware, flow/player, levels, objects, sound) |
 
@@ -49,10 +50,24 @@ The boot screen offers two modes:
   continue. Up Up Down Down Left Right Left Right on that screen plays a chime and opens the
   **DIP switches** (difficulty 1-8, lives 3/5, bonus life, continue, demo sounds, COLOR; BACK or B
   returns to the boot screen).
-- **HOME**: the Home screen (SIDE ARMS + MD): START GAME (3 credits by default), OPTIONS, BACK.
+- **HOME**: the Home screen (SIDE ARMS + MD): START GAME (3 credits by default), BOSS RUSH, OPTIONS, BACK.
   OPTIONS: difficulty (EASY, the arcade's levels 1-8, HARD), lives 1-7, bonus life (the four arcade
-  tables or none), continue (off / limited by credits / unlimited), credits 1-9, COLOR,
+  tables or none), continue (off / limited by credits / unlimited), credits 1-9, COLOR, PARALLAX,
   CONTROLS, SOUND TEST.
+
+**PARALLAX** (Home, a port mode, ON by default): depth scrolling in every section — the starfield
+split into four depth layers (per row, or per column on the long vertical legs), section 5's cave
+wall as a slower far layer, and section 1's Mt Fuji and hills as slower bands. Gameplay is
+unchanged; Arcade mode keeps the arcade view. Details: [docs/parallax.md](docs/parallax.md).
+
+**BOSS RUSH** (Home, a port mode): the game's 12 bosses in the arcade order — the sprite bosses of
+sections 1, 3, 5, 7 (x2), 8 (x2), 9, the three wheels and the final boss — each in its own arena
+(the arcade's boss halt of that section, normal enemies off, the arcade's boss behaviour). No lives:
+an 8-segment energy bar under 1UP / 2UP; a hit costs one segment (2 s blinking invulnerability,
+weapons kept), a terrain crush too (the ship re-enters at its spawn point). +2 segments after each
+boss. Start loadout: BIT, S.G., M.B.L., 3WAY at level 1, AUTO, speed 2 (the boss POW drops still
+work). Player 2 joins with Start. The best run (bosses defeated, then fight time) is saved in SRAM
+and shown on the Home screen. Details: [docs/frontend.md](docs/frontend.md#boss-rush).
 
 Controls (default): **A** fire left, **B** fire right, **C** next weapon, **Start** start / coin.
 CONTROLS remaps the three actions to A/B/C (or X/Y/Z on a 6-button pad), sets X/Y/Z (6-button) to
@@ -60,7 +75,7 @@ previous / next / a given weapon or LOCK FIRE (fires the way the ship faces with
 X = previous, Y = next, Z = lock), and switches autofire on per fire button (one shot every 4 frames,
 the arcade AUTO weapon's rate). Menus: B goes back. A+B+C+Start returns to the boot screen.
 
-The ranking and all settings are kept in battery SRAM.
+The ranking, all settings and the Boss Rush record are kept in battery SRAM.
 
 ## Colour
 
@@ -68,3 +83,7 @@ The arcade palette (4 bits per channel) is converted to the Genesis's 3 bits per
 
 - **ARCADE**: the converted arcade colours.
 - **VIVID** (default): every palette passes through a build-time table that raises saturation (×1.4) and brightness (×1.15), keeping greys neutral. It compensates for the Genesis's coarser colour steps and the darker output of common emulators.
+
+## Boot intros (local only)
+
+The SEGA logo (with the "SEGA" chant) and the CAPCOM logo (with its FM jingle) play at boot when the intro kits are present in `src/intro/`. Those kits contain data from other games, so the folder is gitignored and never committed. Run `tools/fetch_intros.sh` to copy them from the sibling ports (`_capcom/son son/sonson_native`, `_capcom/_capcom logo intro`). Without them the game builds and boots straight to its menu.

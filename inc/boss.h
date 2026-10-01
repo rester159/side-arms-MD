@@ -11,6 +11,10 @@ void boss_start(u8 kind, u16 id);
 void bosses_reset(void);            /* drop any boss, its shots and the ending (new game / warp) */
 void bosses_update(void);           /* once per frame, after players_update() */
 void bosses_draw(void);             /* in game_draw(), after players and enemies (bosses sit below) */
+bool boss_present(void);            /* a boss object is in play (spawned by EV_BOSS, its death flash not over) */
+extern u16 boss_kills;              /* bosses defeated since power-on (counts up at the killing hit: the
+                                     * last bar of a sprite boss / wheel core, the last head of the final
+                                     * boss); the Boss Rush (flow_rush.c) watches it */
 
 /* ---- HUD -----------------------------------------------------------------
  * The arcade draws one 4-character group ($6C-$6F) per remaining HP bar on the text

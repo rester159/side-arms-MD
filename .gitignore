@@ -19,3 +19,6 @@ __pycache__/
 *.o
 *.lst
 src/rom_header.c.bak
+
+# Local-only boot intros (SEGA / CAPCOM kits from other games): tools/fetch_intros.sh
+src/intro/

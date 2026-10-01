@@ -111,6 +111,7 @@ void menu_select_enter(void)
     select_draw();
     hud_text(7, 23, 0, "PORTED BY RESTER 159, 2026");
     hud_string(FE_STR_COPYRIGHT, -1, -1);
+    hud_text(36, 27, 0, "V1.0");                    /* port version, bottom right */
 }
 
 void menu_select_update(void)
@@ -125,17 +126,42 @@ void menu_select_update(void)
     }
 }
 
-/* ---- Home screen: SIDE ARMS + MD, START GAME / OPTIONS / BACK ----------------------------- */
-#define HOME_ROW 17
-static const char *const HOME_ITEM[3] = { "START GAME", "OPTIONS", "BACK" };
+/* ---- Home screen: SIDE ARMS + MD, START GAME / BOSS RUSH / OPTIONS / BACK --------------- */
+#define HOME_ROW 16
+enum { HOME_START, HOME_RUSH, HOME_OPTIONS, HOME_BACK, HOME_ITEMS };
+static const char *const HOME_ITEM[HOME_ITEMS] = { "START GAME", "BOSS RUSH", "OPTIONS", "BACK" };
 static u8 home_cursor;
+
+/* the line under the menu: credits for START GAME, the Boss Rush record for BOSS RUSH */
+static void home_info(void)
+{
+    hud_blank(0, 24, HUD_COLS);
+    if (home_cursor != HOME_RUSH) {
+        hud_text(15, 24, 2, "CREDITS");
+        hud_number(23, 24, 2, home_cfg.credits, 1);
+        return;
+    }
+    char t[32], *p = t;
+    memcpy(p, "BEST ", 5); p += 5;
+    if (!rush_best.bosses) { memcpy(p, "-- NO RECORD --", 16); }
+    else {
+        if (rush_best.bosses >= 10) *p++ = '0' + rush_best.bosses / 10;
+        *p++ = '0' + rush_best.bosses % 10;
+        const char *w = rush_best.bosses == 1 ? " BOSS  " : " BOSSES  ";
+        while (*w) *p++ = *w++;
+        rush_time_text(p, rush_best.frames);
+    }
+    s16 n = strlen(t);
+    hud_text((HUD_COLS - n) / 2, 24, 2, t);
+}
 
 static void home_draw(void)
 {
-    for (u16 i = 0; i < 3; i++) {
+    for (u16 i = 0; i < HOME_ITEMS; i++) {
         hud_text(13, HOME_ROW + i * 2, 0, home_cursor == i ? ">" : " ");
         hud_text(15, HOME_ROW + i * 2, home_cursor == i ? 4 : 0, HOME_ITEM[i]);
     }
+    home_info();
 }
 
 void menu_home_enter(void)
@@ -144,24 +170,27 @@ void menu_home_enter(void)
     hud_logo(TRUE, HUD_LOGO_TILE);
     hud_md((HUD_COLS - FE_MD_COLS) / 2, FE_LOGO_ROW + 8, HUD_MD_TILE);     /* "MD" under the logo */
     home_draw();
-    hud_text(15, 23, 2, "CREDITS");
-    hud_number(23, 23, 2, home_cfg.credits, 1);
     hud_string(FE_STR_COPYRIGHT, -1, -1);
 }
 
 void menu_home_update(void)
 {
     u16 in = menu_keys();
-    if (in & BUTTON_UP) { home_cursor = home_cursor ? home_cursor - 1 : 2; home_draw(); }
-    if (in & BUTTON_DOWN) { home_cursor = home_cursor < 2 ? home_cursor + 1 : 0; home_draw(); }
+    if (in & BUTTON_UP) { home_cursor = home_cursor ? home_cursor - 1 : HOME_ITEMS - 1; home_draw(); }
+    if (in & BUTTON_DOWN) { home_cursor = home_cursor + 1 < HOME_ITEMS ? home_cursor + 1 : 0; home_draw(); }
     u16 p1 = pad_raw[0].pressed, p2 = pad_raw[1].pressed;
+    u16 who = (p1 & (BUTTON_START | BUTTON_A | BUTTON_C)) || !p2 ? 0 : 1;
     bool go = (in & (BUTTON_A | BUTTON_C)) != 0;
-    if ((in & BUTTON_START) || (go && home_cursor == 0)) {
-        flow_home_start((p1 & (BUTTON_START | BUTTON_A | BUTTON_C)) || !p2 ? 0 : 1);
+    if ((in & (BUTTON_START | BUTTON_A | BUTTON_C)) && home_cursor == HOME_RUSH) {
+        flow_rush_start(who);
         return;
     }
-    if (in & BUTTON_B || (go && home_cursor == 2)) { flow_goto(FS_SELECT); return; }
-    if (go && home_cursor == 1) flow_goto(FS_SETUP);
+    if ((in & BUTTON_START) || (go && home_cursor == HOME_START)) {
+        flow_home_start(who);
+        return;
+    }
+    if (in & BUTTON_B || (go && home_cursor == HOME_BACK)) { flow_goto(FS_SELECT); return; }
+    if (go && home_cursor == HOME_OPTIONS) flow_goto(FS_SETUP);
 }
 
 /* ---- Arcade: DIP switches ---------------------------------------------------------------- */
@@ -190,11 +219,12 @@ static const MItem OPT_ITEMS[] = {
     { "CONTINUE", &home_cfg.cont, 3, CONT_HOME },
     { "CREDITS", &o_credits, 9, NUM + 1 },
     { "COLOR", &game_cfg.color, 2, COLOR_NAMES },
+    { "PARALLAX", &home_cfg.parallax, 2, ONOFF },       /* docs/parallax.md */
     { "CONTROLS", NULL, 0, NULL },
     { "SOUND TEST", NULL, 0, NULL },
     { "BACK", NULL, 0, NULL },
 };
-enum { OPT_CONTROLS = 6, OPT_SOUND, OPT_BACK };
+enum { OPT_CONTROLS = 7, OPT_SOUND, OPT_BACK };
 
 static void home_from_cfg(void)
 {

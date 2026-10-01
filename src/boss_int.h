@@ -46,6 +46,7 @@ void boss_score(Player *p, u8 score_idx);       /* $2272 with score index +$15 *
 u8 boss_rng(u8 *seed, u8 add);
 void boss_hud_set(bool on, u8 bars, u8 hits);
 void boss_pows(s16 cy, s16 cx2, u8 sub, u8 dy, u8 dx);  /* 4 POW capsules ($4DCF) around (cy, cx2*2) */
+void boss_defeated(void);                       /* the killing hit: boss_kills++ */
 void boss_wipe(void);                           /* $6B71: enemies, bullets, boss shots gone */
 /* death explosion task $3916/$3A06: blasts around (cy, cx2) then a 480-frame pause, then
  * level_resume() (sprite bosses) - the wheel calls it after moving to the next section. */

@@ -29,6 +29,7 @@ typedef struct {            /* Home: options, saved in SRAM */
     u8 bonus;               /* 0-3, BONUS_NONE */
     u8 cont;                /* CONT_* */
     u8 credits;             /* 1-9 credits per game (start, 2P join, LIMITED continues), default 3 */
+    u8 parallax;            /* PARALLAX: 1 ON (default) / 0 OFF; not an arcade feature (docs/parallax.md) */
 } HomeSettings;
 extern DipSettings dip_cfg;
 extern HomeSettings home_cfg;
@@ -52,6 +53,7 @@ typedef enum {
     FS_COIN,                /* Arcade: INSERT COIN screen (entry of the Arcade mode) */
     FS_HOME,                /* Home: logo + MD, START GAME / OPTIONS / BACK */
     FS_CONTROLS, FS_SOUND,  /* Home options submenus */
+    FS_RUSH, FS_RUSH_END,   /* Home: BOSS RUSH and its result screen (flow_rush.c) */
 } FlowState;
 extern FlowState flow_state;
 
@@ -108,6 +110,16 @@ void menu_controls_enter(void);
 void menu_controls_update(void);
 void menu_sound_enter(void);
 void menu_sound_update(void);
+/* Boss Rush (flow_rush.c; docs/frontend.md) */
+typedef struct { u8 bosses; u32 frames; } RushRecord;   /* best run: bosses defeated, fight time */
+extern RushRecord rush_best;                            /* saved in SRAM with the settings */
+void flow_rush_start(u16 starter);    /* Home BOSS RUSH: the first boss card, `starter` pad plays */
+void flow_rush_update(void);
+void flow_rush_draw(void);
+void flow_rush_abort(void);           /* leave the rush rules (soft reset) */
+void flow_rush_end_enter(void);       /* BOSS RUSH CLEAR / OVER screen */
+void flow_rush_end_update(void);
+void rush_time_text(char *buf, u32 frames);   /* "M:SS.CC" (60 frames = 1 s), >= 9 bytes */
 /* SRAM (flow.c) */
 void sram_load(void);
 

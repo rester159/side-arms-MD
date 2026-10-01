@@ -390,6 +390,7 @@ void flow_intro_update(void)
 static void stage_start(void)
 {
     hud_screen_reset();
+    level_spawns_off = FALSE;           /* (a Boss Rush skips them) */
     level_start(0);                     /* $158E: script $815C */
     stage_video_on();
     stage_sprites_on();

@@ -10,7 +10,7 @@ This is a from-scratch Sega Genesis game, written for the Genesis hardware. It d
 | resource | use |
 |---|---|
 | plane B | background: 64×32 ring of 32×32 world cells, 56-slot metatile VRAM cache (`bg.c`) |
-| plane A | starfield, low priority (`video.c`) |
+| plane A | starfield, low priority (`video.c`); Home parallax: star depth layers or a far texture (`parallax.c`, docs/parallax.md) |
 | window | HUD text, high priority; split by H-interrupt into top rows (scores) and bottom rows (weapons/speed) (`hud.c`) |
 | sprites | all game objects, high priority; patterns pre-converted at build time and streamed by DMA (`sprites.c`) |
 | PAL0/1 | background zone palettes (+ star colours), swapped per palette zone |

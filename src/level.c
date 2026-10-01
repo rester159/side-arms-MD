@@ -20,6 +20,7 @@
 
 Level level;
 u8 level_bullet_speed = 3;              /* $E050 speed level (3-6), loaded with the stage music */
+bool level_spawns_off;                  /* Boss Rush (port): the script's enemy spawn records are skipped */
 volatile u16 dbg_warp;                  /* test hook: (section + 1) | (boss ordinal << 8), see level_warp() */
 static s8 latch_x, latch_y;             /* $E08A/$E08B */
 void enemy_spawn_event(u16 section, u16 index) __attribute__((weak));
@@ -87,7 +88,7 @@ static bool fire(const LevelEvent *e)
     case EV_RANK:     level.rank = e->a; break;   /* $8000: + table $8049[difficulty] = +0 by default */
     case EV_BOSS:     boss_start(e->a, e->b); break;
     case EV_HALT:     level_halt(); break;
-    case EV_SPAWN:    if (enemy_spawn_event) enemy_spawn_event(level.section, e->b); break;
+    case EV_SPAWN:    if (enemy_spawn_event && !level_spawns_off) enemy_spawn_event(level.section, e->b); break;
     case EV_NEXT:
         if (level.section + 1 < LEVEL_SECTIONS) { level_start(level.section + 1); return FALSE; }
         level_halt();                   /* past the last record: stay put */

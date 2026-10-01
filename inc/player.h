@@ -48,6 +48,10 @@ typedef struct {
     u8 extend_idx;                  /* +$1A: next entry of the bonus-life table */
     u8 ring_toggle;                 /* +$35: combined-robot ring pattern A/B */
     u8 name[3];                     /* +$3C: free for the front end (NAMING) */
+    /* --- Boss Rush (port, not arcade; docs/frontend.md) --- */
+    u8 energy;                      /* 0: the arcade's lives rule. 1-8: energy bar - a hit that would kill
+                                       costs one segment instead (the last one kills) */
+    bool hit_blink;                 /* the invulnerability after an absorbed hit blinks the body */
 } Player;
 
 extern Player players[2];
@@ -59,6 +63,10 @@ bool player_out_of_lives(const Player *p);      /* lives exhausted, death animat
 void players_update(void);
 void players_draw(void);
 void player_kill(Player *p);                    /* arcade $222C (ignored while invulnerable) */
+/* Boss Rush: frames of invulnerability after a hit absorbed by the energy bar (2 s) */
+#define PLAYER_HIT_INVULN 120
+/* Boss Rush: weapon levels [WPN_*] (0 = not owned; AUTO: 0/$10/$11) and speed 1-3, orbit rebuilt */
+void player_loadout(Player *p, const u8 level[6], u8 speed);
 void player_add_score(Player *p, u32 points);   /* score + extends (arcade $2272/$22AE) */
 Player *player_credit(Player *shooter);         /* who scores a shooter's kill ($2516: the owner, or
                                                    the other player when the owner has no lives) */

@@ -133,6 +133,9 @@ void boss_pows(s16 cy, s16 cx2, u8 sub, u8 dy, u8 dx)
     item_spawn_pow(to_gx(256 + (u8)(x0 - dx)), to_gy(cy));
 }
 
+u16 boss_kills;
+void boss_defeated(void) { boss_kills++; }
+
 void boss_wipe(void)
 {
     pj_clear();
@@ -509,6 +512,8 @@ void boss_start(u8 k, u16 id)
         break;
     }
 }
+
+bool boss_present(void) { return kind != 0; }
 
 void bosses_update(void)
 {

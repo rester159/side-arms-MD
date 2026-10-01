@@ -107,6 +107,13 @@ f1045, selection f1045 — reproduced to the frame). `player_kill` is ignored wh
 Out of lives → `in_play = FALSE`; `player_out_of_lives()` is TRUE; continue/game over belong to the front
 end (`player_continue`, `player_start`).
 
+### Boss Rush energy (port, `energy_hit`)
+`Player.energy` 0 = the arcade's rule. With an energy bar (Boss Rush, docs/frontend.md) `player_kill_now`
+first spends a segment while more than one is left: sound `$1B`, FX_SMALL burst, `invuln` =
+`PLAYER_HIT_INVULN` (120) with `hit_blink` (body hidden while `invuln & 4`), weapons and speed kept; a
+terrain crush also re-enters the ship from its spawn point (`player_spawn`). The last segment kills
+normally. `player_loadout()` sets weapon levels + speed and rebuilds the orbit.
+
 ### Combined "Side Arms" robot (`combined.c`)
 Verified by code reading; the arcade run of this feature was only seen in the attract demo, so the parts
 marked UNVERIFIED are best-effort.

@@ -13,7 +13,8 @@ Data: `tools/build_bosses.py` -> `src/gen/boss_data.c`, `inc/gen/boss_data.h`;
 | function | use |
 |---|---|
 | `boss_start(kind, id)` | level.c `EV_BOSS` (kind 0 sprite, 1 wheel, 2 final; id = arcade spawn routine) |
-| `bosses_update()` / `bosses_draw()` / `bosses_reset()` | called by the front end (flow_game.c / flow_attract.c) |
+| `bosses_update()` / `bosses_draw()` / `bosses_reset()` | called by the front end (flow_game.c / flow_attract.c / flow_rush.c) |
+| `boss_present()`, `boss_kills` | a boss object is in play; count of bosses defeated, incremented at the killing hit (sprite boss last bar `$6B4E`, wheel core last bar `$74E0`, final boss last head `$602E`) — the Boss Rush (docs/frontend.md) times and sequences the fights with it |
 | `BossHud boss_hud` | `active`, `bars` (remaining HP bars), `hits` (hits left in the bar, 20 per bar), `serial` (changes when the bars change). The arcade draws one `$6C-$6F` group per bar at text `$D137` ($0897) |
 | `boss_ending_active()`, `boss_game_cleared()` | the ending task; the front end returns to the title when cleared ($0B84: the game does not loop) |
 | `level_halt()`, `level_warp(section, boss)`, `level_bullet_speed` | level extras (declared in boss.h): `$8057` halt, debug/test warp, `$E050` bullet speed level loaded with the stage music |
@@ -125,6 +126,11 @@ HUD column c - 12, row r -> r - 2).
   the enemy tables stay aligned) and `level.c` starts the next section.
 * `EV_MUSIC` carries the enemy-bullet speed level the arcade loads into `$E050` with the stage
   music (B0:$80CA, table $813C + 8*stage, default difficulty) -> `level_bullet_speed`.
+* `level_spawns_off` (port): `EV_SPAWN` records are skipped (Boss Rush: bosses only). Reset by every
+  normal stage start.
+* Boss Rush arenas (`src/flow_rush.c`): `level_warp(section, n)`, then the camera one pixel before
+  the boss record so the next scroll step fires it; from there the timeline, halts, wheel pre-render
+  and death sequences run unchanged. The 12 arenas were each played to the kill (docs/frontend.md).
 * `dbg_warp` (RAM, test hook) = (section + 1) | (boss ordinal << 8) -> `level_warp()`.
 
 ## Verification

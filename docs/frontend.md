@@ -14,6 +14,7 @@ state machine per player.
 | `src/flow_menu.c` | port menus: boot screen, Home screen, DIP switches, OPTIONS, CONTROLS, SOUND TEST |
 | `src/flow_attract.c` | Arcade INSERT COIN screen, WARNING, title + RANKING TABLE, attract demo |
 | `src/flow_game.c` | coins/credits, credit screen, start + NAMING, Earth intro, stage start, continue, game over, 2P join |
+| `src/flow_rush.c` | BOSS RUSH (port mode): boss list, arenas, cards, energy, timer, result screen, record |
 | `src/flow_scene.c` | pre-rendered background scenes (title city, Earth intro) on plane B |
 | `src/hud.c`, `inc/hud.h` | window-plane text, H-int window split, glyph pools, in-game panel |
 | `src/input.c` | pad reading, control mapping (remapping, 6-button extras, autofire) |
@@ -100,7 +101,7 @@ the zone under the camera with `bg_set_zone()`, which flushes bg.c's cache.
 | row (y) | content | arcade |
 |---|---|---|
 | 0 (0) | `1UP` col 0, P1 score cols 4-11, `HI` col 14, hi score cols 17-24, `2UP` col 28, P2 score cols 32-39 | row 2 (`$D08A..$D0AE`), score format `$0627` (7 digits, leading zeros blank, fixed final 0, zero = blank) |
-| 1 (8) | lives icons (char `$40`, lives − 1, max 5) under 1UP / 2UP | row 3, `$067B` |
+| 1 (8) | lives icons (char `$40`, lives − 1, max 5) under 1UP / 2UP; Boss Rush: energy bar (cols 0-7 / 28-35) and fight time M:SS (cols 17-23) | row 3, `$067B` |
 | 2 (16) | boss hit bars: one `$6C-$6F` group per remaining bar, right-aligned | row 4, `$089F` |
 | 25 (200) | per player (P1 cols 0-19, P2 20-39): `NAMING` + 3 letters 2 cells apart / `CONTINUE` + 2 digits / ` GAME OVER` (colour 4) | row 27 |
 | 26 (208) | weapon bar, 20 cells per player | row 28, `$19BE`, colours `$1E7C` |
@@ -120,6 +121,7 @@ boot screen (ARCADE / HOME, "PORTED BY RESTER 159, 2026")
            coin (Start with no credit, or C) on any of these -> CREDIT -> Start -> INTRO -> PLAY
            PLAY: all players out -> WARNING                         ($1BD9 -> $0B84)
  HOME   -> Home screen (logo + MD): START GAME -> INTRO -> PLAY; all players out -> Home screen
+                                    BOSS RUSH -> RUSH (12 boss arenas) -> RUSH_END (CLEAR / OVER) -> Home
                                     OPTIONS -> CONTROLS, SOUND TEST;  BACK / B -> boot
 A+B+C+Start on pad 1: back to the boot screen.
 ```
@@ -186,6 +188,7 @@ step a value, B goes back. Every exit saves to SRAM.
 | credits | coins (Start / C) | CREDITS 1-9 per game (default 3) |
 | demo sounds | ON / OFF (DSW1 bit 7, `$02FA`) | ON |
 | COLOR | ARCADE / VIVID | same (shared) |
+| parallax | — (the arcade view) | PARALLAX ON (default) / OFF ([parallax.md](parallax.md)) |
 | controls, sound test | — (the Home settings apply in both modes) | CONTROLS, SOUND TEST submenus |
 
 Difficulty effects (both from the arcade): enemy bullet cap `$E017` = rank + B0:`$8049[d]`
@@ -227,16 +230,97 @@ game reads (`pad[]`), so the game code is unchanged:
 ### Ranking / SRAM
 
 5 entries {score, 3 arcade char codes}, saved at every insertion; settings saved when a menu is
-left. Cartridge SRAM (header "RA", `$200001`, odd bytes), byte offsets:
+left; the Boss Rush record when a run beats it. Cartridge SRAM (header "RA", `$200001`, odd bytes),
+byte offsets:
 
 | offset | content |
 |---|---|
 | 0-3 | magic `SAR2` (v1 saves: `SAR1`) |
 | 4-38, 39 | ranking 5 × 7 bytes, checksum — the v1 layout, so a v1 save keeps its ranking |
-| 40-60, 61 | settings: version 1, DIP ×5, Home ×5, COLOR, last mode, controls ×8; checksum |
+| 40 | settings version: 3 (2 = before PARALLAX, 1 = before the Boss Rush) |
+| 41-60 | DIP ×5, Home ×5, COLOR, last mode, controls ×8 (versions 1-3) |
+| 61-65 | versions 2-3: Boss Rush record — bosses defeated (0-12), fight time in frames (u32, big endian) |
+| 66 | version 3: Home PARALLAX (0 / 1) |
+| 67 (v2: 66, v1: 61) | settings checksum over bytes 40-66 (v2: 40-65, v1: 40-60) |
 
-Loading: a bad checksum, an unknown settings version or an out-of-range value resets that block
-to the defaults (the ranking to `$0B34`). `hi_score` (player module) starts at the top entry.
+Loading: a bad checksum, an unknown settings version or an out-of-range value resets that block to
+the defaults (the ranking to `$0B34`). A version-1 block keeps its settings and starts with no Boss
+Rush record, a version-2 block keeps its settings and record with PARALLAX ON; the next save
+writes version 3. `hi_score` (player module) starts at the top entry.
+
+## Boss Rush
+
+A port mode (Home screen, BOSS RUSH; not in the arcade, Arcade mode is unchanged): every boss of the
+game one after the other, with an energy bar instead of lives. `src/flow_rush.c`, states `FS_RUSH`
+and `FS_RUSH_END`.
+
+**Boss list.** Built at the start from the level timeline (the `EV_BOSS` records of
+`tools/build_levels.py`, section order), so it is the arcade's own sequence — 12 bosses:
+
+| # | section | boss | | # | section | boss |
+|---|---|---|---|---|---|---|
+| 1 | 1 | sprite `$69D0` | | 7 | 7 (2nd) | sprite `$6DB4` |
+| 2 | 2 | wheel `$7192` | | 8 | 8 | sprite `$6DB4` |
+| 3 | 3 | sprite `$6C12` | | 9 | 8 (2nd) | sprite `$6DB4` |
+| 4 | 4 | wheel `$719C` | | 10 | 9 | sprite `$6DB4` |
+| 5 | 5 | sprite `$6C12` | | 11 | 9 (2nd) | wheel `$71A6` |
+| 6 | 7 | sprite `$6DB4` | | 12 | 10 | final `$5FC3` |
+
+(Section 6 has no boss.) No boss names are shown: the arcade gives none.
+
+**Arenas.** `level_warp(section, n)` replays the section's direction, rank and music records up to
+the boss (bullet cap and speed are the arcade's for that section and the chosen difficulty), then
+the camera is put one pixel before the boss record on its leg. When the card ends the timeline runs
+as in the game: the record spawns the boss, the camera reaches the arcade's halt (`EV_HALT`; sprite
+bosses 1-14 px later, the wheels after their 262-px ride-in, during which `bg_frames_begin()`
+pre-renders the wheel frames exactly as in a normal game; the boss VRAM blocks are borrowed from the
+BG cache as usual). Boss code, HP, weapons and death sequences are untouched. `level_spawns_off`
+makes `EV_SPAWN` records do nothing, so no normal enemy appears; the bosses' POW drops stay (items
+module) and can be collected in the breather. The section's music plays during the card (until the
+boss's own); the final section has only its stage music, as in the arcade.
+
+**Sequence.** Card (120 frames, camera held, rows 3-5: "BOSS n / 12", "SECTION s" or "FINAL BOSS",
+"READY" before the first): the ships enter with the normal spawn glide (`player_spawn`, 80 frames
+invulnerable) → fight → at the killing hit (`boss_kills` changes, boss.h) the timer stops, every
+player with energy gets +2, card "BOSS DEFEATED / TIME m:ss.cc / ENERGY +2" for 180 frames
+(explosions, POW) → next card (`enemies_clear()`, warp). After the final boss: 110 frames (before
+the ending task would print its text at 120), then BOSS RUSH CLEAR. When every joined player is out:
+GAME OVER card 90 frames, then BOSS RUSH OVER. The result screen (logo, bosses defeated, time, best,
+NEW RECORD blinking 24/12, scores) plays music `$2C` (clear) / `$2E` (over); A / C / Start after 60
+frames returns to the Home screen.
+
+Cards use rows 3-5 with rows 0-5 forced on (`hud_rows`), so the window stays one top + one bottom
+block and the HUD keeps its 2-interrupt split.
+
+**Energy** (`Player.energy`, player.c `energy_hit`). The ships start with 1 life and
+`RUSH_ENERGY` = 8 segments. A hit that would kill (enemy/boss contact, bullets, beams, missiles:
+everything that calls `player_kill`) costs one segment instead while more than one is left: sound
+`$1B`, a small burst, `PLAYER_HIT_INVULN` = 120 frames of invulnerability with the body blinking
+4 on / 4 off; weapons, speed and position are kept. A terrain crush (`$8451`) also costs a segment
+and the ship re-enters from its spawn point (entry glide, no terrain test meanwhile). The last
+segment is a normal death (death animation, then out). Bonus lives are off during the rush. HUD
+row 1: 8 cells of the speed meter's glyphs (`$78/$79/$7B`), green, spent cells dark green, the last
+two flash red / yellow.
+
+**Tuning** (constants at the top of `src/flow_rush.c`): `RUSH_ENERGY` 8, `RUSH_REFILL` 2,
+`RUSH_SPEED` 2, `RUSH_LOADOUT` = BIT 1, S.G. 1, M.B.L. 1, 3WAY 1, AUTO `$10` (weapon select starts
+on BIT; C / X / Y / Z switch as usual), `CARD_FRAMES` 120, `BREATHER_FRAMES` 180, `FINAL_FRAMES`
+110, `OUT_FRAMES` 90; `PLAYER_HIT_INVULN` 120 (`inc/player.h`).
+
+**2 players.** The other pad joins with Start at any time before the end (full energy, same
+loadout), once; each player has an own energy bar; the run ends when both are out.
+
+**Time and record.** Time = frames of fighting (end of the card to the killing hit; cards and
+breathers excluded), 60 frames = 1 s. HUD: whole seconds (redrawn only when they change — a
+per-frame redraw cost a lag frame at the busiest boss moments); cards and result screen: 1/100 s.
+Record (`rush_best`, SRAM): more bosses defeated wins, equal count with less time wins. The Home
+screen shows it under the menu while BOSS RUSH is selected ("BEST n BOSSES m:ss.cc").
+
+Scores count as usual but do not enter the arcade ranking; `hi_score` is restored after the run. The
+HUD's game glyph pool is emptied at the start and the end of a run (`hud_game_pool_reset`), so the
+rush text never crowds out the normal game's text (the pool is otherwise kept until power-off; a run
+uses at most ~80 of its 99 tiles). A soft reset (A+B+C+Start) restores the normal rules
+(`flow_rush_abort`).
 
 ## Verification
 
@@ -275,6 +359,27 @@ Front end 2 (boot / COIN / Home screens, menus, controls, SRAM v2), driven throu
   (`frame_counter` checked every frame).
 - `tools/qa_soak.py`: the 2P join presses Start twice (coin, then start).
 
+Boss Rush (`.local/build-bossrush*`, `reports/bossrush/`; headless runner, pad through the libretro
+port or `dbg_pad_override`, kills sped up with `boss_dbg_autohit`):
+
+- Home: BOSS RUSH entry, record line ("-- NO RECORD --" / "BEST 1 BOSS 0:18.48" after a power cycle
+  with the save RAM copied into a fresh core).
+- Full run, 1P, autohit: all 12 bosses in order (sections 1 2 3 4 5 7 7 8 8 9 9 10), each card,
+  fight and breather captured (`bossNN_*.png`), BOSS RUSH CLEAR with 12 / 12, time 1:54.81, NEW
+  RECORD; SRAM block version 2 with `0c 00001ae9`.
+- Hits: `dbg_player_cmd` kill → energy 8 → 7, invulnerable 120, body blinks (`04/05_hit_blink`);
+  energy 2 → bar flashes (`08b/08c`); terrain crush forced during wheel 2's ride-in (ship put at
+  (40, 176) in the floor) → energy 8 → 7, ship back at the spawn point gliding in.
+- 2P: pad 2 Start joins with 8 segments (`06_2p_join`); both drained → GAME OVER card →
+  BOSS RUSH OVER 1 / 12.
+- SRAM: a version-1 settings block (HARD difficulty) loads with its settings and the ranking kept,
+  record empty.
+- Lag frames (runner frame vs `frame_counter`) over a whole run: only at the warp of each card
+  (1-2), the frame a boss appears, the killing frame, the wheel halt (2) and the wheel death camera
+  jump (2) — the boss module's known ones; none from the rush HUD (with a per-frame time redraw
+  there was one more at ~220 frames into the `$6DB4` fights).
+- A normal Home game after a run: enemy spawns back on (150 spawned in the first 2600 frames).
+
 ## Deviations / limits
 
 - 40 columns: the HUD is a native layout (above); boss bars are right-aligned to column 39 (the
@@ -286,7 +391,7 @@ Front end 2 (boot / COIN / Home screens, menus, controls, SRAM v2), driven throu
   table: they appear only if the enemies module provides `enemy_spawn_record(cmd, target)`.
 - The intro's slot-3 task `$34FA` is not reproduced (not analysed in the RE notes).
 - No name entry after GAME OVER: the arcade's ranking takes the NAMING name (`$1B73`).
-- Port additions, not in the arcade: the boot / Home / menu screens, "MD", the COIN screen (built from
+- Port additions, not in the arcade: the boot / Home / menu screens, the Boss Rush, "MD", the COIN screen (built from
   arcade parts, see Flow), the EASY/HARD presets, NONE bonus, Home credits/continue modes, remapping,
   autofire, X/Y/Z functions, sound test, settings in SRAM. Arcade mode: Start inserts a coin only
   when there is no credit, so a start from zero credits takes two presses (coin, start).

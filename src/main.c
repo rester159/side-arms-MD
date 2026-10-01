@@ -8,6 +8,10 @@ volatile u16 prof_line;        /* debug: scanline when the frame's work ended */
  * [2] after game_draw, [3] after video_frame. A value >= 262 means the frame overran. */
 volatile u16 prof_seg[4];
 void sound_init(void) __attribute__((weak));
+/* SEGA / CAPCOM boot intros: local-only kits in src/intro/ (gitignored, tools/fetch_intros.sh).
+ * Absent in a clean clone, so the hook is weak. They expect to run right after SGDK's VDP init
+ * and before the game's own video and sound setup. */
+void boot_intros(void) __attribute__((weak));
 
 /* lines since the VBlank interrupt that started frame vt0 (8-bit V counter, NTSC: 0-234 then
  * 229-255 for the last lines; read as line numbers, close enough for profiling) */
@@ -22,6 +26,7 @@ int main(bool hardReset)
 {
     (void)hardReset;
     JOY_init();
+    if (boot_intros) boot_intros();
     video_init();
     if (sound_init) sound_init();
     game_init();

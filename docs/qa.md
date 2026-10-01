@@ -165,6 +165,8 @@ warnings are silenced in that file; the generated `boss_data.c` overflow is fixe
 ## Remaining issues
 
 - 2P / combined-robot heavy waves drop 1-3 % (sections 2, 4, 7-9), 1P section 9's boss fight ~1 %.
+- Home PARALLAX ON (docs/parallax.md): 1P unchanged (0.16 % vs 0.28 % OFF); 2P 1.44 % vs 1.22 % OFF,
+  mostly section 9.
 - Camera jumps (warps, section starts, teleports, wheel deaths) cost 2 frames (3 for a warp to a
   section start).
 - `hud_panel`'s per-frame diff still costs a few lines; the sampling profile suggests more than the

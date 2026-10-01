@@ -149,6 +149,7 @@ static void bar_lost(void)
         /* $6B4E: last bar - clear the screen, explosions, 4 POW, flash 40 times */
         s16 cy = (u8)(b.y + 16), cx2 = (u8)((b.x >> 1) + 0x18);
         b.weapons = FALSE;
+        boss_defeated();
         boss_wipe();
         boss_blast_task(blasts_sprite, sizeof(blasts_sprite), cy, cx2);
         boss_pows(cy, cx2, 0x10, 0x18, 0x28);

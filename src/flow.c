@@ -55,6 +55,7 @@ void flow_apply_config(void)
         game_cfg.demo_sounds = TRUE;
     }
     extend_setting = game_cfg.bonus;    /* player.c bonus-life table (DSW0 bits 4-5) */
+    video_set_parallax(game_cfg.mode == MODE_HOME && home_cfg.parallax);   /* Home only (docs/parallax.md) */
     pal_set_mode(game_cfg.color);
     credits = 0;
 }
@@ -71,9 +72,12 @@ static void settings_defaults(void)
     home_cfg.bonus = 0;
     home_cfg.cont = CONT_LIMITED;
     home_cfg.credits = 3;
+    home_cfg.parallax = 1;
     game_cfg.mode = MODE_ARCADE;
     game_cfg.color = COLOR_VIVID;
     input_defaults(&pad_cfg);
+    rush_best.bosses = 0;                   /* no Boss Rush record yet */
+    rush_best.frames = 0;
 }
 
 /* ---- SRAM ---------------------------------------------------------------------------------- *
@@ -81,17 +85,26 @@ static void settings_defaults(void)
  *   0-3   magic: "SAR1" (v1, ranking only) or "SAR2" (v2)
  *   4-38  ranking: 5 x {score u32, 3 arcade char codes}            (same in v1 and v2)
  *   39    ranking checksum                                          (same in v1 and v2)
- *   40-60 v2 settings: version (SET_VERSION), DIP x5, Home x5, COLOR, last mode, controls x8
- *   61    settings checksum
- * A v1 save keeps its ranking (settings take their defaults and are written as v2 on the next
- * save); a bad checksum, an unknown settings version or an out-of-range value resets that block. */
+ *   40    settings version: 1, 2 or 3 (SET_VERSION)
+ *   41-60 settings: DIP x5, Home x5, COLOR, last mode, controls x8 (versions 1-3)
+ *   61-65 versions 2-3: Boss Rush record: bosses defeated, fight time in frames (u32, big endian)
+ *   66    version 3: Home PARALLAX (0 / 1)
+ *   61 / 66 / 67  settings checksum (version 1 / 2 / 3)
+ * A v1 save keeps its ranking (settings take their defaults and are written as v3 on the next
+ * save); a version-1 settings block keeps its settings (the record starts empty), a version-2
+ * block its settings and record (PARALLAX starts ON); a bad checksum, an unknown settings
+ * version or an out-of-range value resets that block. */
 #define SRAM_MAGIC_V1 0x53415231UL      /* "SAR1" */
 #define SRAM_MAGIC    0x53415232UL      /* "SAR2" */
 #define RANK_OFS      4
 #define RANK_LEN      (5 * 7)
 #define SET_OFS       (RANK_OFS + RANK_LEN + 1)
-#define SET_VERSION   1
-#define SET_LEN       21
+#define SET_VERSION   3
+#define SET_VALUES    20                /* settings bytes after the version byte */
+#define SET_LEN_V1    (1 + SET_VALUES)
+#define SET_LEN_V2    (SET_LEN_V1 + 5)  /* + Boss Rush record */
+#define SET_LEN       (SET_LEN_V2 + 1)  /* + Home PARALLAX */
+#define RUSH_MAX_BOSSES 16
 
 static u8 sram_sum(const u8 *b, u16 n)
 {
@@ -101,15 +114,15 @@ static u8 sram_sum(const u8 *b, u16 n)
 }
 
 /* settings block <-> bytes; each value with its count (valid range 0..count-1, +min) */
-static u8 *const SET_VAL[SET_LEN - 1] = {
+static u8 *const SET_VAL[SET_VALUES] = {
     &dip_cfg.difficulty, &dip_cfg.lives_b, &dip_cfg.bonus, &dip_cfg.cont, &dip_cfg.demo_sounds,
     &home_cfg.difficulty, &home_cfg.lives, &home_cfg.bonus, &home_cfg.cont, &home_cfg.credits,
     &game_cfg.color, &game_cfg.mode,
     &pad_cfg.button[0], &pad_cfg.button[1], &pad_cfg.button[2],
     &pad_cfg.extra[0], &pad_cfg.extra[1], &pad_cfg.extra[2], &pad_cfg.autofire[0], &pad_cfg.autofire[1],
 };
-static const u8 SET_MIN[SET_LEN - 1] = { 0, 0, 0, 0, 0,  0, 1, 0, 0, 1,  0, 0,  0, 0, 0, 0, 0, 0, 0, 0 };
-static const u8 SET_MAX[SET_LEN - 1] = { 7, 1, 3, 1, 1,  9, 7, 4, 2, 9,  1, 1,  5, 5, 5,
+static const u8 SET_MIN[SET_VALUES] = { 0, 0, 0, 0, 0,  0, 1, 0, 0, 1,  0, 0,  0, 0, 0, 0, 0, 0, 0, 0 };
+static const u8 SET_MAX[SET_VALUES] = { 7, 1, 3, 1, 1,  9, 7, 4, 2, 9,  1, 1,  5, 5, 5,
                                          XB_COUNT - 1, XB_COUNT - 1, XB_COUNT - 1, 1, 1 };
 
 static void sram_save(void)
@@ -121,7 +134,11 @@ static void sram_save(void)
         memcpy(rb + i * 7 + 4, ranking[i].name, 3);
     }
     sb[0] = SET_VERSION;
-    for (u16 i = 0; i < SET_LEN - 1; i++) sb[1 + i] = *SET_VAL[i];
+    for (u16 i = 0; i < SET_VALUES; i++) sb[1 + i] = *SET_VAL[i];
+    u32 t = rush_best.frames;
+    sb[SET_LEN_V1] = rush_best.bosses;
+    sb[SET_LEN_V1 + 1] = t >> 24; sb[SET_LEN_V1 + 2] = t >> 16; sb[SET_LEN_V1 + 3] = t >> 8; sb[SET_LEN_V1 + 4] = t;
+    sb[SET_LEN_V2] = home_cfg.parallax;
     SRAM_enable();
     SRAM_writeLong(0, SRAM_MAGIC);
     for (u16 i = 0; i < RANK_LEN; i++) SRAM_writeByte(RANK_OFS + i, rb[i]);
@@ -148,9 +165,11 @@ void sram_load(void)
     for (u16 i = 0; rank_ok && i < RANK_LEN; i++) rb[i] = SRAM_readByte(RANK_OFS + i);
     rank_ok = rank_ok && SRAM_readByte(RANK_OFS + RANK_LEN) == sram_sum(rb, RANK_LEN);
     for (u16 i = 0; v2 && i < SET_LEN; i++) sb[i] = SRAM_readByte(SET_OFS + i);
-    bool set_ok = v2 && sb[0] == SET_VERSION && SRAM_readByte(SET_OFS + SET_LEN) == sram_sum(sb, SET_LEN);
+    /* settings version 1 (21 bytes + checksum) or 2 (26 bytes + checksum) */
+    u16 len = !v2 ? 0 : sb[0] == 1 ? SET_LEN_V1 : sb[0] == 2 ? SET_LEN_V2 : sb[0] == SET_VERSION ? SET_LEN : 0;
+    bool set_ok = len && SRAM_readByte(SET_OFS + len) == sram_sum(sb, len);
     SRAM_disable();
-    for (u16 i = 0; set_ok && i < SET_LEN - 1; i++)
+    for (u16 i = 0; set_ok && i < SET_VALUES; i++)
         if (sb[1 + i] < SET_MIN[i] || sb[1 + i] > SET_MAX[i]) set_ok = FALSE;
     if (rank_ok)
         for (u16 i = 0; i < 5; i++) {
@@ -159,7 +178,13 @@ void sram_load(void)
             memcpy(ranking[i].name, b + 4, 3);
         }
     if (set_ok)
-        for (u16 i = 0; i < SET_LEN - 1; i++) *SET_VAL[i] = sb[1 + i];
+        for (u16 i = 0; i < SET_VALUES; i++) *SET_VAL[i] = sb[1 + i];
+    if (set_ok && len == SET_LEN && sb[SET_LEN_V2] <= 1) home_cfg.parallax = sb[SET_LEN_V2];
+    if (set_ok && len >= SET_LEN_V2 && sb[SET_LEN_V1] <= RUSH_MAX_BOSSES) {
+        const u8 *b = sb + SET_LEN_V1 + 1;
+        rush_best.bosses = sb[SET_LEN_V1];
+        rush_best.frames = ((u32)b[0] << 24) | ((u32)b[1] << 16) | ((u16)b[2] << 8) | b[3];
+    }
     hi_score = ranking[0].score;     /* $E600 = top ranking score */
 }
 
@@ -192,6 +217,8 @@ void flow_goto(FlowState s)
     case FS_CREDIT:   flow_credit_enter(); break;
     case FS_INTRO:    flow_intro_enter(); break;
     case FS_PLAY:     break;
+    case FS_RUSH:     break;
+    case FS_RUSH_END: flow_rush_end_enter(); break;
     }
 }
 
@@ -210,6 +237,7 @@ void flow_update(void)
     if ((pad[0].held & (IN_FIRE_L | IN_FIRE_R | IN_WEAPON | IN_START)) == (IN_FIRE_L | IN_FIRE_R | IN_WEAPON | IN_START)
         && pad[0].pressed && flow_state != FS_SELECT) {
         sound_play(0x00);
+        if (flow_state == FS_RUSH) flow_rush_abort();
         flow_game_reset();
         flow_goto(FS_SELECT);
         return;
@@ -227,6 +255,8 @@ void flow_update(void)
     case FS_CREDIT:   flow_credit_update(); break;
     case FS_INTRO:    flow_intro_update(); break;
     case FS_PLAY:     flow_play_update(); break;
+    case FS_RUSH:     flow_rush_update(); break;
+    case FS_RUSH_END: flow_rush_end_update(); break;
     }
 }
 
@@ -234,6 +264,7 @@ void flow_draw(void)
 {
     if (flow_state == FS_DEMO) flow_demo_draw();
     else if (flow_state == FS_PLAY) flow_game_draw();
+    else if (flow_state == FS_RUSH) flow_rush_draw();
     scene_update();
     hud_frame();
 }

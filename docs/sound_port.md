@@ -172,3 +172,64 @@ Run: `make` (or at least `.venv/bin/python tools/build_sound.py`), then
 
 Correction to `docs/re/sound.md`: the key-off countdown is `dur × (max(gate,1) + 1) / 16` (spec `$0441-$0449`
 adds `dur` g times to `dur`), not `dur × gate / 16`; confirmed by tick-exact key-offs against MAME.
+
+## Boot crash (Genesis Plus GX, Oct 2026) — not a sound bug
+
+Symptom: with the `V1.0` line on the boot screen the ROM hung at boot in Genesis Plus GX (RetroArch core,
+`tools/run_rom.py`) but ran in MAME; tiny layout changes seemed to toggle it, and skipping `sound_init()`
+seemed to cure it. The sound driver turned out to be innocent.
+
+**Root cause.** The shared SGDK install (`~/mars/m68k-elf`) had `ENABLE_BANK_SWITCH` set to 1 in
+`inc/config.h` (and `libmd.a` was rebuilt), both on Oct 1 00:49. That made SGDK's header template
+write `"SEGA SSF"` as the console name. Genesis Plus GX (like Mega EverDrive and MegaSD) then
+emulates the extended SSF mapper, where a byte written to `$A130F1` picks the 512 KB bank shown at
+`$000000-$07FFFF`. On a plain cartridge that address is the SRAM control register.
+`sram_load()` (`src/flow.c`, called from `game_init()`) runs `SRAM_enableRO()`, which writes
+3 to `$A130F1`. Everything below `$80000`, including the vectors, the SGDK library and most game code,
+was suddenly replaced by ROM `$180000-$1FFFFF`. The CPU ran whatever bytes were at `+$180000`, so
+the exact symptom depended on layout: a halt, a runaway, or even a crash of the emulator process.
+MAME does not emulate that mapper for this header, so it was unaffected.
+
+Evidence (Genesis Plus GX core, via its exported `m68k`, `zram`, `Z80` and `zbank` symbols):
+- The Z80 RAM after `sound_init()` matches `sa_sound_drv` byte for byte (0 differences in `$0000-$13FF`),
+  and the mailbox is correct (go = 1, bank = $44). The Z80 runs and sets ready = `$80`. Its bank register
+  stays 0 until the first command.
+- Stepping the 68000 one instruction at a time (`m68k_run(cycles + 1)`) from frame 35: `move.b #3,$A130F1`
+  at `main+$4ee` (inlined `sram_load`). Then `jsr SRAM_readLong` causes an exception (14-byte frame),
+  then PC = 0, 4, 8 … through zeroed "vectors", and finally the CPU halts (`stopped` = 2) at PC `$24`, SR `$2300`.
+- `m68k.memory_map[0x00..0x07].base` moves from `cart.rom + 0` to `cart.rom + $180000` at that point and
+  stays there.
+- The same tree built with `"SEGA MEGA DRIVE "` boots. Built with `"SEGA SSF"` it hangs, and by frame 400 it
+  crashes the emulator (SIGSEGV). Under the SSF header, rebuilds of the committed HEAD tree hang too. Earlier
+  HEAD ROMs booted only because they were built before the SGDK config change.
+
+**Fix.**
+- `src/rom_header.c` always writes `"SEGA MEGA DRIVE "` and does not depend on `ENABLE_BANK_SWITCH`.
+  The game has no mapper: ROM ≤ 4 MB, SRAM at `$200000-$20FFFF` switched by `$A130F1`.
+- `tools/finalize_rom.py` fails the build if the console name is anything else.
+- `tests/sound_rom/src/rom_header.c` (untracked copy) gets the same fixed name.
+- The SGDK install itself is left alone, because other projects share it. With the flag set,
+  `SYS_resetBanks()` writes identity banks, and `FAR()` only switches banks for data at or above
+  `$300000`, so both are harmless while the ROM stays under 3 MB (it is 2.5 MB now). If the ROM
+  ever grows past 3 MB, build against an SGDK with `ENABLE_BANK_SWITCH 0`.
+
+**Debug changes from the hunt, now reverted (`src/main.c` matches HEAD again):**
+- `SRAM_disable()` at the start of `main()` was redundant, because SGDK's `internal_reset()` already
+  calls it before `main`. Its comment ("GPGX powers up with SRAM mapped") misread the mapper problem.
+- Raising the interrupt mask to 4 around `SYS_doVBlankProcess()` was harmful.
+  `SYS_doVBlankProcess()` first *waits* for VBlank, so the H-int was masked for the rest of the
+  active display every frame. The HUD's window split (register `$12`, rewritten by H-int every 8
+  lines) never switched on, and the boot screen stayed black (CRAM loaded, display on, window off).
+  The race it was meant to prevent is real in principle: an H-int register write between the two
+  words of a VDP command in SGDK's `flushQueue` would corrupt that command. But it can only happen
+  when the DMA queue overruns VBlank, and it was not what caused this hang. If it ever needs
+  guarding, mask only around `DMA_flushQueue()`, after the VBlank wait, not around the whole call.
+
+Verification:
+- Boot in Genesis Plus GX with the V1.0 line at colour 0/2 and row 26/27, and without the line:
+  all reach the select screen (`frame_counter` running, display on, `V1.0` drawn bottom right).
+- Sound: `sound_test.py` cases `cmd_21 cmd_2e cmd_38 cmd_01 cmd_0c cmd_13 scn_sfx scn_priority api`
+  all PASS, and `--gpgx` shows all commands taken.
+- In the main ROM: 249 driver ticks per 60 frames, and game commands go through the FIFO
+  (write/read indices advance, bank register set to `$228000`/`$230000`).
+- `tools/check` is clean.

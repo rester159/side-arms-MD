@@ -45,6 +45,7 @@ u32 hud_rows_get(void);
 void hud_sprites(bool on);                  /* sprites in use: all text goes to the game pool */
 void hud_clear(u32 rows);                   /* blank these rows */
 void hud_screen_reset(void);                /* blank rows 3-24, release the screen pool, hide the logo */
+void hud_game_pool_reset(void);             /* blank every row, empty the game pool (Boss Rush start / end) */
 
 /* Genesis cell coordinates (40x28) */
 void hud_codes(s16 col, s16 row, u8 colour, const u16 *codes, u16 n);   /* arcade char codes */
@@ -69,6 +70,7 @@ void hud_md(s16 col, s16 row, u16 vram_tile);
  * messages, boss hit bars. Native 40-column layout:
  *   row 0   1UP  P1 score     HI hi score       2UP  P2 score
  *   row 1   P1 lives icons                      P2 lives icons
+ *           (Boss Rush: P1 energy bar, cols 0-7; P2 energy bar, cols 28-35)
  *   row 2                          boss bars (right-aligned, arcade $D137)
  *   row 25  P1 NAMING / CONTINUE / GAME OVER    P2 ...
  *   row 26  P1 weapon bar (20 cells)            P2 weapon bar
@@ -80,7 +82,10 @@ typedef struct {
     u8 msg;                     /* HUD_MSG_* */
     u8 msg_arg;                 /* CONTINUE: 0-10; NAMING: 1 = label visible (blink) */
     u8 name[3];                 /* NAMING: letters as arcade codes */
+    bool energy_on;             /* Boss Rush: row 1 shows the energy bar instead of the lives icons */
+    u8 energy;                  /* segments left, 0-HUD_ENERGY_MAX */
 } HudPlayer;
+#define HUD_ENERGY_MAX 8
 typedef struct {
     bool on;
     bool twoup;                 /* show the 2UP label */

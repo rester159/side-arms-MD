@@ -54,6 +54,7 @@ extern Level level;
 void level_start(u16 section);
 void level_update(void);
 void level_resume(void);            /* boss defeated */
+extern bool level_spawns_off;       /* Boss Rush: EV_SPAWN records ignored (bosses only) */
 static inline s16 cam_x(void);
 static inline s16 cam_y(void);
 bool terrain_solid(s16 wx, s16 wy); /* world pixel */

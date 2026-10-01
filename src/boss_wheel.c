@@ -120,6 +120,7 @@ static void core_bar_lost(void)
     if (!w.bars) {
         /* $74E0: wipe, camera to the next section (copy 3 = its start), explosions, POW */
         Obj *o = &w.core;
+        boss_defeated();
         boss_wipe();
         w.spinning = FALSE;
         bg_frames_end();
@@ -192,7 +193,7 @@ bool wboss_update(void)
         w.spinning = TRUE; w.c2 = w.turn = w.orbit = 0;
         level.scroll_x = wi->copy_x[0]; level.scroll_y = wi->copy_y[0];
         video_set_camera(cam_x(), cam_y());
-        bg_frames_begin(wi->frames);
+        bg_frames_begin(bg_is_home() && wi->frames_home ? wi->frames_home : wi->frames);   /* Home: sockets filled */
     }
     if (w.spinning) spin();
     for (u16 k = 0; k < 8; k++) if (w.core_state < 3) pod_update(&w.pod[k]);

@@ -14,6 +14,18 @@ void bg_enable(bool on);
 void bg_update(void);   /* stream cells + set scroll; call once per frame */
 u16 bg_cache_misses(void);
 
+/* ---- Home parallax (docs/parallax.md, parallax.c) -------------------------
+ * bg_set_home: use the zones' Home variants (texture cells cut out for a far
+ * layer) and the distant-scenery bands. bg_scroll_external: plane-B scroll is
+ * written by parallax.c (line scroll), not by bg_update(). bg_band_lines: the
+ * screen lines [l0, l1) of the active band and its camera x. */
+void bg_set_home(bool on);
+void bg_scroll_external(bool on);
+bool bg_is_enabled(void);
+bool bg_is_home(void);                  /* Home zone variants selected */
+u16 bg_zone_index(void);                /* 0xFFFF: none */
+bool bg_band_lines(s16 *l0, s16 *l1, s16 *x);
+
 /* ---- VRAM blocks borrowed from the metatile cache (boss module) ----------
  * A cache slot is 16 consecutive tiles = exactly one 32x32 sprite. Along the
  * whole game path the view never needs more than 33 of the 56 slots, so

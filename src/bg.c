@@ -2,6 +2,7 @@
 #include "palette.h"
 #include "video.h"
 #include "gen/assets.h"
+#include "gen/parallax_data.h"
 
 /* Plane B (64x32 tiles) is a ring of 16x8 world cells (32x32 px). The visible
  * window of cells is kept loaded; when the camera crosses a cell boundary only
@@ -12,7 +13,13 @@
  *
  * Boss support (docs/bosses.md): slots can be lent out as plain 16-tile VRAM
  * blocks (refs = RESERVED), and a rectangle of cells can be overridden by
- * pre-rendered animation frames (the BG wheel bosses). */
+ * pre-rendered animation frames (the BG wheel bosses).
+ *
+ * Home parallax (docs/parallax.md): bg_set_home() selects the zone variants
+ * (cut texture cells, the texture itself is on plane A) and the bands: world
+ * cell rows of distant scenery streamed at their own camera x (bx), shown with
+ * plane-B line scroll (parallax.c). A band owns its ring rows; the main view
+ * code skips them while it is active. */
 
 #define RING_W      16
 #define RING_H      8
@@ -55,6 +62,18 @@ static u16 *fr_img;                     /* nframes x full 64x32 plane images, or
 static s16 fr_shown, fr_pending = -1;
 static void frames_drop(void);
 
+/* Home parallax */
+static u16 zone_id = 0xFFFF;
+static bool home, ext_scroll, zone_stale;
+static const u8 *ext_tiles;             /* zone variant: metatiles >= zone->metas */
+static const u16 *ext_tmpl;
+static const ParBand *band;             /* active band (its camera differs from the main one) */
+static s16 bcam, bx0, bx1, by0, by1;    /* band camera x, loaded band columns, band rows */
+static s16 bpre_x = NO_PRE, bpre_y, blast;
+static s8 bhdir;
+#define BROW(y) (band && (y) >= by0 && (y) <= by1)
+static void band_off(bool resync);
+
 u16 bg_cache_misses(void) { return misses; }
 
 static void flush_cache(void)
@@ -69,6 +88,7 @@ static void flush_cache(void)
     memset(shadow, 0, sizeof(shadow));
     lx0 = 1; lx1 = 0; ly0 = 1; ly1 = 0;
     pre_x = NO_PRE;
+    band = NULL; bpre_x = NO_PRE;
     dirty_all = TRUE;
 }
 
@@ -81,7 +101,12 @@ void bg_init(void)
 
 void bg_set_zone(u16 z)
 {
-    zone = &zones[z];
+    const ZoneVariant *v = home ? zone_home[z] : NULL;
+    zone = v ? &v->z : &zones[z];
+    ext_tiles = v ? v->extra_tiles : NULL;
+    ext_tmpl = v ? v->extra_tmpl : NULL;
+    zone_id = z;
+    zone_stale = FALSE;
     flush_cache();
     pal_load(0, zone->pal, 32);
 }
@@ -97,7 +122,7 @@ static u8 acquire(u16 meta)
         if (slot_meta[i] != 0xFFFF) meta_slot[slot_meta[i]] = NO_SLOT;
         slot_meta[i] = meta; meta_slot[meta] = i; slot_refs[i] = 1;
         const u8 *src = meta < zone->metas ? zone->tiles + (u32)meta * 512
-                                           : fr->extra_tiles + (u32)(meta - zone->metas) * 512;
+                                           : (fr ? fr->extra_tiles : ext_tiles) + (u32)(meta - zone->metas) * 512;
         DMA_queueDmaFast(DMA_VRAM, (void *)src, (VRAM_BG_TILE + i * 16) * 32, 256, 2);
         misses++;
         return i;
@@ -114,7 +139,7 @@ static u8 acquire(u16 meta)
 static void cell_words(u16 e, u8 s, u16 *dst, u16 stride)
 {
     u16 meta = e & 0x0FFF;
-    const u16 *t = meta < zone->metas ? zone->tmpl + meta * 16 : fr->extra_tmpl + (meta - zone->metas) * 16;
+    const u16 *t = meta < zone->metas ? zone->tmpl + meta * 16 : (fr ? fr->extra_tmpl : ext_tmpl) + (meta - zone->metas) * 16;
     u16 b = VRAM_BG_TILE + s * 16;
     switch (e & 0xC000) {
     case 0:
@@ -162,7 +187,7 @@ static void drop_cell(s16 cx, s16 cy)
 
 static void column(s16 x, s16 y0, s16 y1, bool load)
 {
-    for (s16 y = y0; y <= y1; y++) { if (load) load_cell(x, y); else drop_cell(x, y); }
+    for (s16 y = y0; y <= y1; y++) { if (BROW(y)) continue; if (load) load_cell(x, y); else drop_cell(x, y); }
     if (load) dirty_cols |= 1 << (x & (RING_W - 1));
 }
 
@@ -175,16 +200,132 @@ static void row(s16 y, s16 x0, s16 x1, bool load)
 static void pre_drop(void)
 {
     if (pre_x == NO_PRE) return;
-    for (s16 y = ly0; y < pre_y; y++) drop_cell(pre_x, y);
+    for (s16 y = ly0; y < pre_y; y++) if (!BROW(y)) drop_cell(pre_x, y);
     pre_x = NO_PRE;
 }
 
 /* load the look-ahead column's remaining rows (all of them if n is large) */
 static void pre_load(u16 n)
 {
-    for (; n && pre_y <= ly1; n--, pre_y++) load_cell(pre_x, pre_y);
+    for (; n && pre_y <= ly1; pre_y++) if (!BROW(pre_y)) { load_cell(pre_x, pre_y); n--; }
     if (pre_y > ly1) dirty_cols |= 1 << (pre_x & (RING_W - 1));     /* complete: send it */
 }
+
+/* ---- Home parallax bands ---------------------------------------------------
+ * The band group mirrors the main view's horizontal streaming for rows by0..by1:
+ * loaded columns bx0..bx1 around bcam, its own look-ahead column. */
+static void bcolumn(s16 x, bool load)
+{
+    for (s16 y = by0; y <= by1; y++) { if (load) load_cell(x, y); else drop_cell(x, y); }
+    if (load) dirty_cols |= 1 << (x & (RING_W - 1));
+}
+
+static void bpre_drop(void)
+{
+    if (bpre_x == NO_PRE) return;
+    for (s16 y = by0; y < bpre_y; y++) drop_cell(bpre_x, y);
+    bpre_x = NO_PRE;
+}
+
+static void bpre_load(u16 n)
+{
+    for (; n && bpre_y <= by1; n--, bpre_y++) load_cell(bpre_x, bpre_y);
+    if (bpre_y > by1) dirty_cols |= 1 << (bpre_x & (RING_W - 1));
+}
+
+/* the band takes over its rows as they are (same columns as the main view) */
+static void band_on(const ParBand *b)
+{
+    pre_drop();
+    band = b; by0 = b->cy0; by1 = b->cy1;
+    bx0 = lx0; bx1 = lx1; bcam = blast = cam_x; bhdir = hdir; bpre_x = NO_PRE;
+}
+
+/* back to the main view's columns (resync: reload the rows now; else they stay empty for a full reload) */
+static void band_off(bool resync)
+{
+    if (!band) return;
+    bpre_drop();
+    pre_drop();
+    for (s16 y = by0; y <= by1; y++)
+        for (s16 x = bx0; x <= bx1; x++) drop_cell(x, y);
+    band = NULL;
+    if (!resync) return;
+    for (s16 y = by0; y <= by1; y++)
+        for (s16 x = lx0; x <= lx1; x++) load_cell(x, y);
+    dirty_all = TRUE;                   /* every column changed: one plane DMA (colbuf holds 16 strips) */
+}
+
+static void band_update(void)
+{
+    s16 nx0 = bcam >> 5, nx1 = (bcam + SCREEN_W - 1) >> 5;
+    if (bcam != blast) bhdir = bcam > blast ? 1 : -1;
+    blast = bcam;
+    if (bpre_x != NO_PRE && bpre_x != (bhdir > 0 ? bx1 + 1 : bx0 - 1)) bpre_drop();
+    if (nx0 != bx0 || nx1 != bx1) {
+        s16 dx = nx0 - bx0;
+        if (dx > 1 || dx < -1) {                    /* jump: reload the band rows */
+            bpre_drop();
+            for (s16 x = bx0; x <= bx1; x++) bcolumn(x, FALSE);
+            for (s16 x = nx0; x <= nx1; x++) bcolumn(x, TRUE);
+            dirty_all = TRUE;
+        } else {
+            if (bpre_x != NO_PRE && bpre_x >= nx0 && bpre_x <= nx1) {
+                bpre_load(0xFFFF);
+                if (bpre_x > bx1) bx1 = bpre_x; else bx0 = bpre_x;
+                bpre_x = NO_PRE;
+            }
+            for (s16 x = bx0; x < nx0; x++) bcolumn(x, FALSE);
+            for (s16 x = nx1 + 1; x <= bx1; x++) bcolumn(x, FALSE);
+            s16 kx0 = bx0 > nx0 ? bx0 : nx0, kx1 = bx1 < nx1 ? bx1 : nx1;
+            for (s16 x = nx0; x < kx0; x++) bcolumn(x, TRUE);
+            for (s16 x = kx1 + 1; x <= nx1; x++) bcolumn(x, TRUE);
+        }
+        bx0 = nx0; bx1 = nx1;
+    }
+    if (bhdir && bx1 - bx0 + 2 <= RING_W) {
+        if (bpre_x == NO_PRE) { bpre_x = bhdir > 0 ? bx1 + 1 : bx0 - 1; bpre_y = by0; }
+        if (bpre_y <= by1) bpre_load(PRE_PER_FRAME);
+    }
+}
+
+/* the band for the current camera (NULL: none), and its camera x */
+static const ParBand *band_want(s16 *x)
+{
+    if (!home || fr || !zone) return NULL;
+    for (u16 i = 0; i < PAR_BAND_COUNT; i++) {
+        const ParBand *b = &par_bands[i];
+        if (b->den && b->zone == zone_id && cam_y == b->cam_y && cam_x > b->x0 && cam_x <= b->x1) {
+            s32 t = cam_x - b->x0;           /* 16x16 muls.w + divs.w: no libgcc call */
+            asm ("muls.w %1, %0" : "+d" (t) : "d" ((s16)b->num) : "cc");
+            *x = b->x0 + divs(t, b->den);
+            return *x != cam_x ? b : NULL;
+        }
+    }
+    return NULL;
+}
+
+bool bg_band_lines(s16 *l0, s16 *l1, s16 *x)
+{
+    if (!band) return FALSE;
+    *l0 = by0 * 32 - cam_y; *l1 = (by1 + 1) * 32 - cam_y; *x = bcam;
+    if (*l0 < 0) *l0 = 0;
+    if (*l1 > SCREEN_H) *l1 = SCREEN_H;
+    return TRUE;
+}
+
+/* takes effect at the next bg_update() with the layer on (a menu's plane B is left alone) */
+void bg_set_home(bool on)
+{
+    if (on == home) return;
+    home = on;
+    zone_stale = zone != NULL;
+}
+
+void bg_scroll_external(bool on) { ext_scroll = on; }
+bool bg_is_enabled(void) { return enabled; }
+bool bg_is_home(void) { return home; }
+u16 bg_zone_index(void) { return zone ? zone_id : 0xFFFF; }
 
 void bg_set_camera(s16 x, s16 y) { cam_x = x; cam_y = y; }
 
@@ -194,6 +335,7 @@ void bg_enable(bool on)
     if (on == enabled) return;
     enabled = on;
     pre_drop();
+    band_off(FALSE);
     for (s16 y = ly0; y <= ly1; y++)
         for (s16 x = lx0; x <= lx1; x++) drop_cell(x, y);
     lx0 = 1; lx1 = 0; ly0 = 1; ly1 = 0;
@@ -323,7 +465,7 @@ static void frames_drop(void)
 void bg_frames_begin(const BgFrames *f)
 {
     bg_frames_end();
-    if (!zone || zone != &zones[f->zone]) bg_set_zone(f->zone);
+    if (!zone || zone_id != f->zone) bg_set_zone(f->zone);
     fr = f; fr_state = 1; fr_next = 0; fr_nmeta = 0; fr_shown = -1;
     u16 n = f->w * f->h * f->nframes;
     for (u16 i = 0; i < n; i++) {
@@ -404,12 +546,20 @@ void bg_update(void)
 {
     if (fr_state == 1 && zone) frames_preload();
     else if (fr_state == 3 && frames_render()) fr_state = 2;
+    if (enabled && zone_stale) bg_set_zone(zone_id);
     if (enabled) auto_zone();
     if (enabled && zone) {
         s16 nx0 = cam_x >> 5, ny0 = cam_y >> 5;
         s16 nx1 = (cam_x + SCREEN_W - 1) >> 5, ny1 = (cam_y + SCREEN_H - 1) >> 5;
         if (cam_x != last_cam_x) hdir = cam_x > last_cam_x ? 1 : -1;
         last_cam_x = cam_x;
+        s16 wx = 0;
+        const ParBand *want = band_want(&wx);
+        if (band) {
+            s16 jx = nx0 - lx0, jy = ny0 - ly0;
+            bool full = lx1 < lx0 || jx > 1 || jx < -1 || jy > 1 || jy < -1;   /* load_all follows */
+            if (full || jy || want != band) band_off(!full);
+        }
         /* the look-ahead column is only valid for the current rows and direction */
         if (pre_x != NO_PRE && (ny0 != ly0 || ny1 != ly1 || pre_x != (hdir > 0 ? lx1 + 1 : lx0 - 1)))
             pre_drop();
@@ -437,6 +587,9 @@ void bg_update(void)
             }
             lx0 = nx0; ly0 = ny0; lx1 = nx1; ly1 = ny1;
         }
+        /* Home parallax band: its rows follow their own camera */
+        if (want && !band && lx1 >= lx0 && want->cy0 >= ly0 && want->cy1 <= ly1) band_on(want);
+        if (band) { bcam = wx; band_update(); }
         /* start / continue the look-ahead column (horizontal moves; the ring has 16 columns) */
         if (!fr && hdir && lx1 >= lx0 && lx1 - lx0 + 2 <= RING_W) {
             if (pre_x == NO_PRE) { pre_x = hdir > 0 ? lx1 + 1 : lx0 - 1; pre_y = ly0; }
@@ -444,6 +597,7 @@ void bg_update(void)
         }
     }
     send();
+    if (ext_scroll) return;                         /* Home parallax: parallax.c writes the scroll tables */
     VDP_setHorizontalScrollVSync(BG_B, -cam_x);
     VDP_setVerticalScrollVSync(BG_B, cam_y);
 }

@@ -353,7 +353,7 @@ static struct {
     bool on, twoup;
     u32 hi, score[2];
     bool score_on[2], bar_on[2];
-    u8 lives[2], msg[2], arg[2], name[2][3];
+    u8 lives[2], msg[2], arg[2], name[2][3], energy[2];
     u8 slot[2][5], speed[2], phase[2];
     u8 boss;
 } cur;
@@ -396,6 +396,24 @@ static void draw_speed(u16 i, u8 speed, u8 phase)
         else hud_blank(col, 27, 4);
     }
     cur.speed[i] = speed; cur.phase[i] = phase;
+}
+
+/* Boss Rush energy bar (port): HUD_ENERGY_MAX cells under 1UP / 2UP built from the speed meter's
+ * glyphs ($78 left end, $79 middle, $7B right end, $275D) in arcade text colours: full cells green,
+ * spent cells dark green; with two or fewer left they flash red/yellow (frame bit 3), like the
+ * meter's flash ($1EE2). */
+#define ENERGY_FULL  0x26            /* green */
+#define ENERGY_LOW_A 0x21            /* red    } the last two cells flash */
+#define ENERGY_LOW_B 0x23            /* yellow } */
+#define ENERGY_EMPTY 0x3D            /* dark green */
+static void draw_energy(u16 i, u8 n, u8 phase)
+{
+    for (u16 k = 0; k < HUD_ENERGY_MAX; k++) {
+        u16 code = k == 0 ? 0x78 : k == HUD_ENERGY_MAX - 1 ? 0x7B : 0x79;
+        u8 colour = k >= n ? ENERGY_EMPTY : n > 2 ? ENERGY_FULL : phase ? ENERGY_LOW_B : ENERGY_LOW_A;
+        put(LABEL_COL[i] + k, 1, glyph(&game_pool, code, colour));
+    }
+    cur.energy[i] = n | (phase << 4);
 }
 
 static void draw_msg(u16 i, const HudPlayer *h)
@@ -451,16 +469,24 @@ void hud_panel(const HudPanel *p)
             hud_score(SCORE_COL[i], 0, 0, sc);
             cur.score[i] = sc; cur.score_on[i] = h->score;
         }
-        /* $067B: lives - 1 icons, at most 5 */
-        u8 lv = h->bar && pl->lives > 1 ? pl->lives - 1 : 0;
-        if (lv > 5) lv = 5;
-        if (lv != cur.lives[i]) {
-            static const u16 icon = CH_LIFE;
-            for (u16 k = 0; k < 5; k++) {
-                if (k < lv) hud_codes(LABEL_COL[i] + k, 1, 0, &icon, 1);
-                else hud_blank(LABEL_COL[i] + k, 1, 1);
+        if (h->energy_on) {
+            u8 n = h->energy > HUD_ENERGY_MAX ? HUD_ENERGY_MAX : h->energy;
+            u8 ph = n <= 2 && (frame & 8) ? 1 : 0;
+            if ((n | (ph << 4)) != cur.energy[i]) draw_energy(i, n, ph);
+            cur.lives[i] = 0xFE;                            /* redrawn if the lives come back */
+        } else {
+            if (cur.energy[i] != 0xFF) { hud_blank(LABEL_COL[i], 1, HUD_ENERGY_MAX); cur.energy[i] = 0xFF; }
+            /* $067B: lives - 1 icons, at most 5 */
+            u8 lv = h->bar && pl->lives > 1 ? pl->lives - 1 : 0;
+            if (lv > 5) lv = 5;
+            if (lv != cur.lives[i]) {
+                static const u16 icon = CH_LIFE;
+                for (u16 k = 0; k < 5; k++) {
+                    if (k < lv) hud_codes(LABEL_COL[i] + k, 1, 0, &icon, 1);
+                    else hud_blank(LABEL_COL[i] + k, 1, 1);
+                }
+                cur.lives[i] = lv;
             }
-            cur.lives[i] = lv;
         }
         if (h->msg != cur.msg[i] || h->msg_arg != cur.arg[i] || memcmp(h->name, cur.name[i], 3))
             draw_msg(i, h);
@@ -512,9 +538,28 @@ void hud_frame(void)
     }
 }
 
+/* the game pool's VRAM ranges (see hud.h) */
+static const u16 GAME_POOL[] = { 1352, 56, 1520, 16, 1940, 12, 2033, 15 };
+
+static void game_pool_reset(void)
+{
+    pool_reset(&game_pool, GAME_POOL, 4);
+    memset(speed_cache, 0, sizeof(speed_cache));
+    memset(digit_cache, 0, sizeof(digit_cache));
+}
+
+/* The game pool keeps every glyph until hud_init(); a mode that brings its own text (Boss Rush
+ * cards, timer, energy bar) starts and ends with an empty pool so neither mode crowds the other
+ * out (a full pool falls back to colour-0 glyphs). Clears every row and the panel. */
+void hud_game_pool_reset(void)
+{
+    hud_clear(HUD_ROWS_ALL);
+    cur.on = FALSE;
+    game_pool_reset();
+}
+
 void hud_init(void)
 {
-    static const u16 g[] = { 1352, 56, 1520, 16, 1940, 12, 2033, 15 };
     memset(win, 0, sizeof(win));
     memset(used, 0, sizeof(used));
     used_mask = 0;
@@ -526,9 +571,7 @@ void hud_init(void)
     sprites_on = FALSE;
     dirty = HUD_ROWS_ALL;
     stage_n = 0;
-    pool_reset(&game_pool, g, 4);
-    memset(speed_cache, 0, sizeof(speed_cache));
-    memset(digit_cache, 0, sizeof(digit_cache));
+    game_pool_reset();
     hud_screen_reset();
     win_mask = 0;
     win_reg = 0;

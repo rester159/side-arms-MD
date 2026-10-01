@@ -143,8 +143,34 @@ void player_apply_item(Player *p, u8 item)
     }
 }
 
+void fx_explosion(s16 x, s16 y, u8 kind, bool bg_locked) __attribute__((weak));
+
+/* Boss Rush (port): a hit costs one energy segment instead of the ship while more than one is
+ * left - 2 s of blinking invulnerability, weapons and speed kept. A terrain crush also costs a
+ * segment and puts the ship back at its spawn point (entry glide, no terrain test meanwhile). */
+static bool energy_hit(Player *p)
+{
+    if (!p->energy || combined) return FALSE;
+    if (--p->energy == 0) return FALSE;                 /* the last segment: a normal death */
+    sound_play(0x1B);                                   /* the "speed down" tone */
+    if (fx_explosion) fx_explosion(p->x + 8, p->y + 8, 2, FALSE);    /* FX_SMALL burst */
+    if (crushed) player_spawn(p);                       /* `crushed` stays set: update() stops here */
+    p->invuln = PLAYER_HIT_INVULN;
+    p->hit_blink = TRUE;
+    return TRUE;
+}
+
+void player_loadout(Player *p, const u8 level[6], u8 speed)
+{
+    memcpy(p->level, level, sizeof(p->level));
+    p->speed = speed;
+    p->weapon = 0;                          /* weapon select ($1E03) takes the first owned slot */
+    weapons_build_bits(p);
+}
+
 void player_kill_now(Player *p)
 {
+    if (energy_hit(p)) return;
     sound_play(0x0F);
     if (combined) { combine_hit(); return; }       /* $2231: the robot loses a hit point */
     p->state = PL_DYING;
@@ -224,6 +250,7 @@ static void update(Player *p)
     if (p->state != PL_ALIVE) return;
     p->old_x = p->x; p->old_y = p->y;
     if (p->invuln) p->invuln--;             /* $829C */
+    if (!p->invuln) p->hit_blink = FALSE;
     bool glide = FALSE;
     if (p->entry) {
         p->entry--;
@@ -291,6 +318,7 @@ static void update_all(void)
     for (u16 i = 0; i < 2; i++) if (players[i].in_play) weapon_select(&players[i]);
     update(&players[0]);
     update(&players[1]);
+    crushed = FALSE;                        /* later kills this frame (enemies, bosses) are hits */
     players[0].prev_held = pad[0].held;
     players[1].prev_held = pad[1].held;
 }
@@ -305,6 +333,7 @@ static void draw(const Player *p)
     /* B2:$8F02: the entry timer blinks the body, hidden on even values (OBS die2 f1044-f1061);
      * the respawn frame itself (80) is drawn because the arcade respawns after the composite */
     if (p->entry && !(p->entry & 1) && p->entry < 80) return;
+    if (p->hit_blink && (p->invuln & 4)) return;   /* Boss Rush: absorbed hit, 4 frames on / 4 off */
     spr_32(p->body_code + (p->id ? P2_CODE : 0), p->id ? P2_COLOUR : 0, p->x, p->y, 0);
 }
 
