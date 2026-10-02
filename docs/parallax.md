@@ -34,13 +34,13 @@ variant of the zone has the texture pixels cut out of its metatiles and plane A 
 uncut cells always join seamlessly; cells under the HUD rows are never cut.
 
 **Bands** (`par_bands`, plane B): rows of distant scenery without terrain on a horizontal leg,
-streamed by `bg.c` at their own camera x and shown with plane-B line scroll. Section 1: Mt Fuji
-(world row 4, 3/4 speed) and the hills (rows 2-5, 1/2 speed). `parallax_split.py` checks that the
+streamed by `bg.c` at their own camera x and shown with plane-B line scroll. Section 1: the hills
+(rows 2-5, 1/2 speed). (A Mt Fuji band, row 4 at 3/4 speed, was removed in 1.0: it looked broken.) `parallax_split.py` checks that the
 rows have no terrain and that band and world agree pixel for pixel where the band locks again.
 
 | section | parallax |
 |---|---|
-| 1 | star rows + Mt Fuji and hills bands |
+| 1 | star rows + hills band |
 | 2, 4, 7, 8, 9, 10 | star rows |
 | 3, 6 | star columns on the long vertical legs, star rows elsewhere |
 | 5 | star rows, cave-wall far layer on the cave leg |
@@ -106,7 +106,7 @@ Other checks:
 - Frame-identical to the first implementation (screen hashes, 900 frames each) in sections 1 and 8;
   section 9 differs from frame 452 only because the old build dropped a frame there.
 - Screenshots of every section, ON vs OFF (`reports/parallax/final/`): same playfield, layers
-  moving at their speeds; section 5 far layer, section 1 bands.
+  moving at their speeds; section 5 far layer, section 1 hills band.
 - Boss fights in Home with parallax: sections 2 and 9 (wheel bosses) and 10 (final boss) played
   through to the next section / the ending.
 - SRAM: PARALLAX OFF is saved (settings version 3, byte 66), survives a power cycle and then keeps

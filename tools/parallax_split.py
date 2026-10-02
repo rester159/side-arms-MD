@@ -45,10 +45,9 @@ WHEEL_TABLES = (0x70D2, 0x70E2)
 WHEEL_CENTRE = (319, 128)       # wheel centre - scroll copy position (world px)
 WHEEL_R = (124, 96)             # ellipse radii (measured: rim at +-123 x, +-94 y)
 
-# bands: zone, leg camera y, camera x range [x0, x1] (x1: band locked again), world cell rows, speed
+# bands: zone, leg camera y, camera x range [x0, x1] (x1: band locked again), world cell rows, speed.
+# (A stage 1 Mt Fuji band, row 4 at 3/4 speed, was removed in 1.0: it looked broken.)
 BANDS = [
-    dict(zone='s1r0', name='stage 1 Mt Fuji', cam_y=16, x0=None, x1=None, rows=(4, 4), num=3, den=4,
-         find='fuji'),
     dict(zone='s1r0', name='stage 1 hills', cam_y=16, x0=None, x1=4095, rows=(2, 5), num=1, den=2,
          find='hills'),
 ]
@@ -278,19 +277,6 @@ def _band_find(cfg):
         band = W[cy0 * 32:cy1 * 32 + 32] >> 4
         sea = np.nonzero(((band == 21) | (band == 22)).any(axis=0))[0]
         return dict(x0=int(sea[sea < 3000].max()) + 1, x1=cfg['x1'])
-    if cfg['find'] == 'fuji':
-        # stage 1, row 4: black sky but for the city's two tall towers, Mt Fuji and the cliff
-        op = _opaque_cols(cfg['rows'])
-        towers_end = int(op[op < 1200].max())
-        fuji = (int(op[(op >= 1200) & (op < 2300)].min()), int(op[(op >= 1200) & (op < 2300)].max()))
-        cliff = int(op[op >= 2300].min())
-        x0 = towers_end + 1                         # camera past the towers: none in view
-        # bx = x0 + (cam - x0) * num / den: Fuji has left the band window when bx > its east edge
-        # (and the world window: cam > its east edge); the cliff is still out of view then
-        x1 = -(-(fuji[1] + 1 - x0) * cfg['den'] // cfg['num']) + x0
-        x1 = max(x1, fuji[1] + 1)
-        assert x1 + SW <= cliff, ('fuji band does not fit', x0, x1, cliff)
-        return dict(x0=x0, x1=x1)
     raise ValueError(cfg['find'])
 
 

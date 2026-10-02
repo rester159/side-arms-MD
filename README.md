@@ -57,7 +57,7 @@ The boot screen offers two modes:
 
 **PARALLAX** (Home, a port mode, ON by default): depth scrolling in every section — the starfield
 split into four depth layers (per row, or per column on the long vertical legs), section 5's cave
-wall as a slower far layer, and section 1's Mt Fuji and hills as slower bands. Gameplay is
+wall as a slower far layer, and section 1's hills as a slower band. Gameplay is
 unchanged; Arcade mode keeps the arcade view. Details: [docs/parallax.md](docs/parallax.md).
 
 **BOSS RUSH** (Home, a port mode): the game's 12 bosses in the arcade order — the sprite bosses of
