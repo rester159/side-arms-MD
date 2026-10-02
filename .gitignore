@@ -22,3 +22,13 @@ src/rom_header.c.bak
 
 # Local-only boot intros (SEGA / CAPCOM kits from other games): tools/fetch_intros.sh
 src/intro/
+
+# Organic-level experiment (not shipped): local only
+concepts/
+home_mode/
+src/organic_level.c
+inc/organic_level.h
+tools/build_organic_*.py
+tools/draw_organic_*.py
+tools/build_low_clutter_stage.py
+tools/render_genesis_concept.py
