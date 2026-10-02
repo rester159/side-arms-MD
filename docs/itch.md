@@ -152,7 +152,7 @@ So I built a **robot tester**, a little program that plays every section from st
 The arcade only has one layer of stars behind the action, so in Home mode I added depth:
 
 - **Four layers of stars.** The starfield is split into four layers. Faint stars are "far away" and move slowly, and bright stars are "close" and move faster. The Genesis can scroll each line of the screen at its own speed, so every row of stars glides at its own pace.
-- **Faraway scenery.** In the first section, the distant hills drift slowly in the background. In section 5, the cave wall slides along behind the rock, like a backdrop.
+- **Faraway scenery.** In section 5, the cave wall slides along behind the rock, like a backdrop.
 - **Same game.** Only the look changes. Walls, enemies and bosses are exactly where they always were, so the game plays the same, still at 60 fps.
 
 ---

@@ -46,11 +46,12 @@ WHEEL_CENTRE = (319, 128)       # wheel centre - scroll copy position (world px)
 WHEEL_R = (124, 96)             # ellipse radii (measured: rim at +-123 x, +-94 y)
 
 # bands: zone, leg camera y, camera x range [x0, x1] (x1: band locked again), world cell rows, speed.
-# (A stage 1 Mt Fuji band, row 4 at 3/4 speed, was removed in 1.0: it looked broken.)
-BANDS = [
-    dict(zone='s1r0', name='stage 1 hills', cam_y=16, x0=None, x1=4095, rows=(2, 5), num=1, den=2,
-         find='hills'),
-]
+# Removed in 1.0: stage 1 Mt Fuji (row 4, 3/4 speed: looked broken) and stage 1 hills (rows 2-5,
+# 1/2 speed, x 2464-3744: it never matches the world again before the section 1 -> 2 teleport, so
+# the arcade's seamless cut showed the hills changing into the cliff). The machinery stays.
+# Former config: dict(zone='s1r0', name='stage 1 hills', cam_y=16, x0=None, x1=4095,
+#                     rows=(2, 5), num=1, den=2, find='hills')
+BANDS = []
 
 
 @lru_cache(None)

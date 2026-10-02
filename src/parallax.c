@@ -9,7 +9,7 @@
  * Plane A, star rows (default): the starfield's 32 rows of 8 lines are spread over four depth
  * layers (par_star_row, dim rows far). Every screen line takes the H offset of the plane row it
  * shows, so a star keeps its layer while the camera also moves vertically. Layer x = camera x *
- * speed / 16 (stateless: a teleport is a cut anyway).
+ * speed / 16 + an offset that absorbs camera cuts (the stars keep drifting through a teleport).
  * Plane A, star columns: on the long vertical legs that begin and end at a cut
  * (par_col_legs), V-scroll runs per 16-px column, each column at its layer's speed.
  * Plane A, far layer: in a zone with a far texture (par_far), plane A shows the texture,
@@ -38,6 +38,10 @@ static s16 pa_content;                  /* plane A: -1 unknown, 0 stars, 1 + n =
 static u16 far_rows[8][64];             /* far layer: one period of plane rows */
 static u8 row_layer[64];                /* plane-A row (two periods) -> its depth layer */
 static s16 prev_x, prev_y, prev_bx, prev_l0;    /* last frame's inputs: unchanged -> nothing to do */
+/* Star offsets kept across camera cuts (teleports, section starts): the arcade's stars keep
+ * drifting through a cut, so a layer's position = its speed x camera + an offset that absorbs
+ * the cut. The vertical one moves in whole 8-line rows (cell H-scroll stays possible). */
+static s16 xoff[PAR_STAR_LAYERS], yoff[PAR_STAR_LAYERS], voff;
 static u16 prev_z;
 
 void par_start(void)
@@ -45,6 +49,7 @@ void par_start(void)
     pa_content = -1;
     force_a = force_b = TRUE;
     prev_x = 0x7FFF;
+    memset(xoff, 0, sizeof(xoff)); memset(yoff, 0, sizeof(yoff)); voff = 0;
     for (u16 i = 0; i < 64; i++) row_layer[i] = par_star_row[i & 31];
     mode = 0;
 }
@@ -137,6 +142,16 @@ void par_frame(s16 cam_x, s16 cam_y)
     if (!band) l0 = l1 = 0;
     u16 z = bg_zone_index();
     if (cam_x == prev_x && cam_y == prev_y && bx == prev_bx && l0 == prev_l0 && z == prev_z) return;
+    s16 dx = cam_x - prev_x, dy = cam_y - prev_y;
+    if (prev_x != 0x7FFF && (dx > 16 || dx < -16 || dy > 16 || dy < -16)) {     /* a cut */
+        for (u16 d = 0; d < PAR_STAR_LAYERS; d++) {
+            s16 sp = par_star_speed[d];
+            xoff[d] += (s16)(mul16(prev_x, sp) >> 4) - (s16)(mul16(cam_x, sp) >> 4);
+            yoff[d] += (s16)(mul16(prev_y, sp) >> 4) - (s16)(mul16(cam_y, sp) >> 4);
+        }
+        s16 dv = (s16)(mul16(prev_y, PAR_STAR_V_SPEED) >> 4) - (s16)(mul16(cam_y, PAR_STAR_V_SPEED) >> 4);
+        voff += (dv + 4) & ~7;
+    }
     prev_x = cam_x; prev_y = cam_y; prev_bx = bx; prev_l0 = l0; prev_z = z;
 
     s16 off = 0;
@@ -155,7 +170,7 @@ void par_frame(s16 cam_x, s16 cam_y)
 
     /* plane B band and the H-scroll mode */
     par_dbg_band = band;
-    s16 vs = (s16)(mul16(cam_y, PAR_STAR_V_SPEED) >> 4);
+    s16 vs = (s16)(mul16(cam_y, PAR_STAR_V_SPEED) >> 4) + voff;
     u8 h = HSCROLL_TILE;
     if ((m == M_ROWS && (vs & 7)) || ((l0 | l1) & 7)) h = HSCROLL_LINE;
     if (h != tab_h) { tab_h = h; force_a = force_b = TRUE; }
@@ -170,7 +185,7 @@ void par_frame(s16 cam_x, s16 cam_y)
         /* columns: A at its layer's speed, B at the camera; A's H-scroll stays 0 (16-px aligned,
          * so the partly shown left column never needs a V-scroll value) */
         s16 ly[PAR_STAR_LAYERS];
-        for (u16 d = 0; d < PAR_STAR_LAYERS; d++) ly[d] = (s16)(mul16(cam_y, par_star_speed[d]) >> 4);
+        for (u16 d = 0; d < PAR_STAR_LAYERS; d++) ly[d] = (s16)(mul16(cam_y, par_star_speed[d]) >> 4) + yoff[d];
         for (u16 c = 0; c < 20; c++) {
             vsram[c * 2] = ly[par_star_col[c]];
             vsram[c * 2 + 1] = cam_y;
@@ -181,7 +196,7 @@ void par_frame(s16 cam_x, s16 cam_y)
         s16 lx[PAR_STAR_LAYERS];
         bool same = !force_a && vs == last_a[PAR_STAR_LAYERS];
         for (u16 d = 0; d < PAR_STAR_LAYERS; d++) {
-            lx[d] = (s16)(mul16(cam_x, par_star_speed[d]) >> 4);
+            lx[d] = (s16)(mul16(cam_x, par_star_speed[d]) >> 4) + xoff[d];
             if (lx[d] != last_a[d]) same = FALSE;
         }
         if (!same) {

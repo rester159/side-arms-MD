@@ -22,7 +22,8 @@ u16 bg_cache_misses(void);
 void bg_set_home(bool on);
 void bg_scroll_external(bool on);
 bool bg_is_enabled(void);
-bool bg_is_home(void);                  /* Home zone variants selected */
+bool bg_is_home(void);
+void bg_view(s16 *x, s16 *y);           /* camera of the picture on screen (a zone switch shows the old one a frame longer) */                  /* Home zone variants selected */
 u16 bg_zone_index(void);                /* 0xFFFF: none */
 bool bg_band_lines(s16 *l0, s16 *l1, s16 *x);
 

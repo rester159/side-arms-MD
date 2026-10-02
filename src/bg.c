@@ -74,7 +74,27 @@ static s8 bhdir;
 #define BROW(y) (band && (y) >= by0 && (y) <= by1)
 static void band_off(bool resync);
 
+/* Zone switch under a shown picture (a teleport into another zone, e.g. section 1 -> 2): the
+ * arcade cuts between two near-identical views in one frame. Here the new view needs every
+ * metatile uploaded again (~13 KB: more than one VBlank), so the switch takes two frames:
+ * frame 1 uploads the new tiles into free slots while the old picture stays intact (its slots
+ * HELD, old scroll, old palette); frame 2 sends the new nametable, palette and scroll together.
+ * (Before, the palette landed first and the tiles over the shown slots: one garbled frame.) */
+#define HELD        0xFE                /* slot_refs value: still shown by the old picture */
+static u8 sw_state;                     /* 0 none, 1 new tiles queued, 2 switching, 3 release */
+static bool sw_held;
+static s16 show_x, show_y;              /* camera of the picture on screen */
+
 u16 bg_cache_misses(void) { return misses; }
+
+static void release_held(void)
+{
+    if (!sw_held) return;
+    for (u16 i = 0; i < BG_SLOTS; i++) if (slot_refs[i] == HELD) slot_refs[i] = 0;
+    sw_held = FALSE;
+}
+
+void bg_view(s16 *x, s16 *y) { *x = show_x; *y = show_y; }
 
 static void flush_cache(void)
 {
@@ -99,8 +119,19 @@ void bg_init(void)
     dirty_all = FALSE;
 }
 
-void bg_set_zone(u16 z)
+static void set_zone(u16 z, bool keep)
 {
+    static u8 shown[BG_SLOTS];
+    release_held();
+    sw_state = 0;
+    keep = keep && zone && lx1 >= lx0 && !fr;
+    if (keep) {
+        memset(shown, 0, sizeof(shown));
+        for (u16 i = 0; i < RING_H * RING_W; i++) {
+            u8 sl = (&cell_slot[0][0])[i];
+            if (sl != NO_SLOT) shown[sl] = 1;
+        }
+    }
     const ZoneVariant *v = home ? zone_home[z] : NULL;
     zone = v ? &v->z : &zones[z];
     ext_tiles = v ? v->extra_tiles : NULL;
@@ -108,8 +139,14 @@ void bg_set_zone(u16 z)
     zone_id = z;
     zone_stale = FALSE;
     flush_cache();
-    pal_load(0, zone->pal, 32);
+    if (keep) {
+        for (u16 i = 0; i < BG_SLOTS; i++)
+            if (shown[i] && slot_refs[i] != RESERVED) { slot_refs[i] = HELD; sw_held = TRUE; }
+        sw_state = 1;                   /* palette and nametable: with the switch (send) */
+    } else pal_load(0, zone->pal, 32);
 }
+
+void bg_set_zone(u16 z) { set_zone(z, FALSE); }
 
 static u8 acquire(u16 meta)
 {
@@ -293,6 +330,7 @@ static void band_update(void)
 static const ParBand *band_want(s16 *x)
 {
     if (!home || fr || !zone) return NULL;
+#if PAR_BAND_COUNT                              /* none in 1.0 (docs/parallax.md) */
     for (u16 i = 0; i < PAR_BAND_COUNT; i++) {
         const ParBand *b = &par_bands[i];
         if (b->den && b->zone == zone_id && cam_y == b->cam_y && cam_x > b->x0 && cam_x <= b->x1) {
@@ -302,6 +340,9 @@ static const ParBand *band_want(s16 *x)
             return *x != cam_x ? b : NULL;
         }
     }
+#else
+    (void)x;
+#endif
     return NULL;
 }
 
@@ -355,7 +396,7 @@ static void auto_zone(void)
     s16 cx = (cam_x + SCREEN_W / 2) >> 5, cy = (cam_y + SCREEN_H / 2) >> 5;
     if (zone && zone_has(zone, cx, cy)) return;
     for (u16 i = 0; i < ZONE_COUNT; i++)
-        if (zone_has(&zones[i], cx, cy)) { bg_set_zone(i); return; }
+        if (zone_has(&zones[i], cx, cy)) { set_zone(i, TRUE); return; }
 }
 
 static void release_cells(const u8 *o)
@@ -392,6 +433,10 @@ static void load_all(s16 x0, s16 y0, s16 x1, s16 y1)
                     released = TRUE;
                     sl = acquire(e & 0x0FFF);
                 }
+                if (sl == NO_SLOT && sw_held) {         /* zone switch: no room to keep the old picture */
+                    release_held();
+                    sl = acquire(e & 0x0FFF);
+                }
                 if (sl != NO_SLOT) cell_words(e, sl, dst, 64);
             }
             if (sl == NO_SLOT)
@@ -405,6 +450,15 @@ static void load_all(s16 x0, s16 y0, s16 x1, s16 y1)
 
 static void send(void)
 {
+    if (sw_state == 1) { sw_state = 2; return; }    /* zone switch frame 1: only the new tiles go out */
+    if (sw_state == 2) {                            /* frame 2: nametable, then palette, same VBlank */
+        sw_state = 3;
+        dirty_all = TRUE;
+        DMA_queueDmaFast(DMA_VRAM, shadow, VRAM_PLANE_B, sizeof(shadow) / 2, 2);
+        dirty_all = FALSE; dirty_cols = dirty_rows = 0;
+        pal_load(0, zone->pal, 32);
+        return;
+    }
     if (fr_pending >= 0) {                          /* a pre-rendered wheel frame */
         DMA_queueDmaFast(DMA_VRAM, fr_img + (u32)fr_pending * (sizeof(shadow) / 2), VRAM_PLANE_B, sizeof(shadow) / 2, 2);
         fr_pending = -1;
@@ -544,6 +598,7 @@ void bg_frames_end(void)
 
 void bg_update(void)
 {
+    if (sw_state == 3) { release_held(); sw_state = 0; }   /* the switched picture is on screen */
     if (fr_state == 1 && zone) frames_preload();
     else if (fr_state == 3 && frames_render()) fr_state = 2;
     if (enabled && zone_stale) bg_set_zone(zone_id);
@@ -597,7 +652,8 @@ void bg_update(void)
         }
     }
     send();
+    if (sw_state != 2) { show_x = cam_x; show_y = cam_y; }   /* zone switch frame 1: old picture, old scroll */
     if (ext_scroll) return;                         /* Home parallax: parallax.c writes the scroll tables */
-    VDP_setHorizontalScrollVSync(BG_B, -cam_x);
-    VDP_setVerticalScrollVSync(BG_B, cam_y);
+    VDP_setHorizontalScrollVSync(BG_B, -show_x);
+    VDP_setVerticalScrollVSync(BG_B, show_y);
 }

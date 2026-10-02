@@ -75,7 +75,9 @@ void video_frame(void)
     if (want_stars != stars_on && !par) video_stars_draw(want_stars);
     if (par) {
         bg_update();                    /* streams the view, band state for this camera */
-        par_frame(v_cam_x, v_cam_y);
+        s16 vx, vy;
+        bg_view(&vx, &vy);              /* = the camera, except on a zone switch's first frame */
+        par_frame(vx, vy);
         return;
     }
     VDP_setHorizontalScrollVSync(BG_A, -star_x);

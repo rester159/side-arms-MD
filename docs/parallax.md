@@ -34,13 +34,16 @@ variant of the zone has the texture pixels cut out of its metatiles and plane A 
 uncut cells always join seamlessly; cells under the HUD rows are never cut.
 
 **Bands** (`par_bands`, plane B): rows of distant scenery without terrain on a horizontal leg,
-streamed by `bg.c` at their own camera x and shown with plane-B line scroll. Section 1: the hills
-(rows 2-5, 1/2 speed). (A Mt Fuji band, row 4 at 3/4 speed, was removed in 1.0: it looked broken.) `parallax_split.py` checks that the
-rows have no terrain and that band and world agree pixel for pixel where the band locks again.
+streamed by `bg.c` at their own camera x and shown with plane-B line scroll. `parallax_split.py`
+checks that the rows have no terrain and that band and world agree pixel for pixel where the band
+locks again. **None is active in 1.0:** section 1's Mt Fuji band (row 4, 3/4 speed) looked broken,
+and its hills band (rows 2-5, 1/2 speed) never matches the world again before the section 1 -> 2
+teleport, so the arcade's seamless cut (the end of section 1 already shows the cliff and the sea
+that section 2 starts with) showed the hills turning into the cliff. The machinery stays.
 
 | section | parallax |
 |---|---|
-| 1 | star rows + hills band |
+| 1 | star rows |
 | 2, 4, 7, 8, 9, 10 | star rows |
 | 3, 6 | star columns on the long vertical legs, star rows elsewhere |
 | 5 | star rows, cave-wall far layer on the cave leg |
@@ -69,6 +72,20 @@ plane-B frame pre-render switches bands off (`fr`). Boss Rush arenas get the sam
   arcade view only uses the table's first 4 bytes.
 - Tables are DMA'd in VBlank (SGDK queue) only when they change; the scroll-mode register is switched
   from the VBlank callback (`par_vblank`) after the matching tables have been delivered.
+
+## Camera cuts
+
+Teleports (section starts, the wheel deaths) are instant cuts in the arcade, often between two
+views drawn to look alike (end of section 1 -> start of section 2: 18 of 19 metatiles shared).
+
+- Stars: a layer's position = speed x camera + an offset that absorbs each cut (a camera move of
+  more than 16 px in a frame), so the stars keep drifting through a cut as the arcade's do. The
+  vertical offset moves in whole 8-line rows (keeps cell H-scroll possible): at most a 4-px nudge.
+- Background (all modes, `bg.c`): a cut into another zone used to flush the metatile cache, load
+  the new palette first and overwrite tiles still on screen, which showed one garbled frame. Now the
+  switch takes two frames: the new tiles go to free slots while the old picture stays on screen
+  (its slots held, old scroll and palette), then nametable, palette and scroll switch in one VBlank
+  (`set_zone`, `sw_state`). If the cache cannot hold both views, it falls back to the old way.
 
 ## Cost
 
@@ -106,7 +123,7 @@ Other checks:
 - Frame-identical to the first implementation (screen hashes, 900 frames each) in sections 1 and 8;
   section 9 differs from frame 452 only because the old build dropped a frame there.
 - Screenshots of every section, ON vs OFF (`reports/parallax/final/`): same playfield, layers
-  moving at their speeds; section 5 far layer, section 1 hills band.
+  moving at their speeds; section 5 far layer.
 - Boss fights in Home with parallax: sections 2 and 9 (wheel bosses) and 10 (final boss) played
   through to the next section / the ending.
 - SRAM: PARALLAX OFF is saved (settings version 3, byte 66), survives a power cycle and then keeps
