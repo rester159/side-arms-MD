@@ -178,3 +178,24 @@ Baseline ROM, driver, sound data, failed boot result and audio are preserved in
 
 The itch.io draft is `2026-10-03_side_arms_itch_post.txt`. It describes a local test
 build and requests device retesting; no post or ROM has been published by this task.
+
+## v1.1 release build
+
+The follow-up release was built from source commit `15c54df`, containing these bug
+fixes and V1.1 labels on both mode select and Home. Unfinished multiplayer and Before
+Christ changes were excluded from the release commit and remain in the development
+workspace. The local SEGA/CAPCOM intro assets were included in the binary as before.
+
+- Output: `dist/side-arms-md-v1.1.bin`, 2,621,440 bytes.
+- SHA-256: `061059e4024c82d873da98cc08c2b5547a1fe87fffaf36361b6f3a3ea5057a54`.
+- Clean build; header ROM extent and checksum verified.
+- Home screenshot visually confirms V1.1; Home normal play, Boss Rush and SRAM
+  save/reload passed. All eight PAL/NTSC clean/dirty launch/reset cases passed.
+- Sound driver and data are byte-identical to the version that passed the 114 sound
+  cases. All four full-game combat-clock regressions passed on this release ROM:
+  245–250 ticks per 60 video frames, at most seven pending half-ticks, and no sound
+  stall longer than one video frame. Existing busy-scene gameplay slowdown remains.
+- Release-specific screenshots and logs are retained locally in `reports/v1.1/`.
+
+The repository remains source-only; the new binary is a local release artifact.
+Uploading it to itch.io is a separate step. Device-testing limitations above still apply.
