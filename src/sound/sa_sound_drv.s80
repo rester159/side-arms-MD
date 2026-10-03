@@ -36,8 +36,11 @@ PDIRTY      EQU     RAM+$03         ; patches must be reloaded on the next music
 SUBT        EQU     RAM+$04         ; Timer A half periods not consumed yet
 CURBANK     EQU     RAM+$05         ; 0 = M, 1 = S, $FF unknown
 NOTETAB     EQU     RAM+$06         ; region F-number table
-PSGMUL      EQU     RAM+$08         ; 27 NTSC / 29 PAL
+PSGTABHI    EQU     RAM+$08         ; high byte of period table in bank S ($C0 / $E0)
 BANKM       EQU     RAM+$09         ; bank number of bank M (S = M + 1)
+SFXDIRTY    EQU     RAM+$0B         ; a command may have activated a lower-priority slot
+TOP1        EQU     RAM+$0C         ; slot selected by sfx this tick (0 = none)
+TOP2        EQU     RAM+$0E
 IMG1        EQU     RAM+$10         ; -> 11 SSG register values of virtual chip 1 / 2
 IMG2        EQU     RAM+$12
 PSGIDLE     EQU     RAM+$14
@@ -49,7 +52,6 @@ PICKS       EQU     RAM+$20         ; 3 x {voice, volume}
 VVOL        EQU     RAM+$28         ; 6 tone volumes
 WANT        EQU     RAM+$30         ; wanted PSG state: N0..N2, att0..att3
 PSH         EQU     RAM+$40         ; PSG shadow (+10 noise control)
-NCACHE      EQU     RAM+$50         ; 6 x {TP, N}
 SHAD1       EQU     RAM+$70         ; SSG images (11 bytes)
 SHAD2       EQU     RAM+$80
 CHAN        EQU     RAM+$100        ; 4 sets x 6 channels x 16 bytes
@@ -115,14 +117,14 @@ init
             or      a
             jr      nz,.pal
             ld      hl,NTAB_NTSC
-            ld      a,27
+            ld      a,$C0
             ld      bc,(917>>2)*256+(917&3)
             jr      .rg
 .pal        ld      hl,NTAB_PAL
-            ld      a,29
+            ld      a,$E0
             ld      bc,(918>>2)*256+(918&3)
 .rg         ld      (NOTETAB),hl
-            ld      (PSGMUL),a
+            ld      (PSGTABHI),a
             ; static channel fields of the 24 records
             ld      ix,CHAN
             ld      e,4
@@ -597,16 +599,33 @@ loadpatch   call    poll
             add     hl,hl
             ld      de,PATCHES
             add     hl,de
-            ld      e,(ix+CH_PART)
+            ; Burst writer: no per-register call / stack saves. This path owns
+            ; BC/DE/HL, unlike ymwf's general preserve-all contract. Keep the
+            ; busy check and >=17 Z80 cycles between address and data writes.
+            ; Less time reloading six instruments means less catch-up jitter.
+            ld      b,YM0>>8
+            ld      c,(ix+CH_PART)
             ld      a,(ix+CH_OFS)
             add     a,$30
-            ld      b,24
-.r          ld      d,(hl)
-            call    ymwf
-            add     a,4
+            ld      d,a
+            ld      e,24
+.r          ld      a,(YM0)
+            add     a,a
+            jr      c,.r
+            ld      a,d
+            ld      (bc),a
+            inc     c
+            ld      a,(hl)
+            ld      (bc),a
+            dec     c
             inc     hl
-            djnz    .r
+            ld      a,d
+            add     a,4
+            ld      d,a
+            dec     e
+            jr      nz,.r
             add     a,$20               ; $B0 + channel
+            ld      e,c
             ld      d,(hl)
             call    ymwf
             inc     hl
@@ -633,6 +652,8 @@ slotix      ld      l,a
 ; start SFX: c = slot, de = frame list (bank S). A busy slot restarts; voice fields are kept, the
 ; mixer is reset (spec $09EC).
 sfx_start   ld      a,c
+            ld      hl,SFXDIRTY
+            ld      (hl),1
             push    de
             call    slotix
             pop     de
@@ -655,7 +676,11 @@ sfx_stop    ld      hl,SLOT             ; spec $0141
 ; per virtual chip only the highest active slot runs (spec $05D5)
 sfx         ld      ix,SLOT+4*32
             call    .chip
+            ld      (TOP1),ix
             ld      ix,SLOT+9*32
+            call    .chip
+            ld      (TOP2),ix
+            ret
 .chip       ld      b,5
             ld      de,-32
 .f          ld      a,(ix+SL_ACT)
@@ -663,6 +688,7 @@ sfx         ld      ix,SLOT+4*32
             jr      nz,slot_tick
             add     ix,de
             djnz    .f
+            ld      ix,0
             ret
 
 ; frame countdown; a new frame is read when it reaches 0 and that tick has no slides (spec $064C)
@@ -827,23 +853,40 @@ slides      push    ix
 
 ; per virtual chip: the highest active slot stops every lower slot (spec $0A7B; no SFX of the data
 ; repeats forever, so all lower slots stop) and provides the SSG register image
-sfxout      ld      ix,SLOT+4*32
+sfxout      ld      ix,(TOP1)
             ld      iy,SHAD1
+            ld      de,SLOT+4*32
             call    .chip
             ld      (IMG1),hl
-            ld      ix,SLOT+9*32
+            ld      ix,(TOP2)
             ld      iy,SHAD2
+            ld      de,SLOT+9*32
             call    .chip
             ld      (IMG2),hl
+            xor     a
+            ld      (SFXDIRTY),a
             ret
-.chip       ld      b,5
+.chip       push    ix
+            pop     hl
+            ld      a,h
+            or      l
+            jr      z,.silent
+            ld      a,(ix+SL_ACT)
+            or      a
+            jr      z,.rescan           ; selected effect ended: a lower slot may survive
+            ld      a,(SFXDIRTY)
+            or      a
+            jr      z,.render           ; no new slot: lower priorities are already stopped
+.rescan     push    de
+            pop     ix
+            ld      b,5
             ld      de,-32
 .f          ld      a,(ix+SL_ACT)
             or      a
             jr      nz,.act
             add     ix,de
             djnz    .f
-            ld      hl,SILENT
+.silent     ld      hl,SILENT
             ret
 .act        push    ix
             dec     b
@@ -852,6 +895,7 @@ sfxout      ld      ix,SLOT+4*32
             ld      (ix+SL_ACT),0
             djnz    .k
 .img        pop     ix
+.render
             push    ix
             pop     hl
             ld      de,SL_VOICE
@@ -934,6 +978,7 @@ psgmap      call    poll
             jr      .go
 .busy       xor     a
 .go         ld      (PSGIDLE),a
+            call    bank_s             ; period lookup tables share the SFX data bank
             ; tone volumes (0 if the tone is off in the mixer) + per chip noise loudness
             ld      hl,(IMG2)
             ld      de,VVOL
@@ -1178,7 +1223,7 @@ psgmap      call    poll
             ret
 
 ; hl -> pick {voice index or $FF, volume}, de -> WANT N slot. Stores N (unless no voice) and
-; returns a = attenuation. N is cached per voice (NCACHE) while its period does not change.
+; returns a = attenuation. Period conversion is a lookup in the current SFX bank.
 .chan       ld      a,(hl)
             cp      $FF
             jr      nz,.c1
@@ -1188,7 +1233,6 @@ psgmap      call    poll
             ld      c,(hl)
             push    bc
             push    de
-            ld      b,a
             cp      3                   ; voices 0-2 = chip 2 A-C, 3-5 = chip 1 A-C
             ld      hl,(IMG2)
             jr      c,.c2
@@ -1203,39 +1247,11 @@ psgmap      call    poll
             inc     hl
             ld      a,(hl)
             and     $0F
-            ld      d,a                 ; de = TP
-            ld      a,b
-            add     a,a
-            add     a,a
-            add     a,NCACHE&$FF
-            ld      l,a
-            ld      h,NCACHE>>8
-            ld      a,(hl)
-            cp      e
-            jr      nz,.miss
-            inc     hl
-            ld      a,(hl)
-            cp      d
-            jr      nz,.miss2
-            inc     hl
-            ld      e,(hl)
-            inc     hl
-            ld      d,(hl)
-            jr      .have
-.miss2      dec     hl
-.miss       ld      (hl),e
-            inc     hl
-            ld      (hl),d
-            inc     hl
-            push    hl
-            ex      de,hl
+            ld      h,a
+            ld      l,e                 ; hl = 12-bit TP
             call    tpn
             ex      de,hl
             pop     hl
-            ld      (hl),e
-            inc     hl
-            ld      (hl),d
-.have       pop     hl
             ld      (hl),e
             inc     hl
             ld      (hl),d
@@ -1243,61 +1259,16 @@ psgmap      call    poll
             ld      a,c
             jp      att
 
-; hl = SSG period (12 bit) -> hl = PSG N (1..1023): N = TP - round(TP*mul/256), halved while > 1023
-; (mul 27 NTSC = 16+8+2+1, 29 PAL = 16+8+4+1). TP 0 counts as 1, like the SSG.
-tpn         ld      a,h
-            or      l
-            jr      nz,.nz
-            inc     l
-.nz         push    hl                  ; TP
-            ld      b,h
-            ld      c,l
-            add     hl,hl               ; TP*2
-            ld      a,(PSGMUL)
-            cp      29
-            jr      nz,.m2
-            add     hl,hl               ; TP*4
-.m2         add     hl,bc               ; TP*3 / TP*5
-            ex      de,hl
-            ld      h,b
-            ld      l,c
-            add     hl,hl
-            add     hl,hl
-            add     hl,hl               ; TP*8
-            add     hl,de               ; TP*11 / TP*13 (< 65536)
-            ex      de,hl
-            ld      h,b
-            ld      l,c
-            add     hl,hl
-            add     hl,hl
-            add     hl,hl
-            add     hl,hl               ; TP*16
-            ld      a,0
-            add     hl,de               ; TP*27 / TP*29 in a:hl
-            adc     a,a
-            ld      c,a
-            ld      a,l                 ; q = (a:hl + $80) >> 8
-            add     a,$80
-            ld      a,h
-            adc     a,0
-            ld      l,a
-            ld      a,c
-            adc     a,0
+; hl = 12-bit SSG period -> hl = PSG N (1..1023). Bank S must be selected.
+; Every table entry is checked against the former arithmetic in qa_itch_sound_data.py.
+tpn         add     hl,hl
+            ld      a,(PSGTABHI)
+            add     a,h
             ld      h,a
-            ex      de,hl
-            pop     hl
-            or      a
-            sbc     hl,de               ; N = TP - q
-.o          ld      a,h
-            cp      4
-            jr      c,.ok
+            ld      e,(hl)
             inc     hl
-            srl     h
-            rr      l
-            jr      .o
-.ok         or      l
-            ret     nz
-            inc     l
+            ld      d,(hl)
+            ex      de,hl
             ret
 
 att         and     $0F                 ; a = SSG volume 0..15 -> PSG attenuation

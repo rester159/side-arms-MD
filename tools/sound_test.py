@@ -9,8 +9,8 @@ the tick counter ($C000 copy) planted to the arcade's value so triplet / slide p
 Checks per tick:
   FM   musical equivalence: per tick the same key-on/off writes (order, channel, slots) and pitch
        writes as the arcade's YM2203 FM writes mapped to the port (chip 2 -> part II, key-on codes 4-6,
-       F-numbers through the region table), and the same operator / FB-ALG register state after the
-       tick. Also counted: ticks whose whole write sequence is identical.
+       F-numbers through the region table), and operator / FB-ALG state after the explicit
+       carrier-only music attenuation. Also counted: raw write-identical ticks (before mix adjustment).
   PSG  the PSG state must equal tools/sound_model.py applied to the arcade's SSG register images.
   CMD  the driver takes each command on the scheduled tick.
 Audio (MAME -wavwrite of both machines, informative): RMS envelope correlation and sounding length.
@@ -27,6 +27,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).parent))
 from arcade_source import Source, ROOT
 import sound_model as sm
+from build_sound import CARRIER_MASKS, MUSIC_TL
 
 OUT = ROOT / 'reports/sound_port'
 CART = ROOT / 'tests/sound_rom'
@@ -35,6 +36,11 @@ SFX = [c for c in range(0x01, 0x20) if c not in (0x10, 0x16, 0x19, 0x1F)]
 MUSIC = list(range(0x20, 0x39))
 # name: (secs, [(frame, cmd), ...]) ; frames are arcade frames (60 Hz) after the start
 SCENARIOS = {
+    # Sustained two-player-style shots/explosions: exercise priority replacement,
+    # cached slot selection and rapid period slides over a looping music track.
+    'scn_combat': (20, [(0, 0x21)] +
+                   [(f, (0x07, 0x01, 0x08, 0x02, 0x03, 0x09)[(f // 4) % 6])
+                    for f in range(4, 1100, 4)] + [(1120, 0x00)]),
     # game over ($2E, set $C300) over stage BGM ($21, set $C200): freeze, silence, resume
     'scn_priority': (22, [(0, 0x21), (600, 0x2E)]),
     # same set restarted (no set change -> 2-tick start), another song in the same set, $38 in $C100
@@ -229,8 +235,15 @@ def compare(name, secs, seq, j, rerun_arcade):
     latch = (0, 1)
     keyons_a = keyons_m = 0
     sa, sm_ = {}, {}                      # YM2612 register state (part, reg) from both streams
-    def voice_state(st):                  # operator / FB-ALG registers of the 6 channels
-        return {k: v for k, v in st.items() if (0x30 <= k[1] <= 0x9F and k[1] & 3 != 3) or 0xB0 <= k[1] <= 0xB2}
+    def voice_state(st, mixed=False):     # operator / FB-ALG registers of the 6 channels
+        result = {k: v for k, v in st.items() if (0x30 <= k[1] <= 0x9F and k[1] & 3 != 3) or 0xB0 <= k[1] <= 0xB2}
+        if mixed:
+            for (part, reg), value in result.items():
+                if 0x40 <= reg <= 0x4E:
+                    algorithm = st.get((part, 0xB0 + (reg & 3)), 0) & 7
+                    if CARRIER_MASKS[algorithm] & (1 << ((reg >> 2) & 3)):
+                        result[(part, reg)] = min(127, (value & 127) + MUSIC_TL)
+        return result
     for i in range(n):
         exp = map_fm(a['ticks'][i]['w'], ntsc)
         got = [w for w in m['ticks'][i]['w'] if w[1] != 0x27]
@@ -246,7 +259,7 @@ def compare(name, secs, seq, j, rerun_arcade):
         # this tick, same operator / pitch registers after it
         keys = lambda ws: [w for w in ws if w[1] == 0x28]
         pitch = lambda ws: sorted(w for w in ws if 0xA0 <= w[1] <= 0xA6)
-        if keys(exp) == keys(got) and pitch(exp) == pitch(got) and voice_state(sa) == voice_state(sm_):
+        if keys(exp) == keys(got) and pitch(exp) == pitch(got) and voice_state(sa, mixed=True) == voice_state(sm_):
             fm_ok += 1
         else:
             fm_bad += 1
@@ -373,14 +386,18 @@ def main():
                 for nm in names}
         res = [futs[nm].result() for nm in names]
     lines = []
+    failed = False
     for r in res:
         if r['name'] == 'api':
+            failed |= not r['order_ok'] or r['sent'] != r['taken']
             lines.append(f"api      sent={r['sent']} taken={r['taken']} order_ok={r['order_ok']} latency_ms={r['latency_ms']}")
             continue
         if 'error' in r:
+            failed = True
             lines.append(f"{r['name']:12s} ERROR {r['error']}"); continue
         ok = (r['fm_ticks_bad'] == 0 and r['psg_ticks_bad'] == 0 and r['cmd_ok'] and r['complete']
               and (r['poll_gap_ms'] or 0) < 2.0)
+        failed |= not ok
         lines.append(f"{r['name']:12s} {'PASS' if ok else 'FAIL'} ticks={r['ticks']} cmds={','.join(r['commands'])} "
                      f"fm={r['fm_ticks_ok']}/{r['ticks']} (write-identical {r['fm_write_identical_ticks']}; {r['fm_writes']} writes, keyons arcade/md "
                      f"{r['keyons'][0]}/{r['keyons'][1]}) psg={r['psg_ticks_ok']}/{r['ticks']} "
@@ -394,6 +411,8 @@ def main():
     (OUT / f'report{tag}.txt').write_text('\n'.join(lines) + '\n')
     (OUT / f'report{tag}.json').write_text(json.dumps(res, indent=1))
     print('\n'.join(lines))
+    if failed:
+        raise SystemExit(1)
 
 
 if __name__ == '__main__':

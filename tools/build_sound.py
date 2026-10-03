@@ -36,6 +36,32 @@ LEN_DOTTED = [0, 0, 3, 6, 12, 24, 48, 96]       # arcade $0472
 OP_PATCH, OP_JUMP, OP_END = 0x7D, 0x7E, 0x7F    # stream opcodes; 0 = rest, 1..96 = note, bit 7 = triplet
 KIND = {'stop_all': 0, 'stop_sfx': 1, 'stop_music': 2, 'sfx': 3, 'music': 4}
 
+# 16 total-level steps = 12 dB. Only output carriers are attenuated; changing
+# modulators would change the instrument. Register order is S1, S3, S2, S4.
+MUSIC_TL = 16
+CARRIER_MASKS = (0x8, 0x8, 0x8, 0x8, 0xC, 0xE, 0xE, 0xF)
+
+
+def mix_patch(raw):
+    patch = bytearray(raw)
+    mask = CARRIER_MASKS[patch[24] & 7]
+    for slot in range(4):
+        if mask & (1 << slot):
+            patch[4 + slot] = min(127, (patch[4 + slot] & 127) + MUSIC_TL)
+    return bytes(patch)
+
+
+def psg_period_table(multiplier):
+    """Exact former Z80 arithmetic, precomputed for every 12-bit SSG period."""
+    table = bytearray()
+    for period in range(4096):
+        period = period or 1
+        value = period - ((period * multiplier + 128) >> 8)
+        while value > 1023:
+            value = (value + 1) >> 1
+        table += max(1, value).to_bytes(2, 'little')
+    return table
+
 
 class DurTable:
     """(ticks to next event, key-off tick or 0) pairs shared by all streams."""
@@ -247,7 +273,7 @@ def main():
             cmd[n] = (3, slot, WIN + sfx_at); sfx_at += len(fr)
         else:
             cmd[n] = (KIND.get(e['kind'], 5), 0, 0)
-    if music_at > 0x8000 or sfx_at > 0x8000:
+    if music_at > 0x8000 or sfx_at > 0x4000:
         raise SystemExit(f'build_sound: bank overflow (music {music_at}, sfx {sfx_at})')
     for n, (k, arg, ptr) in cmd.items():
         bank0[CMDTAB + 4 * n:CMDTAB + 4 * n + 4] = bytes([k, arg, ptr & 0xFF, ptr >> 8])
@@ -263,7 +289,10 @@ def main():
     for key, p in j['patches'].items():
         raw = bytes.fromhex(p['raw'])     # registers $30,$34,..,$8C (operator order S1 S3 S2 S4), $B0, key-on mask
         o = PATCHES + 32 * int(key, 16)
-        bank0[o:o + 26] = raw
+        bank0[o:o + 26] = mix_patch(raw)
+    # Spare space in SFX bank: NTSC at Z80 $C000, PAL at $E000. No ROM growth.
+    bank1[0x4000:0x6000] = psg_period_table(27)
+    bank1[0x6000:0x8000] = psg_period_table(29)
     blob = bytes(bank0) + bytes(bank1)
     OUT_BIN.write_bytes(blob)
     import hashlib

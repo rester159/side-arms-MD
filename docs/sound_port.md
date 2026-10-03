@@ -1,5 +1,33 @@
 # Side Arms MD — sound driver (native Genesis design)
 
+## 2026-10-03 itch.io follow-up
+
+The [dated bug report](../2026-10-03_side_arms_bugs.md) records the latest fixes and
+verification; the measurements further below describe the original sound port.
+
+- Music patches now attenuate only output carriers by 16 TL steps (nominally 12 dB).
+  Modulators, pitch, events, envelopes and SFX data retain their original values.
+  `sound_test.py` compares operator state after this explicit carrier adjustment;
+  it still requires the same key events, pitches and PSG state on every tick.
+- Sound-effect slot selection is reused between stepping and rendering. Lower slots
+  are cleared again only when a new command could have activated one; when the
+  selected effect ends, the original priority search still runs.
+- Exact PSG period conversions for all 4,096 input values are precomputed for both
+  regions into unused space in bank S: `$C000-$DFFF` NTSC and `$E000-$FFFF` PAL in
+  the Z80 window. Frame lists must end before bank offset `$4000`. This replaces
+  the arithmetic and per-voice period cache without increasing the two-bank ROM size.
+- Patch register uploads use a dedicated burst loop, retaining YM busy checks and
+  address/data spacing. Driver tick rate and catch-up semantics are unchanged.
+
+The gameplay clock regression (`tools/qa_itch_clock.py`) complements the isolated
+MAME sound cartridge: sustained combat can contend for CPU/bus time in ways the
+jukebox does not. `tools/qa_itch_sound_data.py` checks every lookup entry, all eight
+FM algorithms, saturation and unchanged event/SFX data against a baseline blob.
+Physical console balance and compatibility still require affected-device retests.
+
+Carrier ordering/topology reference: [FM implementation, slot indices and algorithm
+connections](https://github.com/ValleyBell/libvgm/blob/master/emu/cores/fmopn.c).
+
 An original Genesis sound driver: music on the YM2612, SFX on the SN76489 PSG. The arcade sound program
 (audiocpu `a_04k.rom`) is used only as a **behavioural spec** (`docs/re/sound.md`); its code structure, RAM
 layout and byte code are not reused. Where an arcade rule is reproduced, the source cites it as `spec $xxxx`.

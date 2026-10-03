@@ -5,7 +5,7 @@ PY := .venv/bin/python
 .PHONY: all assets check-rom clean run
 all: check-rom
 	$(MAKE) assets
-	$(MAKE) -f $(GDK)/makefile.gen JAVA=$(JAVA) LIBGCC="$(shell $(GDK)/bin/m68k-elf-gcc -m68000 -print-libgcc-file-name)"
+	$(MAKE) -f $(GDK)/makefile.gen -f tools/cart_boot.mk JAVA=$(JAVA) LIBGCC="$(shell $(GDK)/bin/m68k-elf-gcc -m68000 -print-libgcc-file-name)"
 	$(PY) tools/finalize_rom.py out/release/rom.bin
 check-rom:
 	@python3 -c "import sys;sys.path.insert(0,'tools')" && $(PY) tools/arcade_source.py

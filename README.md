@@ -11,6 +11,10 @@ Requirements: SGDK at `~/mars/m68k-elf` (override with `GDK=`), Java, Python 3, 
 1. Put the 27 files of the MAME `sidearms` (World) set in `rom/`, or set `SIDEARMS_SOURCE=/path`. `tools/rom_manifest.json` checks every file by SHA-256.
 2. `make` builds `out/release/rom.bin`. `make run` opens it in RetroArch with Genesis Plus GX.
 
+The project build adapts SGDK's boot entry with `tools/cart_boot.mk`: flash-cart launch
+and console reset both initialize RAM and perform the TMSS check. Use the project
+Makefile so this startup fix and the cartridge-header validation are included.
+
 ## Layout
 
 | path | contents |

@@ -1,0 +1,20 @@
+Boot compatibility and sound fixes — testing update
+
+Thanks to everyone who tested Side Arms v1.0 and reported problems, especially jackic, SleepingGiant-b0r3d, patrickf56, Zanac28, ravage1974 and Jankins97.
+
+I've been working through the boot failures and sound issues. Here's what's changed in the local test build:
+
+• More reliable startup. I found a case where controller settings left behind by a flash-cart menu could make the game skip essential initialization. The old build hung in a test that reproduced that condition; the updated build starts correctly. I also corrected the save-memory header.
+
+• Quieter music. I've lowered the music so the sound effects have more room. This adjusts the instruments' output volume while keeping their modulation, notes and timing intact.
+
+• Smoother music timing in busy scenes. Combat testing exposed sound processing falling behind and then catching up. Removing repeated work from the sound driver greatly reduced that backlog and the catch-up bursts in the tested scenes, including two-player combat. Small timing delays remain under stress, so I'd still appreciate listening feedback.
+
+The updated build has passed emulator startup/reset checks in PAL and NTSC, save/reload checks, and sound regressions against the arcade reference. That does not yet confirm the reported EverDrive and MiSTer problems are resolved on those devices. This is a testing update; the fixes have not been uploaded to the public download yet.
+
+For the next build's hardware retest, please include your console/region, flash-cart model or MiSTer core version, and where any remaining boot or sound problem occurs. A short recording would be especially helpful for intermittent music stutters.
+
+Also, for anyone looking for turbo fire: Home → Options → Controls already lets you enable autofire separately for each fire button.
+
+Thanks again for helping make this port better!
+— RESTER 159
