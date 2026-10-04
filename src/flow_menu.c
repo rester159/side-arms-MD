@@ -111,7 +111,7 @@ void menu_select_enter(void)
     select_draw();
     hud_text(7, 23, 0, "PORTED BY RESTER 159, 2026");
     hud_string(FE_STR_COPYRIGHT, -1, -1);
-    hud_text(36, 27, 0, "V1.1");                    /* port version, bottom right */
+    hud_text(36, 27, 0, "V1.2");                    /* port version, bottom right */
 }
 
 void menu_select_update(void)
@@ -171,7 +171,7 @@ void menu_home_enter(void)
     hud_md((HUD_COLS - FE_MD_COLS) / 2, FE_LOGO_ROW + 8, HUD_MD_TILE);     /* "MD" under the logo */
     home_draw();
     hud_string(FE_STR_COPYRIGHT, -1, -1);
-    hud_text(36, 27, 0, "V1.1");                    /* release version */
+    hud_text(36, 27, 0, "V1.2");                    /* release version */
 }
 
 void menu_home_update(void)

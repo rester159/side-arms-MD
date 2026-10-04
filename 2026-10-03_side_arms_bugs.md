@@ -258,3 +258,16 @@ Reproduce the mapping test (the symbol file must be next to each ROM):
 
 The itch.io text has been updated as a draft; neither the post nor the new BIN has
 been uploaded to itch.io by this task.
+
+## v1.2 release
+
+The MiSTer compatibility follow-up is now labeled V1.2 on mode select and Home.
+`dist/side-arms-md-v1.2.bin` is 2,621,440 bytes; SHA-256:
+`4df5f9dced12995d9ba558abf5624e49e6f8d6c7fae08cfb322052f582f95de5`.
+Compared with the tested v1.1 MiSTer-fix BIN, only the shared version-string byte
+and the cartridge checksum byte differ. All game code and assets are identical.
+The release source excludes the unfinished multiplayer/Before Christ work.
+The cartridge-mapping regression, Home saves/reset/legacy settings, and gameplay
+are rerun on this exact BIN; evidence is retained under `reports/v1.2/`.
+Physical MiSTer and flash-cart confirmation remains outstanding. The itch draft
+is labeled v1.2; no itch upload or publication has been performed.

@@ -1,4 +1,4 @@
-Side Arms v1.1 — boot compatibility and sound fixes
+Side Arms v1.2 — boot compatibility and sound fixes
 
 Thanks to everyone who tested Side Arms v1.0 and reported problems, especially jackic, SleepingGiant-b0r3d, patrickf56, Zanac28, ravage1974 and Jankins97.
 
