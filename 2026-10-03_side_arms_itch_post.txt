@@ -1,10 +1,12 @@
-Boot compatibility and sound fixes — testing update
+Side Arms v1.1 — boot compatibility and sound fixes
 
 Thanks to everyone who tested Side Arms v1.0 and reported problems, especially jackic, SleepingGiant-b0r3d, patrickf56, Zanac28, ravage1974 and Jankins97.
 
 I've been working through the boot failures and sound issues. Here's what's changed in the local test build:
 
 • More reliable startup. I found a case where controller settings left behind by a flash-cart menu could make the game skip essential initialization. The old build hung in a test that reproduced that condition; the updated build starts correctly. I also corrected the save-memory header.
+
+• MiSTer cartridge-mapping fix. A targeted test now reproduces the white screen: startup was accidentally enabling save memory over part of the ROM. The new build removes those unnecessary bank-switch writes. Save loading also restores ROM access before checking settings. Physical MiSTer retesting is still needed.
 
 • Quieter music. I've lowered the music so the sound effects have more room. This adjusts the instruments' output volume while keeping their modulation, notes and timing intact.
 

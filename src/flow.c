@@ -152,7 +152,7 @@ void settings_save(void) { sram_save(); }
 
 void sram_load(void)
 {
-    u8 rb[RANK_LEN], sb[SET_LEN];
+    u8 rb[RANK_LEN], sb[SET_LEN + 1];
     for (u16 i = 0; i < 5; i++) {
         ranking[i].score = fe_default_ranking[i].score;
         memcpy(ranking[i].name, fe_default_ranking[i].name, 3);
@@ -163,12 +163,15 @@ void sram_load(void)
     bool v2 = magic == SRAM_MAGIC;
     bool rank_ok = v2 || magic == SRAM_MAGIC_V1;
     for (u16 i = 0; rank_ok && i < RANK_LEN; i++) rb[i] = SRAM_readByte(RANK_OFS + i);
-    rank_ok = rank_ok && SRAM_readByte(RANK_OFS + RANK_LEN) == sram_sum(rb, RANK_LEN);
-    for (u16 i = 0; v2 && i < SET_LEN; i++) sb[i] = SRAM_readByte(SET_OFS + i);
+    u8 rank_sum = SRAM_readByte(RANK_OFS + RANK_LEN);
+    for (u16 i = 0; v2 && i <= SET_LEN; i++) sb[i] = SRAM_readByte(SET_OFS + i);
+    /* Restore ROM before interpreting the block: the compiler may put switch
+     * tables and constants above $200000, which SRAM shadows on MiSTer/carts. */
+    SRAM_disable();
+    rank_ok = rank_ok && rank_sum == sram_sum(rb, RANK_LEN);
     /* settings version 1 (21 bytes + checksum) or 2 (26 bytes + checksum) */
     u16 len = !v2 ? 0 : sb[0] == 1 ? SET_LEN_V1 : sb[0] == 2 ? SET_LEN_V2 : sb[0] == SET_VERSION ? SET_LEN : 0;
-    bool set_ok = len && SRAM_readByte(SET_OFS + len) == sram_sum(sb, len);
-    SRAM_disable();
+    bool set_ok = len && sb[len] == sram_sum(sb, len);
     for (u16 i = 0; set_ok && i < SET_VALUES; i++)
         if (sb[1 + i] < SET_MIN[i] || sb[1 + i] > SET_MAX[i]) set_ok = FALSE;
     if (rank_ok)

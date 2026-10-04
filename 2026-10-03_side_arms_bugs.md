@@ -199,3 +199,62 @@ workspace. The local SEGA/CAPCOM intro assets were included in the binary as bef
 
 The repository remains source-only; the new binary is a local release artifact.
 Uploading it to itch.io is a separate step. Device-testing limitations above still apply.
+
+## MiSTer white-screen follow-up
+
+A follow-up reports a white screen with the latest Update All installation; the
+exact core build and tested ROM filename have not been confirmed.
+
+The [MiSTer cartridge implementation](https://github.com/MiSTer-devel/MegaDrive_MiSTer/blob/master/rtl/cartridge.sv)
+provides a concrete explanation missed by the original emulator matrix. For a ROM
+at most 4 MiB, low-byte writes to `/TIME` set the SRAM latch from bit 0. They are not
+SSF2 bank-selection writes. SGDK's shared library has bank switching enabled and
+its reset routine writes 7, 6, ..., 1 to `$A130FF` through `$A130F3`. The last write
+leaves SRAM enabled, shadowing `$200000-$3FFFFF`, including this game's ROM data.
+Genesis Plus GX's ordinary cartridge decode does not reproduce that broad alias.
+
+`src/cart_mapper.c` supplies the project's fixed-map implementation of SGDK's
+mapper API: reset emits no bank-register writes and FAR access preserves the
+original pointer. This also prevents future accesses above 3 MiB from introducing
+bank switching. The existing finalizer enforces the 4 MiB ROM limit; ordinary SRAM
+access at `$A130F1` remains available. The shared SGDK installation is unchanged.
+
+`tools/qa_mister_mapper.py` applies that SRAM decode to Genesis Plus GX's cartridge
+bus. The original v1.1 produces a solid white screen, zero game-loop updates and
+an unready sound driver; its captured writes end at `$A130F3 = 1`. The fixed-map
+build reaches mode select with 120/120 updates and a ready sound driver.
+
+The expanded test also exposed a save-loading issue: while SRAM was enabled,
+compiled save-version selection could consult a ROM table in the shadowed region.
+`src/flow.c` now copies the complete settings block and checksum into RAM, disables
+SRAM, then interprets and validates it. This preserves older settings formats.
+
+Acceptance checks: reproduce failure on the original binary; confirm fixed boot
+under the cartridge model; change Home lives through the menus and reload across
+reset; load settings versions 1, 2 and 3; start Home gameplay; rerun normal
+PAL/NTSC clean/dirty launch/reset checks and a busy 2P gameplay/audio sample.
+This is a targeted software model of cartridge mapping, **not FPGA simulation or
+a physical MiSTer pass**. Device retest remains required to close B02.
+
+Final follow-up build: `dist/side-arms-md-v1.1-mister-fix.bin` (2,621,440 bytes).
+SHA-256: `67cb1c061805a3a690b52240a9e7942f42d99834564172099e66738cc2d1d94c`.
+The original v1.1 BIN is retained separately. Both menu version labels remain V1.1.
+
+Results: normal startup matrix 8/8 passes; the mapping regression reproduces the
+original white screen, while the fixed build in both NTSC and PAL reaches the menus, saves/reloads Home
+lives through reset, loads legacy settings versions 1 and 2 as well as current
+version 3, and enters advancing Home gameplay. The 3,000-frame section-9 2P stress
+sample passes: 246–250 sound ticks per 60 frames, maximum seven pending half-ticks,
+and no sound freeze longer than one frame. Sound driver and data remain byte-identical
+to the previously verified release. No C compiler warnings. Logs/screenshots, the
+reviewed cartridge RTL snapshot and release symbols are in `reports/mister/`.
+
+Reproduce the mapping test (the symbol file must be next to each ROM):
+
+```sh
+.venv/bin/python tools/qa_mister_mapper.py --rom .local/mister-baseline/rom.bin --output reports/mister/baseline --expect-failure
+.venv/bin/python tools/qa_mister_mapper.py --rom /path/to/fixed/out/release/rom.bin --output reports/mister/fixed
+```
+
+The itch.io text has been updated as a draft; neither the post nor the new BIN has
+been uploaded to itch.io by this task.
