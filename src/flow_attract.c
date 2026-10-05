@@ -263,6 +263,7 @@ static void demo_inputs(void)
         u8 v = din[i].val & 0x7F;
         pad[i].pressed = v & ~pad[i].held;
         pad[i].held = v;
+        pad_fire_held[i] = v & (IN_FIRE_L | IN_FIRE_R);
     }
 }
 

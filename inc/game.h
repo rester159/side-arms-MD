@@ -11,6 +11,7 @@ enum {
 };
 typedef struct { u8 held, pressed; } Pad;
 extern Pad pad[2];                  /* logical game inputs (IN_*), after the control mapping */
+extern u8 pad_fire_held[2];         /* mapped fire buttons before autofire; combined ring repeats itself */
 void input_update(void);
 
 /* Physical pad (SGDK BUTTON_* bits: A B C X Y Z MODE START + directions). Menus read these

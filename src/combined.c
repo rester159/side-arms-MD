@@ -212,12 +212,12 @@ void combine_update_player(Player *p, u8 in)
         if (crushed || !combined) return;
         weapons_pose(p);
         weapons_fire(p, in);
-        if (!q->in_play) weapons_ring(p, in);                  /* $8D25: no partner: leader fires it */
+        if (!q->in_play) weapons_ring(p, pad_fire_held[p->id]); /* $8D25: no partner: leader fires it */
         p->ref_y = p->y; p->ref_x = p->x + 16;                 /* $9053 */
         robot_composite();
     } else if (p->in_play) {
         p->x = l->x; p->y = l->y + 32;                         /* $9063: partner record follows */
-        weapons_ring(p, in);
+        weapons_ring(p, pad_fire_held[p->id]);
         robot_composite();
     }
 }

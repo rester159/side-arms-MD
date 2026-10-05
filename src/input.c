@@ -10,6 +10,7 @@
  *             the cadence of the arcade's AUTO weapon $10 (1 shot / 4 frames, B2:$8BEA); the
  *             arcade itself fires one normal shot per press (latch +$06, B2:$86E2). */
 Pad pad[2];
+u8 pad_fire_held[2];
 RawPad pad_raw[2];
 bool pad_six[2];
 PadConfig pad_cfg;
@@ -55,9 +56,11 @@ static u8 map(u16 i, u16 r, u16 pressed)
                 if (r & XYZ_BIT[k]) b |= p->facing_left ? IN_FIRE_L : IN_FIRE_R;
             } else if (x != XB_NONE && x < XB_COUNT && (pressed & XYZ_BIT[k])) pad_weapon_req[i] = x;
         }
-    /* autofire only while this player's ship fires normally: the AUTO weapon and the combined
-     * robot ring already repeat on frame phase while a button is held (B2:$8BEA, $8D51) */
-    bool af = p->in_play && p->state == PL_ALIVE && p->weapon != WPN_AUTO && !combined;
+    pad_fire_held[i] = b & (IN_FIRE_L | IN_FIRE_R);
+    /* The combined leader still uses the press latch (B2:$831F, $86E2). Keep held
+     * input separately for the ring, which repeats on frame phase ($8D51), like AUTO ($8BEA). */
+    bool af = p->in_play && p->state == PL_ALIVE && p->weapon != WPN_AUTO &&
+              (!combined || combined == i + 1);
     for (u16 k = 0; k < 2; k++) {
         u8 bit = k ? IN_FIRE_R : IN_FIRE_L;
         if (!(b & bit)) { af_t[i][k] = 0; continue; }
@@ -71,6 +74,7 @@ void input_update(void)
     if (dbg_pad_override) {
         /* the host wrote pad[]: the menus see the default buttons */
         for (u16 i = 0; i < 2; i++) {
+            pad_fire_held[i] = pad[i].held & (IN_FIRE_L | IN_FIRE_R);
             u16 r = 0, p = 0;
             for (u16 k = 0; k < 8; k++) {
                 static const u16 RAW[8] = { BUTTON_RIGHT, BUTTON_LEFT, BUTTON_DOWN, BUTTON_UP,
