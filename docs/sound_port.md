@@ -261,3 +261,19 @@ Verification:
 - In the main ROM: 249 driver ticks per 60 frames, and game commands go through the FIFO
   (write/read indices advance, bank register set to `$228000`/`$230000`).
 - `tools/check` is clean.
+
+## Real-hardware fixes (v1.4, Oct 2026)
+
+Reported on Mega EverDrive Pro and EverDrive V3 (black screen after the logos; garbled backgrounds after
+about a minute); confirmed fixed on hardware with the v1.3 test build, released as v1.4.
+
+- **Z80 idle driver.** SGDK's `Z80_init()` and `Z80_unloadDriver()` load the null driver through the same
+  miscompiled `Z80_upload()` described above, so it lands one byte high. MAME showed the Z80 executing at
+  `$F3D5` (inside the 68000 bank window) after the boot logos. `z80_idle()` (`src/sound/sound.c`) copies
+  `drv_null` exactly with bank 0; `main()` calls it first, and the private intros call it after their
+  teardowns. Check: the Z80 PC never leaves `$0000-$1FFF` from power-on to gameplay.
+- **Header.** Standard work-RAM range (`$00FF0000-$00FFFFFF`) and a 1 KiB SRAM range (`$200001-$2007FF`,
+  saves use < 100 bytes), aligned like Black Tiger v1.7 for flash-cart detection.
+- **H-int guard.** `hud_vint()` sets a guard that `hud_hint()` honours until `main()` calls
+  `hud_flush_done()` after `SYS_doVBlankProcess()`, so a DMA flush that runs into the active display cannot
+  be split by the window-split register write.

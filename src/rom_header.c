@@ -23,12 +23,12 @@ const ROMHeader rom_header = {
     "JD              ",
     0x00000000,
     0x000FFFFF,                     /* ROM end: set to the real size by tools/finalize_rom.py */
-    0xE0FF0000,
-    0xE0FFFFFF,
+    0x00FF0000,
+    0x00FFFFFF,
     "RA",
     0xF820,
     0x00200001,                     /* odd-byte SRAM, matching SGDK's SRAM byte accessors */
-    0x0020FFFF,
+    0x002007FF,                     /* 1 KiB (saves use < 100 bytes); aligned like Black Tiger v1.7 for flash carts */
     "            ",
     "SAVE: HIGH SCORES AND SETTINGS          ",
     "JUE             "

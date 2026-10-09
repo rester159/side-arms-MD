@@ -38,6 +38,8 @@
 #define HUD_SCREEN_TILE     (1056 + 176)    /* screen pool: 80 tiles + 1664..1791 */
 
 void hud_init(void);
+/* Main loop, after SYS_doVBlankProcess(): the VBlank DMA flush is over. */
+void hud_flush_done(void);
 void hud_frame(void);                       /* once per frame: queue the window/tile DMA */
 
 void hud_rows(u32 mask);                    /* rows always shown; rows holding text are shown anyway */

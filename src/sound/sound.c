@@ -37,6 +37,23 @@ static void z80_put(u16 to, const u8 *from, u16 len, bool fill)
     }
 }
 
+/* Park the Z80 on SGDK's null driver, copied exactly (SGDK's own Z80_init()/Z80_unloadDriver()
+ * upload it one byte too high with this toolchain, and the shifted code runs into the 68000
+ * bank window). Bank 0 so nothing it could still touch is RAM or VDP. Safe to call any time. */
+extern const u8 drv_null[0x3a];
+void z80_idle(void)
+{
+    SYS_disableInts();
+    Z80_requestBus(TRUE);
+    Z80_setBank(0);
+    z80_put(0, drv_null, sizeof(drv_null), FALSE);
+    Z80_startReset();
+    Z80_releaseBus();
+    waitSubTick(50);
+    Z80_endReset();
+    SYS_enableInts();
+}
+
 void sound_init(void)
 {
     static const u8 zero = 0;

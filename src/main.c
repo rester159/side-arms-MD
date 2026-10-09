@@ -1,5 +1,7 @@
 #include <genesis.h>
 #include "game.h"
+#include "hud.h"
+#include "sound.h"
 
 volatile u32 frame_counter;
 volatile u16 prof_line;        /* debug: scanline when the frame's work ended */
@@ -25,6 +27,7 @@ static u16 since(u32 vt0)
 int main(bool hardReset)
 {
     (void)hardReset;
+    z80_idle();                 /* replace SGDK startup's shifted null driver at once */
     JOY_init();
     if (boot_intros) boot_intros();
     video_init();
@@ -44,6 +47,7 @@ int main(bool hardReset)
         prof_line = GET_VCOUNTER;
         frame_counter++;
         SYS_doVBlankProcess();
+        hud_flush_done();
     }
     return 0;
 }

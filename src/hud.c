@@ -37,8 +37,15 @@ static volatile u32 next_mask;
 static volatile u16 next_top, next_bot;
 static volatile bool next_simple, next_ready;
 
+/* Set at VBlank, cleared by main after SYS_doVBlankProcess(): if the DMA flush runs into the
+ * active display, an H-int register write between the two words of a DMA command would send that
+ * transfer to the wrong VRAM address. The window split simply waits until the flush is done. */
+static volatile bool flush_guard;
+void hud_flush_done(void) { flush_guard = FALSE; }
+
 HINTERRUPT_CALLBACK hud_hint(void)
 {
+    if (flush_guard) return;
     if (split_simple) {
         u16 want = 0x80 | split_bot;
         if (want != win_reg) { win_reg = want; *(vu16 *)VDP_CTRL_PORT = 0x9200 | want; }
@@ -56,6 +63,7 @@ HINTERRUPT_CALLBACK hud_hint(void)
 /* VBlank interrupt: the next frame's first window state and H-int spacing */
 static void hud_vint(void)
 {
+    flush_guard = TRUE;
     if (next_ready) {
         win_mask = next_mask;
         split_top = next_top; split_bot = next_bot; split_simple = next_simple;

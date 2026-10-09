@@ -15,6 +15,8 @@
 
 /* Load the Z80 driver and start it (YM2612 + PSG are reset). Call once after SGDK init. */
 void sound_init(void);
+/* Park the Z80 on an exact copy of SGDK's null driver (see sound.c). */
+void z80_idle(void);
 /* Queue one arcade sound command. Non-blocking: holds the Z80 bus for a few microseconds.
  * Up to 15 commands can be pending; further ones are dropped until the driver catches up. */
 void sound_command(u8 cmd);
