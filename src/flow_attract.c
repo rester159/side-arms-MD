@@ -223,7 +223,7 @@ void flow_demo_enter(void)
         const FeDemoInput *in = &fe_demo_inputs[variant * 2 + i];
         din[i].p = in->pairs; din[i].count = in->count; din[i].i = 0; din[i].left = 1; din[i].val = 0;
         /* $0DCC: both players, speed 1, one life */
-        player_start(&players[i], 1);
+        player_start(&normal_players[i], 1);
     }
     demo_frames = 0;
 }
@@ -233,7 +233,7 @@ static void demo_end(void)
     in_demo = FALSE;
     sound_play(0x00);
     hud_sprites(FALSE);
-    for (u16 i = 0; i < 2; i++) { players[i].state = PL_OFF; players[i].score = 0; }
+    for (u16 i = 0; i < 2; i++) { normal_players[i].state = PL_OFF; normal_players[i].score = 0; }
     if (enemies_clear) enemies_clear();
     if (bosses_reset) bosses_reset();
     variant ^= 1;
@@ -263,6 +263,7 @@ static void demo_inputs(void)
         u8 v = din[i].val & 0x7F;
         pad[i].pressed = v & ~pad[i].held;
         pad[i].held = v;
+        pad_fire_held[i] = v & (IN_FIRE_L | IN_FIRE_R);
     }
 }
 
@@ -307,7 +308,7 @@ void flow_demo_update(void)
     /* the demo ends at the script end or when a player's death animation is
      * over ($1A46 -> $1BF7 with $E010 = 0); variant 2's script has no end
      * record, it is capped */
-    bool dead = player_out_of_lives(&players[0]) || player_out_of_lives(&players[1]);
+    bool dead = player_out_of_lives(&normal_players[0]) || player_out_of_lives(&normal_players[1]);
     if (next_ev == 0xFFFF || dead || demo_frames >= 3600) {
         demo_end();
         flow_goto(FS_TITLE);

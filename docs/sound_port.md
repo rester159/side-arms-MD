@@ -53,7 +53,8 @@ void sound_stop_all(void);    // = sound_command(0x00)
 ```
 
 Commands: `$00` stop all, `$01-$1E` SFX (`$10 $16 $19 $1F` stop SFX), `$20-$38` music, `$39-$3F` stop music;
-bits 0-5 are used (spec `$00B8`), `$FF` is ignored. Every call is executed (the game side models the arcade
+bits 0-5 are used (spec `$00B8`), except `$FE`, which selects the native Before Christ
+credits arrangement, and `$FD`, which fully silences it; `$FF` is ignored. Every call is executed (the game side models the arcade
 latch, including its "same value twice is ignored" rule). Commands go into a 16-entry FIFO in Z80 RAM (15
 usable, extra ones are dropped); the driver takes one per tick (~4 ms), as the arcade reads its latch once per
 tick (spec `$00A9`). `sound_command()` holds the Z80 bus for a few µs inside nestable
@@ -66,6 +67,17 @@ driver is shifted too, so `Z80_loadCustomDriver`/XGM loaders are affected). `sou
 with its own asm copy loop and the SGDK reset sequence.
 
 ## Why the Z80
+
+The Before Christ credits extension repeats the existing native ending theme
+four times using a finite `$7C` stream opcode and a per-channel repeat counter.
+It occupies unused space in bank M; the unused operands of stop command `$3F`
+hold its header pointer. Legacy `$3F` still stops music. The compiler replays the
+extended streams as well as the legacy note events. Actual Genesis Plus GX
+audio capture confirms music throughout the 96-second credits scroll. At 6,778
+ending updates the scene sends `$FD`, which also attenuates the two operators
+left untouched by the legacy stop. Capture verifies the stop timer and zero
+samples after output-filter settling, through the remaining input wait.
+This arrangement is not a transcription of the PC Engine CD recording.
 
 The music clock is the arcade's ~249 Hz tick, not the video frame: on the 68000 VBlank it would be 4.15 ticks
 per 60 Hz frame (4.98 at 50 Hz) with up to a frame of jitter, would stall on game lag frames, and every
@@ -261,3 +273,45 @@ Verification:
 - In the main ROM: 249 driver ticks per 60 frames, and game commands go through the FIFO
   (write/read indices advance, bank register set to `$228000`/`$230000`).
 - `tools/check` is clean.
+
+## Real-hardware fixes (v1.4, Oct 2026)
+
+Reported on Mega EverDrive Pro and EverDrive V3 (black screen after the logos; garbled backgrounds after
+about a minute); confirmed fixed on hardware with the v1.3 test build, released as v1.4.
+
+- **Z80 idle driver.** SGDK's `Z80_init()` and `Z80_unloadDriver()` load the null driver through the same
+  miscompiled `Z80_upload()` described above, so it lands one byte high. MAME showed the Z80 executing at
+  `$F3D5` (inside the 68000 bank window) after the boot logos. `z80_idle()` (`src/sound/sound.c`) copies
+  `drv_null` exactly with bank 0; `main()` calls it first, and the private intros call it after their
+  teardowns. Check: the Z80 PC never leaves `$0000-$1FFF` from power-on to gameplay.
+- **Header.** Standard work-RAM range (`$00FF0000-$00FFFFFF`) and a 1 KiB SRAM range (`$200001-$2007FF`,
+  saves use < 100 bytes), aligned like Black Tiger v1.7 for flash-cart detection.
+- **H-int guard.** `hud_vint()` sets a guard that `hud_hint()` honours until `main()` calls
+  `hud_flush_done()` after `SYS_doVBlankProcess()`, so a DMA flush that runs into the active display cannot
+  be split by the window-split register write.
+
+### Expansion integration (2026-10-09)
+
+The expansion incorporates the changes through upstream `e52d280`, including
+the preceding `5aa6ded` combined-robot autofire fix, adapted to four players.
+Both expanded main-loop scheduling paths release the HUD guard only after their
+VBlank processing returns. The existing atomic queued-DMA command writes remain.
+The 1 KiB save range accommodates the expansion's 70-byte save layout.
+
+An instruction-level Genesis Plus GX trace also found a brief Z80 escape during
+the SDK boot/intro upload sequence before the repair hooks could cover it.
+`tools/guard_z80_upload.py`, wired into `tools/cart_boot.mk`, builds a local copy
+of SDK `z80_ctrl.c` with the same exact byte-copy assembly. This covers SDK
+startup and PCM driver loads without changing the installed SDK. The v1.4
+`z80_idle()` calls are retained, including a fallback after the intro hook.
+
+The resulting expansion ROM SHA-256 is
+`b3d03cbc40b3a9dee6a10262eac37038bcaa09a992e016c26632d34d81692127`.
+The boot-to-gameplay trace checked 20,335,296 Z80 instructions over 4,000 video
+frames; maximum PC was `$0B13`. NTSC/PAL cold and dirty-RAM reset checks passed.
+Native HUD/DMA observations, four-player Team Player launches with HuCard music
+in Normal/BC/Boss Rush, save migration, and combined autofire checks passed.
+All ten BC rounds retain the previous linked background pixels and palettes.
+Evidence is in `.local/v14-integration/`. These are emulator checks; this expanded
+ROM has not been tested on an EverDrive. The upstream hardware result above
+applies to upstream v1.4.

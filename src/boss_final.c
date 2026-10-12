@@ -23,7 +23,8 @@ typedef struct {
     u8 t, i, n;
     const BossStep *st;
     u16 code; u8 colour;
-    u8 heading, c12, hp, score_idx;
+    u8 heading, c12, score_idx;
+    u16 hp;
     bool immune, nocontact, started;
 } Seg;
 
@@ -54,19 +55,19 @@ static void decide(u16 k)
     Seg *s = &f.seg[k];
     switch (s->role) {
     case R_BODY:
-        s->hp = FINAL_HP;
+        s->hp = game_scale_health(FINAL_HP);
         s->heading = f.seg[k - 1].heading;              /* (ix-$70): the segment ahead */
         seg_motion(s, 2);
         return;
     case R_TAIL:
         burst(s, 1, 2);
-        s->hp = FINAL_HP;
+        s->hp = game_scale_health(FINAL_HP);
         s->heading = f.seg[k - 1].heading;
         seg_motion(s, 3);
         return;
     case R_HEAD: {
         burst(s, 0, 0);
-        if (s->c12 && !--s->c12) s->hp = FINAL_HEAD_HP;     /* $6276 */
+        if (s->c12 && !--s->c12) s->hp = game_scale_health(FINAL_HEAD_HP);     /* $6276 */
         s16 ty, tx;
         boss_target(&ty, &tx);
         if (s->y < 0x56 || s->y >= 0x92 || (s->x >> 1) < 0x66 || (s->x >> 1) >= 0x88) { ty = 0x78; tx = 0x100; }
@@ -121,7 +122,7 @@ void fboss_start(void)
         s->y = 0x70; s->x = 0x1BF;
         s->t = final_start[k];
         s->heading = 0x10;
-        s->hp = k == 0 ? FINAL_HEAD_HP : FINAL_HP;
+        s->hp = game_scale_health(k == 0 ? FINAL_HEAD_HP : FINAL_HP);
         s->score_idx = k == 5 ? FINAL_LAST_SCORE_IDX : FINAL_SCORE_IDX;
     }
     boss_hud_set(FALSE, 0, 0);                          /* no bar display for the chain */

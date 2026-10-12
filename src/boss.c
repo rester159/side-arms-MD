@@ -39,8 +39,8 @@ void boss_target(s16 *y, s16 *x)
         *y = en_target_y; *x = en_target_x2 * 2 + boss_shift;
         return;
     }
-    for (u16 i = 0; i < 2; i++) {
-        Player *p = &players[i];
+    for (u16 i = 0; i < game_player_limit(); i++) {
+        Player *p = &normal_players[i];
         if (p->state == PL_ALIVE) { *y = raw_y(p->y); *x = raw_x(p->x); return; }
     }
     *y = 0x78; *x = 0xE0 * 2;
@@ -73,19 +73,69 @@ u8 boss_aim(s16 y, s16 x)
 
 volatile u8 boss_dbg_autohit;    /* test hook (QA bot): every boss hit test also counts one P1 shot */
 
+typedef struct { Shot *shot; Player *owner; } BossShotRef;
+static BossShotRef boss_shot_refs[MAX_PLAYERS * MAX_SHOTS];
+static u8 boss_shot_count, boss_shot_ready, boss_shot_scan;
+
+/* Final-boss parts query the same pools repeatedly. During bosses_update,
+ * player shots can be consumed but no player weapon task creates new ones.
+ * Preserve pool/slot order and recheck state after every earlier contact. */
+static u8 boss_shots_indexed(s16 py, s16 px, u8 c, u8 d2, Player **who)
+{
+    if (!boss_shot_ready) {
+        boss_shot_count = 0;
+        for (u16 i = 0; i < MAX_PLAYERS; i++) {
+            Player *p = &normal_players[i];
+            for (u16 k = 0; k < MAX_SHOTS; k++) {
+                Shot *s = &p->shots[k];
+                if (s->active != 1) continue;
+                BossShotRef *ref = &boss_shot_refs[boss_shot_count++];
+                ref->shot = s; ref->owner = p;
+            }
+        }
+        boss_shot_ready = 1;
+    }
+    u8 n = 0;
+    if (boss_dbg_autohit) { *who = &normal_players[0]; n = 1; }
+    py -= 16; px -= 96 + boss_shift;
+    for (u16 i = 0; i < boss_shot_count; i++) {
+        BossShotRef *ref = &boss_shot_refs[i];
+        Shot *s = ref->shot;
+        if (s->active != 1) continue;
+        s16 dy = py - s->y;
+        if (dy < 0) dy = -dy;
+        if (dy >= (s16)(c + s->half_h)) continue;
+        s16 dx = px - s->x;
+        if (dx < 0) dx = -dx;
+        if (dx >= (s16)(d2 + s->half_w)) continue;
+        shot_hit(ref->owner, s);
+        *who = ref->owner; n++;
+    }
+    return n;
+}
+
 u8 boss_shots(s16 py, s16 px, u8 c, u8 d2, Player **who)
 {
+    if (boss_shot_scan) return boss_shots_indexed(py, px, c, d2, who);
     u8 n = 0;
-    if (boss_dbg_autohit) { *who = &players[0]; n = 1; }
-    for (u16 i = 0; i < 2; i++) {
-        Player *p = &players[i];
+    if (boss_dbg_autohit) { *who = &normal_players[0]; n = 1; }
+    /* Convert the target once; every shot uses the same screen origin.
+     * The signed-word assignments retain the original modulo-65536 deltas. */
+    py -= 16;
+    px -= 96 + boss_shift;
+    for (u16 i = 0; i < MAX_PLAYERS; i++) {
+        Player *p = &normal_players[i];
         for (u16 k = 0; k < MAX_SHOTS; k++) {
             Shot *s = &p->shots[k];
             if (s->active != 1) continue;
-            s16 dy = py - raw_y(s->y), dx = px - raw_x(s->x);
+            s16 dy = py - s->y;
             if (dy < 0) dy = -dy;
+            /* Each half-size sum is at most 510. Reject vertical misses
+             * before computing horizontal distance; keep signed wrap behavior. */
+            if (dy >= (s16)(c + s->half_h)) continue;
+            s16 dx = px - s->x;
             if (dx < 0) dx = -dx;
-            if (dy >= c + s->half_h || dx >= d2 + s->half_w) continue;
+            if (dx >= (s16)(d2 + s->half_w)) continue;
             shot_hit(p, s);
             *who = p; n++;
         }
@@ -96,8 +146,8 @@ u8 boss_shots(s16 py, s16 px, u8 c, u8 d2, Player **who)
 bool boss_touch(s16 py, s16 px, u8 e, u8 f2, s8 oy, s8 ox)
 {
     bool hit = FALSE;
-    for (u16 i = 0; i < 2; i++) {
-        Player *p = &players[i];
+    for (u16 i = 0; i < game_player_limit(); i++) {
+        Player *p = &normal_players[i];
         if (p->state != PL_ALIVE || p->invuln) continue;
         s16 dy = raw_y(p->y) + oy - py, dx = raw_x(p->x) + ox - px;
         if (dy < 0) dy = -dy;
@@ -295,15 +345,16 @@ typedef struct {
 } Pj;
 static Pj pj[NPJ];
 static s8 pj_new = -1;
+static u16 pj_end;
 
-void pj_clear(void) { memset(pj, 0, sizeof(pj)); pj_new = -1; }
+void pj_clear(void) { memset(pj, 0, sizeof(pj)); pj_new = -1; pj_end = 0; }
 s8 pj_last(void) { return pj_new; }
 void pj_link(s8 a, s8 b) { if (a >= 0 && b >= 0) pj[(u8)a].mate = b; }
 
 static Pj *pj_alloc(u8 kind)
 {
     for (u16 i = 0; i < NPJ; i++)
-        if (!pj[i].kind) { memset(&pj[i], 0, sizeof(Pj)); pj[i].kind = kind; pj[i].mate = -1; pj[i].bank = 0xFF; pj_new = i; return &pj[i]; }
+        if (!pj[i].kind) { memset(&pj[i], 0, sizeof(Pj)); pj[i].kind = kind; pj[i].mate = -1; pj[i].bank = 0xFF; pj_new = i; if (i >= pj_end) pj_end = i + 1; return &pj[i]; }
     pj_new = -1;
     return NULL;
 }
@@ -317,7 +368,7 @@ static void load(Pj *p)
 static u8 pj_capped_live(void)
 {
     u8 n = 0;
-    for (u16 i = 0; i < NPJ; i++)
+    for (u16 i = 0; i < pj_end; i++)
         if ((pj[i].kind == PJ_MISSILE) || (pj[i].kind == PJ_BULLET && pj[i].bank == 0xFF)) n++;
     return n;
 }
@@ -325,7 +376,7 @@ static u8 pj_capped_live(void)
 u8 pj_bank_live(u8 bank)
 {
     u8 n = 0;
-    for (u16 i = 0; i < NPJ; i++) if (pj[i].kind == PJ_BULLET && pj[i].bank == bank) n++;
+    for (u16 i = 0; i < pj_end; i++) if (pj[i].kind == PJ_BULLET && pj[i].bank == bank) n++;
     return n;
 }
 
@@ -392,9 +443,10 @@ static void missile_steer(Pj *p)
 
 void pj_update(void)
 {
+    while (pj_end && !pj[pj_end - 1].kind) pj_end--;
     bool small_check = !(frame & 1);           /* small objects collide on even $E003 */
     s8 lvl = level_bullet_speed < 3 ? 0 : level_bullet_speed > 6 ? 3 : level_bullet_speed - 3;
-    for (u16 k = 0; k < NPJ; k++) {
+    for (u16 k = 0; k < pj_end; k++) {
         Pj *p = &pj[k];
         if (!p->kind) continue;
         switch (p->kind) {
@@ -446,7 +498,7 @@ void pj_update(void)
 
 void pj_draw(void)
 {
-    for (u16 k = 0; k < NPJ; k++) {
+    for (u16 k = 0; k < pj_end; k++) {
         Pj *p = &pj[k];
         if (!p->kind || !p->code) continue;
         if (p->kind == PJ_BLAST) bc_draw(p->code, p->colour, to_gx(p->x), to_gy(p->y));
@@ -517,6 +569,8 @@ bool boss_present(void) { return kind != 0; }
 
 void bosses_update(void)
 {
+    boss_shot_scan = kind == 3;
+    boss_shot_ready = 0;
     bc_frame();
     boss_ending_tick();
     blast_update();
@@ -531,9 +585,10 @@ void bosses_update(void)
     if (!kind && !blast.on) {
         boss_shift = 0;
         bool blasts = FALSE;
-        for (u16 i = 0; i < NPJ; i++) if (pj[i].kind == PJ_BLAST) blasts = TRUE;
+        for (u16 i = 0; i < pj_end; i++) if (pj[i].kind == PJ_BLAST) blasts = TRUE;
         if (!blasts) bc_release();              /* VRAM blocks back to the BG cache */
     }
+    boss_shot_scan = 0;
 }
 
 void bosses_draw(void)

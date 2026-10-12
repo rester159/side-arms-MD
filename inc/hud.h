@@ -1,5 +1,6 @@
 #pragma once
 #include <genesis.h>
+#include "player.h"
 
 /* Text / HUD on the window plane (VRAM_WINDOW, high priority), 40x28 cells.
  *
@@ -38,7 +39,19 @@
 #define HUD_SCREEN_TILE     (1056 + 176)    /* screen pool: 80 tiles + 1664..1791 */
 
 void hud_init(void);
+/* Call after either VBlank processing path finishes its DMA flush. */
+void hud_flush_done(void);
 void hud_frame(void);                       /* once per frame: queue the window/tile DMA */
+
+/* A scene owning the display can suspend the window callbacks. hud_init()
+ * reinstalls them when returning to the regular front end/game. */
+void hud_suspend(void);
+/* Own a fixed top window without per-scanline HUD interrupts. hud_frame()
+ * still uploads dirty text; hud_init() restores normal split-window mode. */
+void hud_begin_fixed(u16 rows);
+/* One complete 64-cell scrolling-plane row using resident game-font glyphs.
+ * Caller owns plane setup/scrolling and must keep the glyph pool alive. */
+void hud_plane_text_row(VDPPlane plane, u16 row, s16 col, u8 colour, const char *text);
 
 void hud_rows(u32 mask);                    /* rows always shown; rows holding text are shown anyway */
 u32 hud_rows_get(void);
@@ -91,7 +104,8 @@ typedef struct {
     bool twoup;                 /* show the 2UP label */
     u32 hi;
     u8 boss_bars;               /* boss hit bars (0 = none) */
-    HudPlayer pl[2];
+    HudPlayer pl[MAX_PLAYERS];
 } HudPanel;
 void hud_panel(const HudPanel *p);          /* call every frame while it is shown (diffs internally) */
 void hud_panel_off(void);
+void hud_pause_display(bool paused);

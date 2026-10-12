@@ -5,6 +5,7 @@
 #include "flow.h"
 #include "gen/assets.h"
 #include "gen/frontend.h"
+#include "organic_level.h"
 
 /* Fixed background views of the front end (title city $0BD1, Earth intro
  * $13BC), pre-rendered at build time (tools/build_frontend.py) into plane B
@@ -17,6 +18,7 @@ static s16 loaded = -1, loading = -1;
 static u16 load_pos;                    /* tiles sent */
 static s16 shown = -1;
 static u8 resend;
+static const u16 *scene_palette;
 
 void scene_load_set(u16 set)
 {
@@ -53,11 +55,17 @@ void scene_update(void)
         load_pos += n;
         if (load_pos >= s->count) {
             pal_load(0, s->pal, 32);
+            scene_palette = s->pal;
             loaded = loading; loading = -1;
         }
         return;                         /* maps wait for their tiles */
     }
     if (resend && shown >= 0 && fe_scenes[shown].set == loaded) {
+        const u16 *pal = fe_scenes[shown].pal;
+        if (scene_palette != pal) {
+            pal_load(0, pal, 32);
+            scene_palette = pal;
+        }
         DMA_queueDma(DMA_VRAM, (void *)fe_scenes[shown].map, VRAM_PLANE_B, 64 * 28, 2);
         resend--;
     }
@@ -69,6 +77,8 @@ void stage_video_on(void)
 {
     s16 cx = (cam_x() + SCREEN_W / 2) >> 5, cy = (cam_y() + SCREEN_H / 2) >> 5;
     u16 z = 0;
+    if (organic_level_active()) z = ZONE_COUNT - 1;
+    else
     for (u16 i = 0; i < ZONE_COUNT; i++) {
         const Zone *q = &zones[i];
         if (cx >= (s16)q->x0 && cy >= (s16)q->y0 && cx < (s16)(q->x0 + q->w) && cy < (s16)(q->y0 + q->h)) { z = i; break; }

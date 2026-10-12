@@ -42,7 +42,7 @@ static u8 rush_n;
 enum { RS_CARD, RS_FIGHT, RS_BREATHER, RS_OUT };
 static u8 rush_rs, rush_idx;                      /* state, boss index */
 static u16 rush_timer, kills_ref;
-static bool rush_joined[2], result_clear, new_record;
+static bool rush_joined[MAX_PLAYERS], result_clear, new_record;
 static u32 rush_frames, saved_hi;
 static u8 rush_defeated;
 
@@ -129,6 +129,7 @@ static u16 shown_secs;
 
 static void time_hud(bool force)
 {
+    if (game_player_limit() > 2) return;
     u16 secs = rush_frames / 60;
     if (secs == shown_secs && !force) return;
     shown_secs = secs;
@@ -142,7 +143,7 @@ static void time_hud(bool force)
 /* ---- players ----------------------------------------------------------------------------- */
 static void join(u16 i)
 {
-    Player *p = &players[i];
+    Player *p = &normal_players[i];
     rush_joined[i] = TRUE;
     player_start(p, 1);                 /* one life: the energy bar takes the hits */
     p->energy = RUSH_ENERGY;
@@ -151,7 +152,7 @@ static void join(u16 i)
 
 static bool all_out(void)
 {
-    for (u16 i = 0; i < 2; i++) if (rush_joined[i] && !player_out_of_lives(&players[i])) return FALSE;
+    for (u16 i = 0; i < game_player_limit(); i++) if (rush_joined[i] && !player_out_of_lives(&normal_players[i])) return FALSE;
     return TRUE;
 }
 
@@ -163,14 +164,14 @@ static void panel(void)
     hp.hi = hi_score;
     hp.twoup = rush_joined[1];
     if (boss_hud.active) hp.boss_bars = boss_hud.bars;
-    for (u16 i = 0; i < 2; i++) {
+    for (u16 i = 0; i < game_player_limit(); i++) {
         HudPlayer *h = &hp.pl[i];
         if (!rush_joined[i]) continue;
         h->score = TRUE;
         h->bar = TRUE;
         h->energy_on = TRUE;
-        h->energy = players[i].energy;
-        if (player_out_of_lives(&players[i])) h->msg = HUD_MSG_GAMEOVER;
+        h->energy = normal_players[i].energy;
+        if (player_out_of_lives(&normal_players[i])) h->msg = HUD_MSG_GAMEOVER;
     }
     hud_panel(&hp);
 }
@@ -188,8 +189,8 @@ static void arena_enter(void)
     level.vertical = level.dir_y > 0;   /* $E040: spawn side (H: from the left, V: from the top) */
     video_set_camera(cam_x(), cam_y());
     if (b->music) sound_play(b->music); /* the section's music until the boss's own */
-    for (u16 i = 0; i < 2; i++) {
-        Player *p = &players[i];
+    for (u16 i = 0; i < game_player_limit(); i++) {
+        Player *p = &normal_players[i];
         if (!rush_joined[i] || !p->in_play) continue;
         if (p->state == PL_ALIVE) player_spawn(p);         /* entry glide into the new arena */
         for (u16 k = 0; k < MAX_SHOTS; k++) p->shots[k].active = 0;
@@ -219,7 +220,8 @@ void flow_rush_start(u16 starter)
     flow_state = FS_RUSH;
     arena_enter();
     time_hud(TRUE);
-    join(starter);
+    (void)starter;
+    for (u16 i = 0; i < game_player_limit(); i++) join(i);
 }
 
 /* back to the normal game rules (also on a soft reset, flow.c) */
@@ -247,7 +249,7 @@ static void rush_end(bool clear)
 void flow_rush_update(void)
 {
     /* player 2 (or 1) joins with Start once */
-    for (u16 i = 0; i < 2; i++)
+    for (u16 i = 0; i < game_player_limit(); i++)
         if (!rush_joined[i] && (pad[i].pressed & IN_START) && rush_rs != RS_OUT) join(i);
     bool frozen = players_world_frozen();
     if (rush_rs != RS_CARD && !frozen) level_update();      /* the card holds the camera */
@@ -264,8 +266,8 @@ void flow_rush_update(void)
         rush_frames++;
         if (boss_kills != kills_ref) {
             rush_defeated++;
-            for (u16 i = 0; i < 2; i++) {
-                Player *p = &players[i];
+            for (u16 i = 0; i < game_player_limit(); i++) {
+                Player *p = &normal_players[i];
                 if (!rush_joined[i] || !p->energy) continue;
                 p->energy = p->energy + RUSH_REFILL > RUSH_ENERGY ? RUSH_ENERGY : p->energy + RUSH_REFILL;
             }
@@ -323,10 +325,12 @@ void flow_rush_end_enter(void)
     *p++ = ' '; *p++ = ' '; rush_time_text(p, rush_best.frames);
     ctext(19, 2, t);
     if (new_record) ctext(21, 4, "NEW RECORD");
-    for (u16 i = 0; i < 2; i++) {
+    for (u16 i = 0; i < game_player_limit(); i++) {
         if (!rush_joined[i]) continue;
-        hud_string(i ? FE_STR_TWOUP : FE_STR_ONEUP, i ? 22 : 6, 23);
-        hud_score(i ? 26 : 10, 23, 0, players[i].score);
+        char label[] = "1UP"; label[0] += i;
+        u16 col = (i & 1) ? 22 : 6, row = 23 + (i / 2) * 2;
+        hud_text(col, row, 0, label);
+        hud_score(col + 4, row, 0, normal_players[i].score);
     }
     hud_string(FE_STR_COPYRIGHT, -1, -1);
     sound_play(0x00);
@@ -342,7 +346,9 @@ void flow_rush_end_update(void)
         else if ((end_t % 36) == 24) hud_blank(10, 21, 20);
     }
     if (end_t < 60) return;
-    if ((pad_raw[0].pressed | pad_raw[1].pressed) & (BUTTON_START | BUTTON_A | BUTTON_C)) {
+    u16 pressed = 0;
+    for (u16 i = 0; i < game_player_limit(); i++) pressed |= pad_raw[i].pressed;
+    if (pressed & (BUTTON_START | BUTTON_A | BUTTON_C)) {
         sound_play(0x00);
         flow_game_reset();
         flow_goto(FS_HOME);

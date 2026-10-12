@@ -1,0 +1,810 @@
+{
+  "schema": 1,
+  "review": "bc-art-review-v1",
+  "decisions": [
+    {
+      "id": "sprite-3682-0a-pal5",
+      "title": "Small enemy · pose 0A · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-3684-00-pal4",
+      "title": "Homing enemy · pose 00 · palette 4",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-3684-00-pal5",
+      "title": "Homing enemy · pose 00 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-3684-02-pal4",
+      "title": "Homing enemy · pose 02 · palette 4",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-3684-02-pal5",
+      "title": "Homing enemy · pose 02 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-3684-04-pal4",
+      "title": "Homing enemy · pose 04 · palette 4",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-3684-04-pal5",
+      "title": "Homing enemy · pose 04 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-3684-06-pal4",
+      "title": "Homing enemy · pose 06 · palette 4",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-3684-06-pal5",
+      "title": "Homing enemy · pose 06 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-3684-08-pal4",
+      "title": "Homing enemy · pose 08 · palette 4",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-3684-08-pal5",
+      "title": "Homing enemy · pose 08 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x3686-08-0x1183",
+      "title": "Trooper · pose 08",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x3686-00-0x1183",
+      "title": "Trooper · pose 00",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x3686-00-0x1983",
+      "title": "Trooper · pose 00",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x3686-00-0x1184",
+      "title": "Trooper · pose 00",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x3686-08-0x1983",
+      "title": "Trooper · pose 08",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x3686-00-0x1984",
+      "title": "Trooper · pose 00",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x3686-08-0x1184",
+      "title": "Trooper · pose 08",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x3686-08-0x1984",
+      "title": "Trooper · pose 08",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x368c-18-0x9186",
+      "title": "Jet · pose 18",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x368c-00-0x1186",
+      "title": "Jet · pose 00",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x368c-00-0x1986",
+      "title": "Jet · pose 00",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x368c-18-0x1186",
+      "title": "Jet · pose 18",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "sprite-0x368c-28-0x1186",
+      "title": "Jet · pose 28",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "launcher-00",
+      "title": "Launcher · pose 00",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "launcher-08",
+      "title": "Launcher · pose 08",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "launcher-10",
+      "title": "Launcher · pose 10",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "launcher-18",
+      "title": "Launcher · pose 18",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "launcher-20",
+      "title": "Launcher · pose 20",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "launcher-30",
+      "title": "Launcher · pose 30",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-3692-10-p7",
+      "title": "Sprite 3692 · pose 10 · palette 7",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-3692-00-p7",
+      "title": "Sprite 3692 · pose 00 · palette 7",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-3698-00-p2",
+      "title": "Sprite 3698 · pose 00 · palette 2",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-368e-00-p5",
+      "title": "Sprite 368E · pose 00 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-368e-18-p5",
+      "title": "Sprite 368E · pose 18 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-3692-08-p7",
+      "title": "Sprite 3692 · pose 08 · palette 7",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-368e-10-p5",
+      "title": "Sprite 368E · pose 10 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-3692-18-p7",
+      "title": "Sprite 3692 · pose 18 · palette 7",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-367e-08-p1",
+      "title": "Sprite 367E · pose 08 · palette 1",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-367e-18-p1",
+      "title": "Sprite 367E · pose 18 · palette 1",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-367e-10-p1",
+      "title": "Sprite 367E · pose 10 · palette 1",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-367e-00-p1",
+      "title": "Sprite 367E · pose 00 · palette 1",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-367a-32-p9",
+      "title": "Sprite 367A · pose 32 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-367c-04-p1",
+      "title": "Sprite 367C · pose 04 · palette 1",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-3692-20-p7",
+      "title": "Sprite 3692 · pose 20 · palette 7",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-367c-00-p1",
+      "title": "Sprite 367C · pose 00 · palette 1",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-367e-20-p1",
+      "title": "Sprite 367E · pose 20 · palette 1",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-368e-08-p5",
+      "title": "Sprite 368E · pose 08 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36b0-00-p5",
+      "title": "Sprite 36B0 · pose 00 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36b0-08-p5",
+      "title": "Sprite 36B0 · pose 08 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-367a-2c-p2",
+      "title": "Sprite 367A · pose 2C · palette 2",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-367a-30-p0",
+      "title": "Sprite 367A · pose 30 · palette 0",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-369e-08-p9",
+      "title": "Sprite 369E · pose 08 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a0-06-p9",
+      "title": "Sprite 36A0 · pose 06 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a0-08-p9",
+      "title": "Sprite 36A0 · pose 08 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a2-08-p9",
+      "title": "Sprite 36A2 · pose 08 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36ac-00-p7",
+      "title": "Sprite 36AC · pose 00 · palette 7",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-369e-04-p9",
+      "title": "Sprite 369E · pose 04 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a0-02-p9",
+      "title": "Sprite 36A0 · pose 02 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a0-00-p9",
+      "title": "Sprite 36A0 · pose 00 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a0-04-p9",
+      "title": "Sprite 36A0 · pose 04 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a2-06-p9",
+      "title": "Sprite 36A2 · pose 06 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a2-04-p9",
+      "title": "Sprite 36A2 · pose 04 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a2-02-p9",
+      "title": "Sprite 36A2 · pose 02 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-369e-06-p9",
+      "title": "Sprite 369E · pose 06 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a2-00-p9",
+      "title": "Sprite 36A2 · pose 00 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36ac-08-p7",
+      "title": "Sprite 36AC · pose 08 · palette 7",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-369a-08-p3",
+      "title": "Sprite 369A · pose 08 · palette 3",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-369a-00-p3",
+      "title": "Sprite 369A · pose 00 · palette 3",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-369a-10-p3",
+      "title": "Sprite 369A · pose 10 · palette 3",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-368a-08-p6",
+      "title": "Sprite 368A · pose 08 · palette 6",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-369a-18-p3",
+      "title": "Sprite 369A · pose 18 · palette 3",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-369e-00-p9",
+      "title": "Sprite 369E · pose 00 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-369e-02-p9",
+      "title": "Sprite 369E · pose 02 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-367e-08-p2",
+      "title": "Sprite 367E · pose 08 · palette 2",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36ae-00-p8",
+      "title": "Sprite 36AE · pose 00 · palette 8",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-368a-00-p6",
+      "title": "Sprite 368A · pose 00 · palette 6",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36ae-08-p8",
+      "title": "Sprite 36AE · pose 08 · palette 8",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-368e-20-p5",
+      "title": "Sprite 368E · pose 20 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36aa-04-p9",
+      "title": "Sprite 36AA · pose 04 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36aa-06-p9",
+      "title": "Sprite 36AA · pose 06 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36b2-00-p12",
+      "title": "Sprite 36B2 · pose 00 · palette 12",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36aa-02-p9",
+      "title": "Sprite 36AA · pose 02 · palette 9",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-367e-10-p2",
+      "title": "Sprite 367E · pose 10 · palette 2",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-368a-18-p6",
+      "title": "Sprite 368A · pose 18 · palette 6",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-367a-34-p6",
+      "title": "Sprite 367A · pose 34 · palette 6",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-367a-20-p1",
+      "title": "Sprite 367A · pose 20 · palette 1",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36b2-08-p12",
+      "title": "Sprite 36B2 · pose 08 · palette 12",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a6-08-p10",
+      "title": "Sprite 36A6 · pose 08 · palette 10",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a6-06-p10",
+      "title": "Sprite 36A6 · pose 06 · palette 10",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a8-06-p10",
+      "title": "Sprite 36A8 · pose 06 · palette 10",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a4-02-p10",
+      "title": "Sprite 36A4 · pose 02 · palette 10",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d0-10-p4",
+      "title": "Sprite 36D0 · pose 10 · palette 4",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d2-18-p5",
+      "title": "Sprite 36D2 · pose 18 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d2-20-p5",
+      "title": "Sprite 36D2 · pose 20 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d2-10-p5",
+      "title": "Sprite 36D2 · pose 10 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d2-08-p5",
+      "title": "Sprite 36D2 · pose 08 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d2-00-p5",
+      "title": "Sprite 36D2 · pose 00 · palette 5",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d4-00-p6",
+      "title": "Sprite 36D4 · pose 00 · palette 6",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d0-08-p4",
+      "title": "Sprite 36D0 · pose 08 · palette 4",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d4-10-p6",
+      "title": "Sprite 36D4 · pose 10 · palette 6",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d0-18-p4",
+      "title": "Sprite 36D0 · pose 18 · palette 4",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d4-20-p6",
+      "title": "Sprite 36D4 · pose 20 · palette 6",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d4-08-p6",
+      "title": "Sprite 36D4 · pose 08 · palette 6",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d0-00-p4",
+      "title": "Sprite 36D0 · pose 00 · palette 4",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d4-18-p6",
+      "title": "Sprite 36D4 · pose 18 · palette 6",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36d0-20-p4",
+      "title": "Sprite 36D0 · pose 20 · palette 4",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-368a-10-p15",
+      "title": "Sprite 368A · pose 10 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-369a-10-p15",
+      "title": "Sprite 369A · pose 10 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36ac-08-p15",
+      "title": "Sprite 36AC · pose 08 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-368e-00-p15",
+      "title": "Sprite 368E · pose 00 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-3692-00-p15",
+      "title": "Sprite 3692 · pose 00 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-369e-04-p15",
+      "title": "Sprite 369E · pose 04 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a0-00-p15",
+      "title": "Sprite 36A0 · pose 00 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a2-04-p15",
+      "title": "Sprite 36A2 · pose 04 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a4-04-p15",
+      "title": "Sprite 36A4 · pose 04 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a6-00-p15",
+      "title": "Sprite 36A6 · pose 00 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a8-04-p15",
+      "title": "Sprite 36A8 · pose 04 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36b0-10-p11",
+      "title": "Sprite 36B0 · pose 10 · palette 11",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36b0-18-p15",
+      "title": "Sprite 36B0 · pose 18 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36ae-08-p15",
+      "title": "Sprite 36AE · pose 08 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36b2-08-p15",
+      "title": "Sprite 36B2 · pose 08 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36aa-00-p15",
+      "title": "Sprite 36AA · pose 00 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a6-02-p10",
+      "title": "Sprite 36A6 · pose 02 · palette 10",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a8-02-p10",
+      "title": "Sprite 36A8 · pose 02 · palette 10",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36b0-08-p15",
+      "title": "Sprite 36B0 · pose 08 · palette 15",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-367a-26-p1",
+      "title": "Sprite 367A · pose 26 · palette 1",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36aa-08-p9",
+      "title": "Sprite 36AA · pose 08 · palette 9",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36aa-00-p9",
+      "title": "Sprite 36AA · pose 00 · palette 9",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36b0-18-p11",
+      "title": "Sprite 36B0 · pose 18 · palette 11",
+      "decision": "keep",
+      "note": ""
+    },
+    {
+      "id": "actor-36a6-00-p10",
+      "title": "Sprite 36A6 · pose 00 · palette 10",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a8-08-p10",
+      "title": "Sprite 36A8 · pose 08 · palette 10",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-36a4-04-p10",
+      "title": "Sprite 36A4 · pose 04 · palette 10",
+      "decision": "recolor",
+      "note": ""
+    },
+    {
+      "id": "actor-368a-20-p6",
+      "title": "Sprite 368A · pose 20 · palette 6",
+      "decision": "recolor",
+      "note": ""
+    }
+  ]
+}

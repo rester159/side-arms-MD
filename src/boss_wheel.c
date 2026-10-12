@@ -116,7 +116,7 @@ static void core_update(void)
 static void core_bar_lost(void)
 {
     w.bars--;
-    boss_hud_set(TRUE, w.bars, 20);
+    boss_hud_set(TRUE, w.bars, game_scale_health(20));
     if (!w.bars) {
         /* $74E0: wipe, camera to the next section (copy 3 = its start), explosions, POW */
         Obj *o = &w.core;
@@ -136,7 +136,7 @@ static void core_bar_lost(void)
         return;
     }
     if (w.bars == 1) w.score_idx = 0x60;               /* $747D: 50000 */
-    w.hp = 20;
+    w.hp = game_scale_health(20);
     w.c2 = 0;                                           /* $748F */
     sound_play(SND_CRACK);                              /* task $365F (text-layer cracks: not drawn) */
     obj_run(&w.core, core_hit_steps, 16);               /* 12 flash frames, then the idle loop */
@@ -178,8 +178,8 @@ void wboss_start(u8 type)
         o->y = wheel_pod_start[2 * k]; o->x = 0x1BF; o->t = 1; o->delay = wheel_pod_start[2 * k + 1];
     }
     w.core.y = 0x70; w.core.x = 0x1BF; w.core.t = 0x7A; w.core.delay = 0x7A;   /* $73DD, $7202 */
-    w.bars = 4; w.hp = 20; w.score_idx = 0x38; w.immune = TRUE;
-    boss_hud_set(TRUE, w.bars, 20);                     /* $089C */
+    w.bars = 4; w.hp = game_scale_health(20); w.score_idx = 0x38; w.immune = TRUE;
+    boss_hud_set(TRUE, w.bars, game_scale_health(20));                     /* $089C */
     bc_reserve(10);                                     /* pods 4 + core 5 patterns (+1); wheel 1 pins 44 of 56 slots */
     bs_reserve(1);                                      /* pod shots */
 }

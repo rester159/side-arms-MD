@@ -160,15 +160,15 @@ def encode_channel(ops, base):
     """ops -> bytes at Z80 address base (jump targets resolved)."""
     pos, n = [], 0
     for o in ops:
-        pos.append(n); n += {'ev': 2, 'patch': 2, 'jump': 3, 'end': 1}[o[0]]
+        pos.append(n); n += {'ev': 2, 'patch': 2, 'jump': 3, 'repeat4': 3, 'end': 1}[o[0]]
     out = bytearray()
     for o in ops:
         if o[0] == 'ev':
             out += bytes([o[1] | (0x80 if o[2] else 0), o[3]])
         elif o[0] == 'patch':
             out += bytes([OP_PATCH, o[1]])
-        elif o[0] == 'jump':
-            t = base + pos[o[1]]; out += bytes([OP_JUMP, t & 0xFF, t >> 8])
+        elif o[0] in ('jump', 'repeat4'):
+            t = base + pos[o[1]]; out += bytes([OP_JUMP if o[0]=='jump' else 0x7c, t & 0xFF, t >> 8])
         else:
             out += bytes([OP_END])
     return bytes(out)
@@ -178,6 +178,7 @@ def simulate(ops, durs, ticks, c000=0):
     """Model of the driver's channel step (sa_sound_drv.s80 `chan_tick`); returns [(tick, k)] of the
     note/rest events read. c000 = tick counter before the first tick (extract_sound convention)."""
     out, i, count, trip = [], 0, 1, False
+    repeats = 4
     for t in range(ticks):
         c000 = (c000 + 1) & 0xFF
         for _ in range(2 if trip and c000 & 1 else 1):
@@ -190,6 +191,10 @@ def simulate(ops, durs, ticks, c000=0):
                     continue
                 if o[0] == 'jump':
                     i = o[1]; continue
+                if o[0] == 'repeat4':
+                    repeats -= 1
+                    if repeats: i = o[1]
+                    continue
                 if o[0] == 'end':
                     return out
                 out.append((t, o[1])); count = durs.rows[o[3]][0]; trip = o[2]
@@ -273,6 +278,28 @@ def main():
             cmd[n] = (3, slot, WIN + sfx_at); sfx_at += len(fr)
         else:
             cmd[n] = (KIND.get(e['kind'], 5), 0, 0)
+    # BC credits: four finite reprises of our ending theme, not a shared
+    # command loop. Preserve every legacy stream and command kind/address.
+    theme = j['commands']['2c']
+    hdr_addr = music_at; music_at += 18
+    hdr = bytearray()
+    for ch in theme['channels']:
+        original = compile_channel(ch, theme['tempo'], durs)
+        assert original[-1] == ('end',) and ch['info']['total_ticks'] == 6920
+        ops = [('patch', ch['patch'])] + original[:-1] + [('repeat4', 0)]
+        ops += [('ev', 0, False, durs.get(441, 0)), ('end',)]
+        expected = [(ev['t']+6920*i, ev.get('k',0)) for i in range(4)
+                    for ev in ch['events'] if ev['op'] in ('note','rest')]
+        assert simulate(ops,durs,28122) == expected + [(27680,0)]
+        encoded = encode_channel(ops, WIN+music_at)
+        bank0[music_at:music_at+len(encoded)] = encoded
+        hdr += (WIN+music_at).to_bytes(2,'little') + bytes([ch['patch']])
+        music_at += len(encoded)
+    bank0[hdr_addr:hdr_addr+18] = hdr
+    # $3F remains STOP MUSIC; its otherwise ignored operands describe the
+    # dedicated $FE extension, dispatched before the legacy six-bit mask.
+    assert cmd[0x3f][0] == KIND['stop_music']
+    cmd[0x3f] = (KIND['stop_music'], theme['priority'], WIN+hdr_addr)
     if music_at > 0x8000 or sfx_at > 0x4000:
         raise SystemExit(f'build_sound: bank overflow (music {music_at}, sfx {sfx_at})')
     for n, (k, arg, ptr) in cmd.items():

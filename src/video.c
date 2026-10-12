@@ -1,3 +1,4 @@
+#include "cave_palette.h"
 #include "video.h"
 #include "bg.h"
 #include "sprites.h"
@@ -11,11 +12,12 @@ static bool par_want, par_running;
 
 void video_stars_draw(bool on)
 {
-    static u16 row[64];
+    /* Both sources remain valid until VBlank. A shared zero row also lets us
+     * clear the plane without copying 4 KiB into SGDK's DMA scratch buffer. */
+    static u16 blank[64];
     for (u16 y = 0; y < 32; y++) {
-        const u16 *src = star_map + y * 64;
-        for (u16 x = 0; x < 64; x++) row[x] = on ? src[x] : 0;    /* tile | palette, low priority */
-        VDP_setTileMapDataRect(BG_A, row, 0, y, 64, 1, 64, DMA_QUEUE_COPY);
+        const u16 *src = on ? star_map + y * 64 : blank;
+        VDP_setTileMapDataRect(BG_A, src, 0, y, 64, 1, 64, DMA_QUEUE);
     }
     stars_on = on;
 }
@@ -23,6 +25,7 @@ void video_stars_draw(bool on)
 void video_init(void)
 {
     VDP_setEnable(FALSE);
+    DMA_setBufferSize(4096);
     VDP_setScreenWidth320();
     VDP_setPlaneSize(64, 32, FALSE);
     VDP_setBGAAddress(VRAM_PLANE_A);
@@ -78,9 +81,11 @@ void video_frame(void)
         s16 vx, vy;
         bg_view(&vx, &vy);              /* = the camera, except on a zone switch's first frame */
         par_frame(vx, vy);
+        cave_prepare();
         return;
     }
     VDP_setHorizontalScrollVSync(BG_A, -star_x);
     VDP_setVerticalScrollVSync(BG_A, star_y);
     bg_update();
+    cave_prepare();
 }

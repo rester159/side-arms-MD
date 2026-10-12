@@ -1,5 +1,6 @@
 #pragma once
 #include <genesis.h>
+#include "gen/assets.h"
 
 /* Background: the arcade's 4096x4096 world map (128x128 cells of 32x32 px,
  * read by the arcade video hardware straight from ROM b_03d) streamed into a
@@ -8,9 +9,25 @@
 void bg_init(void);
 /* Select palette zone (loads its palettes, invalidates the cache). */
 void bg_set_zone(u16 zone);
+/* Explicit stage artwork, independent of Normal mode's camera zones. Data
+ * must remain alive until bg_init/bg_set_zone. NULL cells uses art->map;
+ * otherwise cells is the BC 16x16 block map (64 bytes/block), and remap maps
+ * its 256 cell IDs to Genesis metatile entries. Coordinates wrap at 4096 px.
+ * Call with display off for initial uploads. No collision state is changed. */
+/* NULL sources uses contiguous art->tiles. Otherwise each entry points to a
+ * DMA-aligned 512-byte block; the table has art->metas entries. */
+/* min_cell_x extends the first authored column leftward for visuals only. */
+/* min_cell_x packs optional visual maximum column in bits 8..14.
+ * Bit 15 mirrors columns 0/7 into the margins of a 256px vertical shaft. */
+void bg_set_stage(const Zone *art, const u8 *cells, const u16 *remap,
+                  const u8 * const *sources, u16 min_cell_x);
 /* Camera = world pixel at the top-left of the Genesis screen. */
 void bg_set_camera(s16 x, s16 y);
 void bg_enable(bool on);
+/* Stop background streaming and borrow a cleared 32x32 tile page from its
+ * existing RAM shadow for scene presentation. Do not call bg_update while
+ * borrowed; bg_init must precede returning to gameplay background use. */
+u16 *bg_scene_page(void);
 void bg_update(void);   /* stream cells + set scroll; call once per frame */
 u16 bg_cache_misses(void);
 

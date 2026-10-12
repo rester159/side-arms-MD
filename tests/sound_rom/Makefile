@@ -11,6 +11,8 @@ sync:
 	@mkdir -p src/_sound inc
 	cp $(TOP)/src/sound/* src/_sound/
 	cp $(TOP)/src/gen/sound_data.s src/_sound/sound_data.s
-	cp $(TOP)/inc/sound.h inc/sound.h
+	cp $(TOP)/inc/sound.h $(TOP)/inc/hucard_score.h $(TOP)/inc/hucard_fm.h $(TOP)/inc/hucard_music.h inc/
+	cp $(TOP)/src/gen/hucard_data.c $(TOP)/src/gen/hucard_fm_data.c src/_sound/
+	cp $(TOP)/src/gen/hucard_pitch.s src/_sound/
 clean:
 	rm -rf out src/_sound inc src/rom_header.c

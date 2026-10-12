@@ -421,6 +421,18 @@ c.append('const MStep en_mot[%d] = {' % len(steps))
 for i, (d, col, dy, dx, code, cm) in enumerate(steps):
     c.append('    {%d, %d, %d, %d, %d},  /* %d %s */' % (d, col, dy, dx, code, i, cm))
 c.append('};')
+# Runtime-layout templates let the 68000 initialize a record with a block copy.
+c.append('#include "src/enemy_int.h"')
+c.append('const Enemy enemy_records[%d] = {' % len(inits))
+for r in inits:
+    fields = dict(live=1, pool=r['pool'], flags=r['flags'], cat=r['cat'], x=r['x'], y=r['y'],
+                  dy=r['dy'], dx=r['dx'], timer=r['timer'], colour=r['colour'], code=r['code'],
+                  next=r['next'], hp=r['hp'], item=r['item'], wall=r['wall'], death=r['death'],
+                  sub_x=r['x'] + 112, sub_y=(r['y'] + 16) & 255, spare=0)
+    values = ['.%s = %d' % kv for kv in fields.items()]
+    values += ['.box = {%s}' % ', '.join(map(str, r['box'])), '.r = {%s}' % ', '.join(map(str, r['r']))]
+    c.append('    {' + ', '.join(values) + '},')
+c.append('};')
 c.append('const EnemyInit enemy_inits[%d] = {' % len(inits))
 for i, r in enumerate(inits):
     c.append('    {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, {%s}, {%s}, %d, %d, %d, %d},  /* %d %s */' % (

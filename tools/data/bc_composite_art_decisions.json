@@ -1,0 +1,312 @@
+{
+  "schema": 1,
+  "decisions": [
+    {
+      "id": "composite-36b6",
+      "round": 1,
+      "decision": "new",
+      "provenance": "user",
+      "status": "original-pce-body-imported",
+      "geometry_source": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/actor-step-hopper/snap/f009240.png",
+      "source_capture_sha256": "f5197a1b0a93a386770f915fbf7c643a10ab26ed6afc9bd0d16783790aca0aec",
+      "limitations": "Original source geometry retained; palette hues approximated with ordered Genesis shades. Attack geometry verified separately against captured source frames."
+    },
+    {
+      "id": "composite-36c4",
+      "round": 2,
+      "decision": "new",
+      "provenance": "user",
+      "status": "original-pce-body-imported",
+      "geometry_source": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round2-ending/snap/f007440.png",
+      "source_capture_sha256": "b2d3e3541f54c23df838738dc0c154434041294ee5af6c73da13dff0460e899a",
+      "limitations": "Original source geometry retained; palette hues approximated with ordered Genesis shades. Attack geometry verified separately against captured source frames."
+    },
+    {
+      "id": "composite-36bc",
+      "round": 3,
+      "decision": "new",
+      "provenance": "user",
+      "status": "original-pce-body-imported",
+      "geometry_source": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round3-defeat/snap/f007920.png",
+      "source_capture_sha256": "6f11bbfebe46930ef4df84b5ce7443b0e17a109494869cff2035c49d7359cf58",
+      "limitations": "Original source geometry retained; palette hues approximated with ordered Genesis shades. Attack geometry verified separately against captured source frames."
+    },
+    {
+      "id": "composite-36be",
+      "round": 4,
+      "decision": "new",
+      "provenance": "user",
+      "status": "original-pce-body-imported",
+      "geometry_source": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round4-defeat/snap/f007440.png",
+      "source_capture_sha256": "c6fafa49a44a6becb761d373189859106a2aa657f832cc00bf760a70842e4abf",
+      "limitations": "Original source geometry retained; palette hues approximated with ordered Genesis shades. Attack geometry verified separately against captured source frames."
+    },
+    {
+      "id": "composite-36b8",
+      "round": 5,
+      "decision": "new",
+      "provenance": "user",
+      "status": "original-pce-body-imported",
+      "geometry_source": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round5-ending/snap/f012720.png",
+      "source_capture_sha256": "7d393d34164462a49518e9e61a6cd14b5734917ba513f302a2018f01afa3a83d",
+      "limitations": "Original source geometry retained; palette hues approximated with ordered Genesis shades. Attack geometry verified separately against captured source frames."
+    },
+    {
+      "id": "composite-36ba",
+      "round": 6,
+      "decision": "new",
+      "provenance": "user",
+      "status": "original-pce-body-imported",
+      "geometry_source": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round6-defeat/snap/f007680.png",
+      "source_capture_sha256": "378d704e858f47e4dc3d52311d1a1f7cbe9b3199bcb0521faee49ba48eb0a7be",
+      "limitations": "Original source geometry retained; palette hues approximated with ordered Genesis shades. Attack geometry verified separately against captured source frames."
+    },
+    {
+      "id": "composite-36c6",
+      "round": 7,
+      "decision": "new",
+      "provenance": "user",
+      "status": "original-pce-body-imported",
+      "geometry_source": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round7-defeat/snap/f009360.png",
+      "source_capture_sha256": "878ca0b9a03ddb01ea2f34e7e826ce4227c408a762f194aaef89bc8c7991eb73",
+      "limitations": "Original source geometry retained; palette hues approximated with ordered Genesis shades. Attack geometry verified separately against captured source frames."
+    },
+    {
+      "id": "composite-36c0",
+      "round": 8,
+      "decision": "new",
+      "provenance": "user",
+      "status": "original-pce-body-imported",
+      "geometry_source": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round8-defeat/snap/f010080.png",
+      "source_capture_sha256": "6bd6621ee657b6e2f41c3bb7b846482255090647836e8eea6a267e824f0af98d",
+      "limitations": "Original source geometry retained; palette hues approximated with ordered Genesis shades. Attack geometry verified separately against captured source frames."
+    },
+    {
+      "id": "composite-36c2",
+      "round": 9,
+      "decision": "new",
+      "provenance": "user",
+      "status": "original-pce-body-imported",
+      "geometry_source": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round9-final/snap/f027360.png",
+      "source_capture_sha256": "4af1c859af833beab4c7650111888b8f4d8cf734e49ec11fd5324f05ac14136f",
+      "limitations": "Original source geometry retained; palette hues approximated with ordered Genesis shades. Attack geometry verified separately against captured source frames."
+    }
+  ],
+  "remaining_rounds": [
+    10
+  ],
+  "placeholder_audit": [
+    {
+      "round": 2,
+      "family": "0x36c4",
+      "current_code": "0x4c0",
+      "current_colour": 14,
+      "match_status": "rejected-silhouette-mismatch",
+      "replacement_status": "bc-specific-shape-integrated",
+      "source_geometry": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round2-ending/snap/f007440.png",
+      "source_capture_sha256": "b2d3e3541f54c23df838738dc0c154434041294ee5af6c73da13dff0460e899a",
+      "rectangular_32px_blocks": 12
+    },
+    {
+      "round": 3,
+      "family": "0x36bc",
+      "current_code": "0x4e0",
+      "current_colour": 5,
+      "match_status": "rejected-silhouette-mismatch",
+      "replacement_status": "corrected-genesis-selection-inferred",
+      "source_geometry": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round3-defeat/snap/f007920.png",
+      "source_capture_sha256": "6f11bbfebe46930ef4df84b5ce7443b0e17a109494869cff2035c49d7359cf58",
+      "rectangular_32px_blocks": 10,
+      "replacement_code": "0x4c0",
+      "replacement_colour": 14
+    },
+    {
+      "round": 4,
+      "family": "0x36be",
+      "current_code": "0x4e0",
+      "current_colour": 0,
+      "match_status": "rejected-silhouette-mismatch",
+      "replacement_status": "source-geometry-preserved-not-integrated",
+      "source_geometry": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round4-defeat/snap/f007440.png",
+      "source_capture_sha256": "c6fafa49a44a6becb761d373189859106a2aa657f832cc00bf760a70842e4abf",
+      "rectangular_32px_blocks": 10
+    },
+    {
+      "round": 5,
+      "family": "0x36b8",
+      "current_code": "0x4a0",
+      "current_colour": 8,
+      "match_status": "rejected-silhouette-mismatch",
+      "replacement_status": "corrected-genesis-selection-inferred",
+      "source_geometry": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round5-ending/snap/f012720.png",
+      "source_capture_sha256": "7d393d34164462a49518e9e61a6cd14b5734917ba513f302a2018f01afa3a83d",
+      "rectangular_32px_blocks": 7,
+      "replacement_code": "0x4a0",
+      "replacement_colour": 14
+    },
+    {
+      "round": 6,
+      "family": "0x36ba",
+      "current_code": "0x4c0",
+      "current_colour": 8,
+      "match_status": "rejected-silhouette-mismatch",
+      "replacement_status": "source-geometry-preserved-not-integrated",
+      "source_geometry": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round6-defeat/snap/f007680.png",
+      "source_capture_sha256": "378d704e858f47e4dc3d52311d1a1f7cbe9b3199bcb0521faee49ba48eb0a7be",
+      "rectangular_32px_blocks": 12
+    },
+    {
+      "round": 7,
+      "family": "0x36c6",
+      "current_code": "0x4e0",
+      "current_colour": 8,
+      "match_status": "rejected-silhouette-mismatch",
+      "replacement_status": "source-geometry-preserved-not-integrated",
+      "source_geometry": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round7-defeat/snap/f009360.png",
+      "source_capture_sha256": "878ca0b9a03ddb01ea2f34e7e826ce4227c408a762f194aaef89bc8c7991eb73",
+      "rectangular_32px_blocks": 12
+    },
+    {
+      "round": 8,
+      "family": "0x36c0",
+      "current_code": "0x4a0",
+      "current_colour": 8,
+      "match_status": "rejected-silhouette-mismatch",
+      "replacement_status": "source-geometry-preserved-not-integrated",
+      "source_geometry": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round8-defeat/snap/f010080.png",
+      "source_capture_sha256": "6bd6621ee657b6e2f41c3bb7b846482255090647836e8eea6a267e824f0af98d",
+      "rectangular_32px_blocks": 10
+    },
+    {
+      "round": 9,
+      "family": "0x36c2",
+      "current_code": "0x4c0",
+      "current_colour": 8,
+      "match_status": "rejected-silhouette-mismatch",
+      "replacement_status": "corrected-genesis-selection-inferred",
+      "source_geometry": "tools/data/bc_composite_source_shapes.json",
+      "source_capture": ".local/pce-reference/round9-final/snap/f027360.png",
+      "source_capture_sha256": "4af1c859af833beab4c7650111888b8f4d8cf734e49ec11fd5324f05ac14136f",
+      "rectangular_32px_blocks": 12,
+      "replacement_code": "0x4e0",
+      "replacement_colour": 5
+    }
+  ],
+  "boss_policy": {
+    "provenance": "user",
+    "body_art": "Import every original PCE BC boss; no regular-Genesis boss substitutions",
+    "attacks": "Import original PCE boss attack graphics and preserve PCE attack behavior",
+    "status": "Nine original PCE composite bodies, four composite attack poses, fifteen dedicated/shared projectile variants and twenty final-serpent poses imported; source geometry and ordered shading verified"
+  },
+  "superseded_body_decisions": [
+    {
+      "id": "composite-36b6",
+      "round": 1,
+      "decision": "new",
+      "provenance": "user",
+      "normal_code": "0x4e0",
+      "normal_colour": 0,
+      "previous_code": "0x4a0",
+      "previous_colour": 14,
+      "adaptation": "Existing 128-to-96 horizontal scaling; six 32x32 resident blocks",
+      "evidence": "Long nose, central orange eye, paired side pods and blue hull correspond to captured PCE boss",
+      "source_capture": ".local/pce-reference/actor-step-hopper/snap/f009240.png",
+      "source_capture_sha256": "f5197a1b0a93a386770f915fbf7c643a10ab26ed6afc9bd0d16783790aca0aec",
+      "superseded_decision": "keep",
+      "status": "pending-original-pce-import"
+    },
+    {
+      "id": "composite-36bc",
+      "round": 3,
+      "decision": "new",
+      "provenance": "user",
+      "normal_code": "0x4c0",
+      "normal_colour": 14,
+      "previous_code": "0x4e0",
+      "previous_colour": 5,
+      "adaptation": "Existing 128-to-96 horizontal scaling and articulated six-block layout; unchanged runtime geometry",
+      "evidence": "Green pointed spacecraft: long tapered nose, dorsal fin, split rear and green metal shade ramp",
+      "source_capture": ".local/pce-reference/round3-defeat/snap/f007920.png",
+      "source_capture_sha256": "6f11bbfebe46930ef4df84b5ce7443b0e17a109494869cff2035c49d7359cf58",
+      "limitations": "Visual correspondence inferred across PCE and Genesis artwork; not pixel-identical source geometry or explicit user approval",
+      "superseded_decision": "keep",
+      "status": "pending-original-pce-import"
+    },
+    {
+      "id": "composite-36b8",
+      "round": 5,
+      "decision": "new",
+      "provenance": "user",
+      "normal_code": "0x4a0",
+      "normal_colour": 14,
+      "previous_code": "0x4a0",
+      "previous_colour": 8,
+      "adaptation": "Existing 128-to-96 horizontal scaling and articulated six-block layout; unchanged runtime geometry",
+      "evidence": "Twin cylindrical cannons and central mechanical body; restore the cyan material ramp instead of red",
+      "source_capture": ".local/pce-reference/round5-ending/snap/f012720.png",
+      "source_capture_sha256": "7d393d34164462a49518e9e61a6cd14b5734917ba513f302a2018f01afa3a83d",
+      "limitations": "Visual correspondence inferred across PCE and Genesis artwork; not pixel-identical source geometry or explicit user approval",
+      "superseded_decision": "keep",
+      "status": "pending-original-pce-import"
+    },
+    {
+      "id": "composite-36c2",
+      "round": 9,
+      "decision": "new",
+      "provenance": "user",
+      "normal_code": "0x4e0",
+      "normal_colour": 5,
+      "previous_code": "0x4c0",
+      "previous_colour": 8,
+      "adaptation": "Existing 128-to-96 horizontal scaling and articulated six-block layout; unchanged runtime geometry",
+      "evidence": "Long pointed mechanical spacecraft with side pods and central blue eye; gold material ramp",
+      "source_capture": ".local/pce-reference/round9-final/snap/f027360.png",
+      "source_capture_sha256": "4af1c859af833beab4c7650111888b8f4d8cf734e49ec11fd5324f05ac14136f",
+      "limitations": "Visual correspondence inferred across PCE and Genesis artwork; not pixel-identical source geometry or explicit user approval",
+      "superseded_decision": "keep",
+      "status": "pending-original-pce-import"
+    },
+    {
+      "id": "composite-36c4",
+      "round": 2,
+      "decision": "new",
+      "provenance": "inferred",
+      "geometry_source": "tools/data/bc_composite_source_shapes.json",
+      "previous_code": "0x4c0",
+      "previous_colour": 14,
+      "adaptation": "Exact captured part geometry packed into eleven nonempty 32x32 resident blocks; four ordered hull shades and two eye/exhaust shades mapped to existing Genesis palettes",
+      "evidence": "The pink articulated hull, three-pronged center and paired rounded shells differ from the previous green creature replacement",
+      "source_capture": ".local/pce-reference/round2-ending/snap/f007440.png",
+      "source_capture_sha256": "b2d3e3541f54c23df838738dc0c154434041294ee5af6c73da13dff0460e899a",
+      "limitations": "Genesis palette approximates PCE hues; light/dark ordering and opaque outlines retained. Inferred new-shape classification, not explicit user approval."
+    }
+  ],
+  "remaining_scope": [
+    "Full-speed multiplayer performance",
+    "Complete expansion acceptance beyond the boss-art import"
+  ],
+  "final_serpent": {
+    "decision": "new",
+    "provenance": "user-all-bosses-instruction",
+    "status": "original-pce-geometry-imported",
+    "poses": 20,
+    "geometry_source": "tools/data/bc_serpent_shapes.json"
+  },
+  "attack_status": "Original composite and ordinary attacks imported; shared families use boss encounter context; captured geometry coverage verified"
+}

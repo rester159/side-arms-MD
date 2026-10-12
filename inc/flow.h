@@ -29,7 +29,9 @@ typedef struct {            /* Home: options, saved in SRAM */
     u8 bonus;               /* 0-3, BONUS_NONE */
     u8 cont;                /* CONT_* */
     u8 credits;             /* 1-9 credits per game (start, 2P join, LIMITED continues), default 3 */
+    u8 players;            /* 1-4: Home player slots and encounter scaling */
     u8 parallax;            /* PARALLAX: 1 ON (default) / 0 OFF; not an arcade feature (docs/parallax.md) */
+    u8 music;               /* 0 Arcade, 1 PC Engine HuCard */
 } HomeSettings;
 extern DipSettings dip_cfg;
 extern HomeSettings home_cfg;
@@ -54,6 +56,7 @@ typedef enum {
     FS_HOME,                /* Home: logo + MD, START GAME / OPTIONS / BACK */
     FS_CONTROLS, FS_SOUND,  /* Home options submenus */
     FS_RUSH, FS_RUSH_END,   /* Home: BOSS RUSH and its result screen (flow_rush.c) */
+    FS_BC,                 /* Home: native Before Christ */
 } FlowState;
 extern FlowState flow_state;
 
@@ -103,6 +106,7 @@ void menu_select_enter(void);
 void menu_select_update(void);
 void menu_home_enter(void);           /* Home screen */
 void menu_home_update(void);
+void bc_scene_start(u8 players);      /* Home: native Before Christ, round one */
 void flow_home_start(u16 player);     /* Home: a new game (credits filled), intro + NAMING */
 void menu_setup_enter(void);          /* DIP screen (Arcade) / OPTIONS (Home) */
 void menu_setup_update(void);
@@ -132,3 +136,8 @@ void scene_update(void);              /* per frame: tile streaming, map resend *
 void scene_invalidate(void);          /* its VRAM was reused */
 void stage_video_on(void);            /* back to bg.c streaming for the current camera */
 void stage_sprites_on(void);          /* sprite VRAM is the sprite cache again */
+
+/* Hidden Home developer sessions never submit rankings. */
+extern bool developer_active;
+extern u8 developer_invincible, developer_lives;
+void developer_normal_update(void);

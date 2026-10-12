@@ -9,17 +9,33 @@
  *   autofire  per fire button: a held button becomes one press every 4 frames (on 2, off 2),
  *             the cadence of the arcade's AUTO weapon $10 (1 shot / 4 frames, B2:$8BEA); the
  *             arcade itself fires one normal shot per press (latch +$06, B2:$86E2). */
-Pad pad[2];
-RawPad pad_raw[2];
-bool pad_six[2];
+Pad pad[MAX_PLAYERS];
+u8 pad_fire_held[MAX_PLAYERS];
+RawPad pad_raw[MAX_PLAYERS];
+bool pad_six[MAX_PLAYERS];
 PadConfig pad_cfg;
-u8 pad_weapon_req[2];
+u8 pad_weapon_req[MAX_PLAYERS];
 volatile u8 dbg_pad_override;     /* test hook: host tool writes pad[] directly */
+
+static u16 joy_ids[MAX_PLAYERS] = { JOY_1, JOY_2, JOY_3, JOY_4 };
+
+void input_configure(void)
+{
+    u8 t1 = JOY_getPortType(PORT_1), t2 = JOY_getPortType(PORT_2);
+    /* SGDK maps Team Player A/B/C/D to 1/3/4/5 or 2/6/7/8. */
+    if (t1 == PORT_TYPE_TEAMPLAYER || t1 == PORT_TYPE_EA4WAYPLAY) {
+        JOY_setSupport(PORT_1, t1 == PORT_TYPE_TEAMPLAYER ? JOY_SUPPORT_TEAMPLAYER : JOY_SUPPORT_EA4WAYPLAY);
+        joy_ids[0] = JOY_1; joy_ids[1] = JOY_3; joy_ids[2] = JOY_4; joy_ids[3] = JOY_5;
+    } else if (t2 == PORT_TYPE_TEAMPLAYER) {
+        JOY_setSupport(PORT_2, JOY_SUPPORT_TEAMPLAYER);
+        joy_ids[0] = JOY_1; joy_ids[1] = JOY_2; joy_ids[2] = JOY_6; joy_ids[3] = JOY_7;
+    }
+}
 
 static const u16 PB_BIT[PB_COUNT] = { BUTTON_A, BUTTON_B, BUTTON_C, BUTTON_X, BUTTON_Y, BUTTON_Z };
 static const u16 XYZ_BIT[3] = { BUTTON_X, BUTTON_Y, BUTTON_Z };
 static const u8 ACT_IN[ACT_COUNT] = { IN_FIRE_L, IN_FIRE_R, IN_WEAPON };
-static u8 af_t[2][2];             /* autofire: frames the fire button has been held */
+static u8 af_t[MAX_PLAYERS][2];             /* autofire: frames the fire button has been held */
 
 void input_defaults(PadConfig *c)
 {
@@ -32,7 +48,7 @@ void input_defaults(PadConfig *c)
     c->autofire[0] = c->autofire[1] = 0;
 }
 
-void input_clear_requests(void) { pad_weapon_req[0] = pad_weapon_req[1] = 0; }
+void input_clear_requests(void) { memset(pad_weapon_req, 0, sizeof(pad_weapon_req)); }
 
 static u8 map(u16 i, u16 r, u16 pressed)
 {
@@ -47,7 +63,7 @@ static u8 map(u16 i, u16 r, u16 pressed)
         if (btn >= PB_COUNT || (btn >= PB_X && !pad_six[i])) btn = a;   /* A / B / C */
         if (r & PB_BIT[btn]) b |= ACT_IN[a];
     }
-    const Player *p = &players[i];
+    const Player *p = &normal_players[i];
     if (pad_six[i])
         for (u16 k = 0; k < 3; k++) {
             u8 x = pad_cfg.extra[k];
@@ -55,9 +71,11 @@ static u8 map(u16 i, u16 r, u16 pressed)
                 if (r & XYZ_BIT[k]) b |= p->facing_left ? IN_FIRE_L : IN_FIRE_R;
             } else if (x != XB_NONE && x < XB_COUNT && (pressed & XYZ_BIT[k])) pad_weapon_req[i] = x;
         }
-    /* autofire only while this player's ship fires normally: the AUTO weapon and the combined
-     * robot ring already repeat on frame phase while a button is held (B2:$8BEA, $8D51) */
-    bool af = p->in_play && p->state == PL_ALIVE && p->weapon != WPN_AUTO && !combined;
+    pad_fire_held[i] = b & (IN_FIRE_L | IN_FIRE_R);
+    /* v1.3: the combined leader still needs press edges; the ring uses held fire.
+     * Uncombined P3/P4 retain their independent autofire cadence. */
+    bool af = p->in_play && p->state == PL_ALIVE && p->weapon != WPN_AUTO &&
+              (!player_is_combined(p) || combined == i + 1);
     for (u16 k = 0; k < 2; k++) {
         u8 bit = k ? IN_FIRE_R : IN_FIRE_L;
         if (!(b & bit)) { af_t[i][k] = 0; continue; }
@@ -70,7 +88,8 @@ void input_update(void)
 {
     if (dbg_pad_override) {
         /* the host wrote pad[]: the menus see the default buttons */
-        for (u16 i = 0; i < 2; i++) {
+        for (u16 i = 0; i < MAX_PLAYERS; i++) {
+            pad_fire_held[i] = pad[i].held & (IN_FIRE_L | IN_FIRE_R);
             u16 r = 0, p = 0;
             for (u16 k = 0; k < 8; k++) {
                 static const u16 RAW[8] = { BUTTON_RIGHT, BUTTON_LEFT, BUTTON_DOWN, BUTTON_UP,
@@ -82,8 +101,8 @@ void input_update(void)
         }
         return;
     }
-    for (u16 i = 0; i < 2; i++) {
-        u16 j = i ? JOY_2 : JOY_1;
+    for (u16 i = 0; i < MAX_PLAYERS; i++) {
+        u16 j = joy_ids[i];
         u16 r = JOY_readJoypad(j);
         pad_six[i] = JOY_getJoypadType(j) == JOY_TYPE_PAD6;
         pad_raw[i].pressed = r & ~pad_raw[i].held;

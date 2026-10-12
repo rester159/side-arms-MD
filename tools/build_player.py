@@ -152,7 +152,7 @@ h += ['extern const s8 MOVE_TABLE[4][16][2];', 'extern const BitStep BIT_PATH[32
 uses = set()
 def big(code, col):
     uses.add((code & 0x7FF, col))
-for off, col in ((0, 0), (0x80, 4)):                       # P1 / P2 bodies
+for off, col in ((0, 0), (0x80, 4), (0, 3), (0x80, 7)):                       # P1 / P2 bodies
     for c in (0x20, 0x22):
         for pose in (0, 0x10, 0x20, 0x30):
             big(c + pose + off, col); big(c + pose + 4 + off, col)
@@ -179,7 +179,8 @@ for c in list(range(0x198, 0x1A0)) + [0x80, 0x81, 0x82]:   # P2-led boomerang ri
     uses.add((c, 7))
 for base in (0x140, 0x180):                                # robot merge, body, flash; partner row
     for d in (0, 2, 4, 6, 0x20, 0x22):
-        big(base + d, 0); big(base + d + 16, 0)
+        for col in (0, 3, 7):
+            big(base + d, col); big(base + d + 16, col)
 for f in death:
     big(f['code'] | ((f['attr'] >> 5) << 8), 8)
 (GEN / 'player_sprites.json').write_text(json.dumps(

@@ -12,6 +12,7 @@ _t=(G/f'zone{zi}_attr.bin').read_bytes()
 attr=[((_t[2*i]<<8)|_t[2*i+1]) for i in range(len(_t)//2)]   # nametable templates (0 = empty)
 m=struct.unpack(f'>{w*h}H',(G/f'zone{zi}_map.bin').read_bytes())
 pw=struct.unpack('>32H',(G/f'zone{zi}_pal.bin').read_bytes())
+pw+=struct.unpack('>32H',(G/'sprite_pal.bin').read_bytes())
 def rgb(wd):
     r=(wd>>1)&7;g=(wd>>5)&7;b=(wd>>9)&7;return (r*36,g*36,b*36)
 pal=np.array([rgb(x) for x in pw],np.uint8)
@@ -27,7 +28,7 @@ for r in range(h):
         e=m[r*w+c];mt=e&0xfff;hf=e>>14&1;vf=e>>15&1
         for sy in range(4):
             for sx in range(4):
-                i=mt*16+sy*4+sx;px=tile(i);p=(attr[i]>>13)&1
+                i=mt*16+sy*4+sx;px=tile(i);p=(attr[i]>>13)&3
                 if hf:px=px[:,::-1]
                 if vf:px=px[::-1,:]
                 dx=(3-sx) if hf else sx;dy=(3-sy) if vf else sy

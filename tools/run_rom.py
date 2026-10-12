@@ -60,7 +60,17 @@ class Runner:
             v = line.split()
             if len(v) >= 3:
                 try:
-                    self.symbols.setdefault(v[2].split('.lto_priv.')[0], int(v[0], 16))
+                    address = int(v[0], 16)
+                    name = v[2].split('.lto_priv.')[0]
+                    # LTO can give a RAM object the same short name as a ROM
+                    # function (e.g. BC's score record and a sound routine).
+                    # RAM inspection must prefer the object, not the first
+                    # entry in the address-sorted symbol listing.
+                    if name not in self.symbols or (
+                        address & 0xff0000 == 0xff0000 and
+                        self.symbols[name] & 0xff0000 != 0xff0000
+                    ):
+                        self.symbols[name] = address
                 except ValueError:
                     pass
 

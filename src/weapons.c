@@ -46,7 +46,8 @@ static void explode_tick(Shot *s)
  * explodes it. Screen = arcade sprite - (96, 16). */
 static s16 probe_x, probe_y;                /* camera + probe offset, set once per frame */
 
-static void shot_move(Shot *s)
+/* Keep this per-shot step inline as BC code grows; avoid a call per projectile. */
+static inline __attribute__((always_inline)) void shot_move(Shot *s)
 {
     s->y += s->vy;
     if ((u16)(s->y + 16) >= 0xF4) { s->active = 0; return; }
@@ -198,7 +199,7 @@ void weapons_pose(Player *p)
     case WPN_BIT: {
         /* B2:$85EF: each orbiter steps once per frame around the last drawn body (y, x+16) */
         u8 n = p->level[WPN_BIT];
-        s16 ry = p->ref_y + (combined ? 8 : 0);
+        s16 ry = p->ref_y + (player_is_combined(p) ? 8 : 0);
         for (u8 k = 0; k < n && k < 3; k++) {
             u8 i = p->bit_step[k];
             if (i >= 32) i = 0;
@@ -210,7 +211,7 @@ void weapons_pose(Player *p)
         break;
     }
     case WPN_MBL:                           /* B2:$8583: pose +$10, launcher code 4/6 beside the body */
-        if (combined) break;
+        if (player_is_combined(p)) break;
         p->body_code += 0x10;
         p->att_code = p->body_code - 0x2C;
         p->att_y = p->y;
@@ -267,7 +268,7 @@ static void fire_mbl(Player *p)             /* B2:$89E4: slots 0, 3 and 5 must b
 {
     if (p->shots[0].active || p->shots[3].active || p->shots[5].active) return;
     const ShotRec *r = &SR_MBL[!p->facing_left];
-    s16 y = p->y + (combined ? 16 : 0);     /* $8A22 */
+    s16 y = p->y + (player_is_combined(p) ? 16 : 0);     /* $8A22 */
     for (u8 i = 0; i < 6; i++) {
         Shot *s = &p->shots[i];
         spawn_at(s, r, p->x, y, SHOT_MBL);
@@ -297,11 +298,12 @@ static void fire_volley(Player *p, const ShotRec *r, u8 kind, u8 pose, u8 snd)
  * press latch. $10: 1 shot / 4 frames (slots 0-7); $11: 3-shot volley / 8 frames. */
 static void fire_auto(Player *p, u8 in)
 {
+    u16 phase = frame + (game_player_limit() > 2 ? p->id * 2 : 0);
     bool v11 = p->level[WPN_AUTO] == 0x11;
     u8 b = in & (IN_FIRE_L | IN_FIRE_R);
     if (b && b != (IN_FIRE_L | IN_FIRE_R)) {
         p->facing_left = (in & IN_FIRE_L) != 0;
-        if (!(frame & (v11 ? 7 : 3))) {
+        if (!(phase & (v11 ? 7 : 3))) {
             if (v11) fire_volley(p, SR_AUTO11[!p->facing_left], SHOT_AUTO, 2, 0x06);
             else {
                 Shot *s = first_free(p, 8);
@@ -309,7 +311,8 @@ static void fire_auto(Player *p, u8 in)
             }
         }
     }
-    upd_linear(p, v11 ? 9 : 8);
+    if (v11) upd_linear(p, 9);
+    else upd_linear(p, 8);
 }
 
 void weapons_fire(Player *p, u8 in)
@@ -363,8 +366,8 @@ void weapons_fire(Player *p, u8 in)
 void weapons_ring(Player *src, u8 in)
 {
     probe_x = cam_x() + 24; probe_y = cam_y() + 8;
-    Player *lead = &players[combined - 1], *part = &players[combined == 1 ? 1 : 0];
-    bool p2led = combined == 2;
+    Player *lead = &normal_players[combined - 1], *part = &normal_players[(combined - 1) ^ 1];
+    bool p2led = !(combined & 1);
     Player *owner = part;                   /* shots land in the partner's slots */
     if ((in & (IN_FIRE_L | IN_FIRE_R)) && !(frame & 3) && free_range(owner, 0, 8)) {
         src->ring_toggle++;
@@ -394,14 +397,11 @@ void weapons_ring(Player *src, u8 in)
 
 void weapons_draw(const Player *p)
 {
-    for (u16 i = 0; i < MAX_SHOTS; i++) {
-        const Shot *s = &p->shots[i];
-        if (s->active) spr_16(s->code, s->colour, s->x, s->y, 0);
-    }
+    spr_shots(p->shots, MAX_SHOTS);
     if (p->state != PL_ALIVE) return;
     if (p->weapon == WPN_BIT && p->bits_valid)          /* orbiters: colour 3 ($8632) */
         for (u8 k = 0; k < p->level[WPN_BIT] && k < 3; k++)
             spr_16(p->bit_code[k], 3, p->bit_x[k], p->bit_y[k], 0);
-    if (p->weapon == WPN_MBL && p->att_valid && !combined)
-        spr_16(p->att_code + (p->id ? P2_CODE : 0), p->id ? P2_COLOUR : 0, p->att_x, p->att_y, 0);
+    if (p->weapon == WPN_MBL && p->att_valid && !player_is_combined(p))
+        spr_16(p->att_code + player_body_offset(p), player_colour(p), p->att_x, p->att_y, 0);
 }

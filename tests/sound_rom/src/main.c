@@ -6,6 +6,8 @@
 
 volatile u8 host_cmd[16];
 volatile u8 host_n;
+volatile u8 host_hucard;  /* 1..21 starts source song 0..20 */
+volatile u8 host_hucard_result;
 volatile u32 frames;
 
 static void show(u8 cmd)
@@ -37,6 +39,10 @@ int main(bool hard)
         if (hit & BUTTON_A) sound_command(cmd);
         if (hit & BUTTON_B) sound_stop_all();
         if (hit & BUTTON_C) sound_command(SOUND_STOP_SFX);
+        if (host_hucard) {
+            host_hucard_result = sound_hucard_start(host_hucard - 1) ? 1 : 2;
+            host_hucard = 0;
+        }
         u8 n = host_n;
         if (n) {
             for (u8 i = 0; i < n && i < 16; i++) sound_command(host_cmd[i]);

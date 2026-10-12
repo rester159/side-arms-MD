@@ -1,5 +1,7 @@
 #include "game.h"
 #include "hud.h"
+#include "sound.h"
+#include "cave_palette.h"
 #include "gen/assets.h"
 #include "gen/frontend.h"
 
@@ -13,6 +15,7 @@ static u8 used[HUD_ROWS];                   /* non-blank cells per row */
 static u32 used_mask;                       /* rows with used[] != 0 */
 static u32 forced;                          /* rows shown even when blank */
 static bool sprites_on;
+static bool fixed_window;
 static volatile u32 win_mask;               /* rows showing the window (read by the H-int) */
 static volatile u16 win_reg;                /* register $12 value currently set */
 
@@ -37,30 +40,67 @@ static volatile u32 next_mask;
 static volatile u16 next_top, next_bot;
 static volatile bool next_simple, next_ready;
 
+/* The general H-int path selects one row bit. BTST avoids a variable
+ * 32-bit shift, especially for the bottom weapon rows. */
+static inline __attribute__((always_inline)) u16 window_row_value(u32 mask, u16 row)
+{
+#if defined(__m68k__)
+    u16 value;
+    __asm__("btst %2,%1\n\tsne %0\n\tandi.w #128,%0"
+        : "=d"(value) : "d"(mask), "d"(row) : "cc");
+    return value;
+#else
+    return (mask >> row) & 1 ? 0x80 : 0;
+#endif
+}
+
+/* The V counter is a byte. Keep the next-row calculation word-sized on
+ * 68000 so the window write completes before the next scanline begins. */
+static inline __attribute__((always_inline)) u16 window_counter_row(u16 counter)
+{
+#if defined(__m68k__)
+    __asm__("addq.w #1,%0\n\tlsr.w #3,%0" : "+d"(counter) : : "cc");
+#else
+    counter = (counter + 1) >> 3;
+#endif
+    return counter >= HUD_ROWS ? 0 : counter;
+}
+
+/* Set at VBlank, cleared by main after SYS_doVBlankProcess(): if the DMA flush runs into the
+ * active display, an H-int register write between the two words of a DMA command would send that
+ * transfer to the wrong VRAM address. The window split simply waits until the flush is done. */
+volatile bool flush_guard;
+volatile u16 cave_hud_line, cave_hud_value;
+volatile u16 cave_hud_words[28];
+HINTERRUPT_CALLBACK cave_raster_hint(void);
+static void hud_configure(void);
+void hud_flush_done(void)
+{
+    if (!cave_has_pending()) { flush_guard=FALSE; return; }
+    u16 mask=SYS_getAndSetInterruptMaskLevel(7);
+    if (cave_commit()) hud_configure();
+    flush_guard=FALSE;
+    SYS_setInterruptMaskLevel(mask);
+}
+
 HINTERRUPT_CALLBACK hud_hint(void)
 {
+    if (flush_guard) return;
     if (split_simple) {
         u16 want = 0x80 | split_bot;
         if (want != win_reg) { win_reg = want; *(vu16 *)VDP_CTRL_PORT = 0x9200 | want; }
         return;
     }
-    u16 row = (GET_VCOUNTER + 1) >> 3;
-    if (row >= HUD_ROWS) row = 0;
-    u16 want = (win_mask >> row) & 1 ? 0x80 : 0x00;
+    u16 row = window_counter_row(GET_VCOUNTER);
+    u16 want = window_row_value(win_mask, row);
     if (want != win_reg) {
         win_reg = want;
         *(vu16 *)VDP_CTRL_PORT = 0x9200 | want;
     }
 }
 
-/* VBlank interrupt: the next frame's first window state and H-int spacing */
-static void hud_vint(void)
+static void hud_configure(void)
 {
-    if (next_ready) {
-        win_mask = next_mask;
-        split_top = next_top; split_bot = next_bot; split_simple = next_simple;
-        next_ready = FALSE;
-    }
     if (split_simple) {
         u16 top = split_top, bot = split_bot;
         win_reg = top;                                  /* up mode: rows 0..top-1 */
@@ -75,6 +115,54 @@ static void hud_vint(void)
         *(vu16 *)VDP_CTRL_PORT = 0x9200 | want;
         *(vu16 *)VDP_CTRL_PORT = 0x8A00 | 7;
     }
+    if (cave_raster_active()) {
+        *(vu16 *)VDP_CTRL_PORT = 0x8A01;
+        if (split_simple) {
+            cave_hud_line=(split_top*8+split_bot*8)/2;
+            cave_hud_value=0x9280|split_bot;
+        } else {
+            cave_hud_line=0xffff;
+            for (u16 row=0;row<28;row++)
+                cave_hud_words[row]=0x9200 | ((win_mask & (1UL<<row)) ? 0x80 : 0);
+        }
+        SYS_setHIntCallback(cave_raster_hint);
+    } else SYS_setHIntCallback(hud_hint);
+}
+
+/* VBlank interrupt: the next frame's first window state and H-int spacing */
+static void hud_vint(void)
+{
+    flush_guard = TRUE;
+    cave_vint();
+    if (next_ready) {
+        win_mask = next_mask;
+        split_top = next_top; split_bot = next_bot; split_simple = next_simple;
+        next_ready = FALSE;
+    }
+    hud_configure();
+    sound_vint();
+}
+
+void hud_suspend(void)
+{
+    SYS_disableInts();
+    VDP_setHInterrupt(FALSE);
+    SYS_setHIntCallback(NULL);
+    SYS_setVIntCallback(sound_vint);
+    next_ready = FALSE;
+    win_mask = win_reg = 0;
+    VDP_setWindowHPos(FALSE, 0);
+    VDP_setWindowVPos(FALSE, 0);
+    SYS_enableInts();
+}
+
+void hud_begin_fixed(u16 rows)
+{
+    hud_init();
+    hud_suspend();
+    fixed_window = TRUE;
+    sprites_on = TRUE;
+    VDP_setWindowVPos(FALSE, rows > HUD_ROWS ? HUD_ROWS : rows);
 }
 
 void hud_rows(u32 mask) { forced = mask; }
@@ -227,6 +315,14 @@ void hud_text(s16 col, s16 row, u8 colour, const char *s)
         if (cell_ok(col, row)) put(col, row, glyph(p, ascii(*s), colour));
 }
 
+void hud_plane_text_row(VDPPlane plane, u16 row, s16 col, u8 colour, const char *text)
+{
+    u16 cells[64] = {0};
+    for (; *text; text++, col++)
+        if (col >= 0 && col < 64) cells[col] = glyph(&game_pool, ascii(*text), colour);
+    VDP_setTileMapDataRow(plane, cells, row & 31, 0, 64, DMA_QUEUE_COPY);
+}
+
 void hud_string(u16 id, s16 col, s16 row)
 {
     const FeString *s = &fe_strings[id];
@@ -351,12 +447,21 @@ static const s16 LABEL_COL[2] = { 0, 28 };
 
 static struct {
     bool on, twoup;
-    u32 hi, score[2];
-    bool score_on[2], bar_on[2];
-    u8 lives[2], msg[2], arg[2], name[2][3], energy[2];
-    u8 slot[2][5], speed[2], phase[2];
+    u32 hi, score[MAX_PLAYERS];
+    bool score_on[MAX_PLAYERS], bar_on[MAX_PLAYERS];
+    u8 lives[MAX_PLAYERS], msg[MAX_PLAYERS], arg[MAX_PLAYERS], name[MAX_PLAYERS][3], energy[MAX_PLAYERS];
+    u8 slot[MAX_PLAYERS][5], speed[MAX_PLAYERS], phase[MAX_PLAYERS];
     u8 boss;
 } cur;
+
+void hud_pause_display(bool paused)
+{
+    hud_blank(0, 2, HUD_COLS);
+    if (paused) hud_text(13, 2, 0, "PAUSED - START");
+    /* Row 2 also holds boss health: force its restoration after resume. */
+    else cur.boss = 0xFF;
+    hud_frame();
+}
 
 void hud_panel_off(void)
 {
@@ -437,9 +542,78 @@ static void draw_msg(u16 i, const HudPlayer *h)
     memcpy(cur.name[i], h->name, 3);
 }
 
+/* Compact per-player state keeps the four-player HUD's hot comparisons
+ * together. Contents are invalidated whenever the panel is opened. */
+static struct {
+    u32 score;
+    u8 energy, lives, msg, arg, bar, weapon, speed, name[3];
+} multi_cur[MAX_PLAYERS];
+
+static void multiplayer_panel(const HudPanel *p)
+{
+    if (!cur.on) {
+        hud_clear(HUD_ROWS_GAME);
+        memset(&cur, 0xFF, sizeof(cur));
+        cur.on = TRUE;
+        memset(multi_cur, 0xFF, sizeof(multi_cur));
+        for (u16 i = 0; i < game_player_limit(); i++) {
+            char label[] = "1UP"; label[0] += i;
+            hud_text(i * 10, 0, 0, label);
+        }
+    }
+    const HudPlayer *h = p->pl;
+    const Player *pl = normal_players;
+    __typeof__(multi_cur[0]) *cached = multi_cur;
+    for (u16 i = 0; i < game_player_limit(); i++, h++, pl++, cached++) {
+        s16 c = i * 10;
+        u8 energy = h->energy_on ? h->energy : 0xFE;
+        u8 lives = h->bar ? pl->lives : 0;
+        if (cached->energy != energy || cached->lives != lives) {
+            hud_blank(c + 4, 0, 3);
+            hud_text(c + 4, 0, 0, h->energy_on ? "E" : "L");
+            hud_number(c + 5, 0, 0, h->energy_on ? energy : lives, 2);
+            cached->energy = energy; cached->lives = lives;
+        }
+        u32 score = h->score ? pl->score : 0;
+        if (score != cached->score) { hud_score(c, 1, 0, score); cached->score = score; }
+        if (h->msg != cached->msg || h->msg_arg != cached->arg || h->bar != cached->bar ||
+            (h->msg == HUD_MSG_NAMING && memcmp(h->name, cached->name, 3))) {
+            hud_blank(c, 25, 10);
+            if (h->msg == HUD_MSG_NAMING) {
+                u16 name[3] = { h->name[0], h->name[1], h->name[2] };
+                hud_text(c, 25, 0, "NAME"); hud_codes(c + 5, 25, 0, name, 3);
+                memcpy(cached->name, h->name, 3);
+            } else if (h->msg == HUD_MSG_CONTINUE) {
+                hud_text(c, 25, 0, "CONT"); hud_number(c + 5, 25, 0, h->msg_arg, 2);
+            } else if (h->msg == HUD_MSG_GAMEOVER) hud_text(c, 25, 4, "GAME OVER");
+            else if (!h->bar) hud_text(c, 25, 0, "START JOIN");
+            cached->msg = h->msg; cached->arg = h->msg_arg;
+        }
+        if (h->bar != cached->bar || pl->weapon != cached->weapon) {
+            static const char *const w[] = { "NORMAL", "BIT", "S.G.", "M.B.L.", "3WAY", "AUTO" };
+            hud_blank(c, 26, 10);
+            if (h->bar) hud_text(c, 26, 0, w[pl->weapon]);
+            cached->weapon = pl->weapon;
+        }
+        if (h->bar != cached->bar || pl->speed != cached->speed) {
+            hud_blank(c, 27, 10);
+            if (h->bar) { hud_text(c, 27, 0, "SPEED"); hud_number(c + 6, 27, 0, pl->speed, 1); }
+            cached->speed = pl->speed;
+        }
+        cached->bar = h->bar;
+    }
+    if (p->boss_bars != cur.boss) {
+        static const u16 grp[4] = { 0x6C, 0x6D, 0x6E, 0x6F };
+        hud_blank(0, 2, HUD_COLS);
+        for (u16 k = 0; k < p->boss_bars && k < 8; k++) hud_codes(HUD_COLS - 4 * (k + 1), 2, 0, grp, 4);
+        cur.boss = p->boss_bars;
+    }
+}
+
 void hud_panel(const HudPanel *p)
 {
     if (!p->on) { hud_panel_off(); return; }
+    if (game_player_limit() > 2) { multiplayer_panel(p); return; }
     if (!cur.on) {
         memset(&cur, 0xFF, sizeof(cur));
         cur.on = TRUE;
@@ -463,7 +637,7 @@ void hud_panel(const HudPanel *p)
     }
     for (u16 i = 0; i < 2; i++) {
         const HudPlayer *h = &p->pl[i];
-        const Player *pl = &players[i];
+        const Player *pl = &normal_players[i];
         u32 sc = h->score ? pl->score : 0;
         if (h->score != cur.score_on[i] || sc != cur.score[i]) {
             hud_score(SCORE_COL[i], 0, 0, sc);
@@ -518,7 +692,7 @@ void hud_frame(void)
 {
     stage_flush();
     u32 m = forced | used_mask;
-    if (m != frame_mask || !split_valid) {
+    if (!fixed_window && (m != frame_mask || !split_valid)) {
         frame_mask = m;
         /* top block + bottom block (possibly empty)? */
         u16 top = 0, bot = HUD_ROWS;
@@ -560,6 +734,7 @@ void hud_game_pool_reset(void)
 
 void hud_init(void)
 {
+    fixed_window = FALSE;
     memset(win, 0, sizeof(win));
     memset(used, 0, sizeof(used));
     used_mask = 0;

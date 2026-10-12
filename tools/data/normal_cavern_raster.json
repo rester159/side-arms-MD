@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "slots": [
+    [
+      [
+        0,
+        2688,
+        2560,
+        2730,
+        0,
+        1024,
+        1568,
+        2122,
+        3694,
+        578,
+        1092,
+        1126,
+        1604,
+        2252,
+        3170,
+        3782
+      ],
+      [
+        0,
+        104,
+        6,
+        0,
+        1124,
+        1612,
+        1670,
+        2158,
+        2216,
+        2730,
+        2762,
+        3200,
+        3308,
+        8,
+        1098,
+        3182
+      ]
+    ],
+    [
+      [
+        0,
+        2688,
+        2560,
+        2730,
+        0,
+        1024,
+        1568,
+        2122,
+        3694,
+        1028,
+        1124,
+        1542,
+        2120,
+        2158,
+        2634,
+        3180
+      ],
+      [
+        0,
+        104,
+        6,
+        0,
+        1124,
+        1612,
+        1670,
+        2158,
+        2216,
+        2730,
+        2762,
+        3200,
+        3308,
+        1092,
+        1126,
+        2252
+      ]
+    ]
+  ],
+  "input_sha256": {
+    "zone10_tiles.bin": "f084cb55b5a996c7f5d9053563c29ad2a5271ab9210e323c7c5c44a0177662c7",
+    "zone10_attr.bin": "e71dd15100a9135ee1aa84e40ab3651a4ae1e16768a0e8c6b9f85eeeecee2e45",
+    "zone10_map.bin": "210b0c9b73679d1de8a64dd65b37ec34db875442a2c8914e2f4c3aa72bc7647d",
+    "zone10_pal.bin": "8b8eca62a9cde1d9e8d31cf7e4da7a692e4c7357d972e88a906c307e7704d957",
+    "zone10h_tiles.bin": "4ecae8d283da497396915afa5287319918c946f1b9495e876439b751c09812d3",
+    "zone10h_attr.bin": "ae258a80408a0e5ef9cf37efff23dcdd07db51f97c1659b3842fb92c6a9cfe51",
+    "zone10h_map.bin": "c8040c8e39a69b337f7b4c2e4cbd3aabab06976c7a2bea80fa3ec5c2de6cd4fc",
+    "zone10_far_tiles.bin": "b7ab0e7946310a5405c403007394e32aeab32741c4337e4ce5de9bec8d4847b4",
+    "zone10_far_map.bin": "ae71c9ef132ed80663954dd5a0dd1c33644937230a2f8f95267ea0d8905e5ce6",
+    "sprite_pal.bin": "3f79592c861226a1e9f6116a161b8bd4eadf2d70271a9d35da12772faec46241",
+    "levels.json": "969c5b36eceb8a4b5b16c66ce7c1a8147ca1931dbf72be853eb92c42eda0dc7c"
+  },
+  "output_sha256": {
+    "zone10h_tiles.bin": "6fd56ae841971da826d7991baeb637f8aa6c9b19acf5d3d2a472c3a5ad05df5b",
+    "zone10_far_tiles.bin": "b7ab0e7946310a5405c403007394e32aeab32741c4337e4ce5de9bec8d4847b4",
+    "zone10_tiles.bin": "fe85bd7bd16db61752048fcdc8067a4a197f66fa81a840f343885c21e1f796d0",
+    "zone10_lower_pal.bin": "81f028ff7c80d25bf0668e73cf6b98e43936f8ece743795c37cb26d905139ed2",
+    "zone10_pal.bin": "a82baef198005a1fa13aa7e0982a36cbe15857767cf9a7b458e226992b441349",
+    "zone10_far_map.bin": "ae71c9ef132ed80663954dd5a0dd1c33644937230a2f8f95267ea0d8905e5ce6",
+    "zone10h_attr.bin": "8a8bc25d7376e9d8f28d7c5beebcb53a4ea9f89a9082482585da4b5a969e37ba",
+    "zone10_attr.bin": "37ebb8d4eaed787dd780678208facd15b50e7b4d4e1e2bfff66720fd99a73f08"
+  }
+}

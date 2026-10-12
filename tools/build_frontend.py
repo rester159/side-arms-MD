@@ -310,6 +310,31 @@ for s, idxs in sorted(set_scenes.items()):
                     c = MD[int(cid)]; hist[c] = hist.get(c, 0) + int(n)
                 blocks.append(hist); cells.append((i, tx, ty))
     pals, assign = fit(blocks, 2, 15, fixed=[seed0, seed1])
+    # Earth and its flash share a source-exact palette. Keeping burning frames
+    # in their existing palette avoids sacrificing globe shades to that union.
+    earth_banks = None
+    burn_banks = None
+    if s == 1:
+        recipe = json.loads((ROOT/'tools/data/frontend_earth_palette.json').read_text())
+        assert recipe['scenes'] == [1, 2]
+        earth_banks = []
+        for color_bank, seed in zip(recipe['banks'], (seed0, seed1)):
+            prefix = [md_word(c) for c in seed]
+            ordered = prefix + sorted(set(color_bank)-set(prefix))
+            assert len(ordered) <= 15 and set(ordered) == set(color_bank)
+            earth_banks.append(ordered)
+        burn_recipe = json.loads((ROOT/'tools/data/frontend_burn_palette.json').read_text())
+        assert burn_recipe['scenes'] == list(range(3, 16))
+        burn_banks = []
+        for bank_index, wanted in enumerate(burn_recipe['banks']):
+            prior = [md_word(c) for c in pals[bank_index]]
+            ordered = list(dict.fromkeys(c for c in prior if c in wanted))
+            ordered += sorted(set(wanted)-set(ordered))
+            prefix_count = 3 if bank_index == 0 else 2
+            assert ordered[:prefix_count] == prior[:prefix_count] and len(ordered) <= 15
+            burn_banks.append(ordered)
+        burn_restored = 0
+        emit('fe_earth_pal', be16([v for bank in earth_banks for v in [0]+bank+[0]*(15-len(bank))]), 'u16')
     ts = TileSet()
     maps = {i: [0] * (64 * 28) for i in idxs}
     lut = [{} for _ in range(2)]
@@ -319,20 +344,51 @@ for s, idxs in sorted(set_scenes.items()):
         p = int(p)
         b = views[i][ty * 8:ty * 8 + 8, tx * 8:tx * 8 + 8]
         px = np.zeros((8, 8), np.uint8)
-        for yy in range(8):
-            for xx in range(8):
-                cid = int(b[yy, xx])
-                if cid >= 0:
-                    c = MD[cid]
-                    if c not in lut[p]:
-                        lut[p][c] = 1 + nearest(c, pals[p])
-                    px[yy, xx] = lut[p][c]
+        if earth_banks is not None and i in recipe['scenes']:
+            needed = {md_word(MD[int(cid)]) for cid in np.unique(b[b >= 0])}
+            choices = [bank for bank in range(2) if needed <= set(earth_banks[bank])]
+            assert choices, (i, tx, ty, needed)
+            p = p if p in choices else choices[0]
+            lookup = {word: pen+1 for pen, word in enumerate(earth_banks[p])}
+            for yy in range(8):
+                for xx in range(8):
+                    cid = int(b[yy, xx])
+                    if cid >= 0:
+                        px[yy, xx] = lookup[md_word(MD[cid])]
+        else:
+            for yy in range(8):
+                for xx in range(8):
+                    cid = int(b[yy, xx])
+                    if cid >= 0:
+                        c = MD[cid]
+                        if c not in lut[p]:
+                            lut[p][c] = 1 + nearest(c, pals[p])
+                        px[yy, xx] = lut[p][c]
+        if burn_banks is not None and i in burn_recipe['scenes']:
+            original_words = np.array([0]+[md_word(c) for c in pals[p]])[px]
+            output_words = original_words.copy()
+            live = b >= 0
+            source_words = np.array([md_word(MD[int(cid)]) if cid >= 0 else 0 for cid in b.ravel()]).reshape(8, 8)
+            selected = live & np.isin(source_words, burn_recipe['source_colors'])
+            output_words[selected] = source_words[selected]
+            burn_restored += int(np.sum(live & (output_words != original_words)))
+            needed = set(map(int, output_words[live]))
+            choices = [bank for bank in range(2) if needed <= set(burn_banks[bank])]
+            assert choices, (i, tx, ty, needed)
+            p = p if p in choices else choices[0]
+            lookup = {word: pen+1 for pen, word in enumerate(burn_banks[p])}
+            px.fill(0)
+            for word in needed:
+                px[live & (output_words == word)] = lookup[word]
         idx, hf, vf = ts.add(px_tile(px))
         maps[i][ty * 64 + tx] = 0x8000 | (p << 13) | (vf << 12) | (hf << 11) | (VRAM_BG_TILE + idx)
     assert len(ts.tiles) <= BG_CACHE_TILES, (s, len(ts.tiles))
     palwords = []
     for p in pals:
         palwords += [0] + [md_word(c) for c in p] + [0] * (15 - len(p))
+    if burn_banks is not None:
+        assert burn_restored == burn_recipe['restored_pixels']
+        palwords = [v for bank in burn_banks for v in [0]+bank+[0]*(15-len(bank))]
     emit(f'fe_set{s}_tiles', b''.join(ts.tiles), comment=f'{len(ts.tiles)} tiles ')
     emit(f'fe_set{s}_pal', be16(palwords), 'u16', 'PAL0+PAL1 ')
     set_info.append((s, len(ts.tiles)))
@@ -342,7 +398,7 @@ for s, idxs in sorted(set_scenes.items()):
 for i, (name, s, x, y) in enumerate(SCENES):
     emit(f'fe_scene{i}_map', be16(scene_maps[i]), 'u16', f'{name}: 64x28 plane B ')
 header.append('typedef struct { const u8 *tiles; u16 count; const u16 *pal; } FeSceneSet;')
-header.append('typedef struct { const u16 *map; u8 set; } FeScene;')
+header.append('typedef struct { const u16 *map; u8 set; const u16 *pal; } FeScene;')
 header.append(f'#define FE_SCENE_SETS {len(set_info)}')
 header.append('extern const FeSceneSet fe_scene_sets[FE_SCENE_SETS];')
 header.append('enum { ' + ', '.join(f'FE_SCENE_{n.upper()}' for n, *_ in SCENES) + ', FE_SCENE_COUNT };')
@@ -353,7 +409,8 @@ for s, n in set_info:
 cdata.append('};')
 cdata.append('const FeScene fe_scenes[FE_SCENE_COUNT] = {')
 for i, (name, s, x, y) in enumerate(SCENES):
-    cdata.append(f'    {{fe_scene{i}_map, {s}}},   /* {name}: arcade scroll ${x:03X},${y:03X} */')
+    scene_pal = 'fe_earth_pal' if i in (1, 2) else f'fe_set{s}_pal'
+    cdata.append(f'    {{fe_scene{i}_map, {s}, {scene_pal}}},   /* {name}: arcade scroll ${x:03X},${y:03X} */')
 cdata.append('};')
 
 # ------------------------------------------------------------------ ranking, bonus tables
@@ -507,10 +564,16 @@ header.append('extern const FeDemoScript fe_demo_scripts[2];')
 
 # ------------------------------------------------------------------ outputs
 lines = ['/* Generated by tools/build_frontend.py. */', '.section .rodata', '.align 2']
-for name in symbols:
+# Group the three 64-byte palettes after the large assets. Their own 64-byte
+# alignment prevents boundary crossing without three separate 512-byte gaps.
+palettes = [name for name in symbols if name.endswith('_pal')]
+compact = palettes + ['fe_md_map']
+for name in [name for name in symbols if name not in compact] + compact:
     # 512-byte aligned: DMA sources must not straddle a 128 KB boundary (hud.c streams fe_bar_tiles
     # in 128-byte runs with DMA_queueDmaFast)
-    lines += [f'.global {name}', '.balign 512', f'{name}:', f'.incbin "res/generated/{name}.bin"']
+    alignment = 64 if name in palettes else 128 if name == 'fe_md_map' else 512
+    if name in palettes: assert (GEN / f'{name}.bin').stat().st_size == 64
+    lines += [f'.global {name}', f'.balign {alignment}', f'{name}:', f'.incbin "res/generated/{name}.bin"']
 (SRC / 'frontend.s').write_text('\n'.join(lines) + '\n')
 (SRC / 'frontend_data.c').write_text('\n'.join(cdata) + '\n')
 (INC / 'frontend.h').write_text('\n'.join(header) + '\n')

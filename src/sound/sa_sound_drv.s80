@@ -8,7 +8,7 @@
 ;
 ; Why on the Z80: the music runs on its own 248.9 Hz clock (YM2612 Timer A), independent of the
 ; 60/50 Hz video and of game lag frames; the YM2612/PSG writes never need the 68000 or its bus; the
-; 68000 only drops command bytes into a FIFO (sound_command()).
+; 68000 drops arcade commands into a FIFO and prepares queued HuCard voice frames.
 ;
 ; Per tick: take one command, step the music (only the highest active priority set), step the SFX
 ; (highest active slot per virtual SSG chip), build the two SSG register images, reduce them to the PSG.
@@ -23,6 +23,7 @@ NTAB_NTSC   EQU     $8100           ; 97 x {block<<3 | fnum hi, fnum lo}, index 
 NTAB_PAL    EQU     $8200
 DURTAB      EQU     $8300           ; 256 x {ticks to next event (2), key-off tick or 0 (2)}
 PATCHES     EQU     $8700           ; 32 x 32: values for $30,$34..$8C, $B0, key-on slot mask
+OP_REPEAT4  EQU     $7C             ; finite native four-pass reprise
 OP_PATCH    EQU     $7D             ; stream: 0 rest / 1..96 note (+$80 triplet) + duration index,
 OP_JUMP     EQU     $7E             ;         $7D patch, $7E jump lo hi, $7F end
 OP_END      EQU     $7F
@@ -66,6 +67,7 @@ CH_PATCH    EQU     7
 CH_KEY      EQU     8               ; key-on byte (slot mask | channel code)
 CH_CODE     EQU     9               ; YM2612 channel code 0-2 / 4-6
 CH_PART     EQU     10              ; 0 = part I, 2 = part II
+CH_REPEAT   EQU     12              ; finite reprise counter; otherwise unused
 CH_OFS      EQU     11              ; register offset 0-2
 ; SFX slot record
 SL_ACT      EQU     0
@@ -84,6 +86,15 @@ MB_BANK     EQU     MBOX+$02
 MB_WR       EQU     MBOX+$04
 MB_RD       EQU     MBOX+$05
 MB_READY    EQU     MBOX+$07
+MB_HU_MODE  EQU     MBOX+$08
+MB_HU_WR    EQU     MBOX+$09
+MB_HU_RD    EQU     MBOX+$0A
+HU_QUEUE    EQU     $1800
+HU_PATCH    EQU     $1B00
+HU_ACTIVE   EQU     $1B06
+HU_PHASE    EQU     $1B08
+HU_UNDERRUN EQU     $1B0A
+HU_FRAMES   EQU     $1B0C
 MB_RING     EQU     MBOX+$10
 
 DRVSIZE     EQU     $1400
@@ -217,6 +228,7 @@ main
             ld      (SUBT),a
             ld      hl,TICK
             inc     (hl)
+            call    hucard
             call    command
             call    music
             call    sfx
@@ -306,6 +318,29 @@ command     ld      a,(MB_RD)
             ld      a,(hl)
             cp      $FF
             ret     z
+            ld      c,a
+            ld      a,(MB_HU_MODE)
+            or      a
+            ld      a,c
+            jr      z,.extension
+            cp      $20
+            ret     nc
+            or      a
+            jp      z,sfx_stop
+.extension
+            cp      $FD
+            jp      z,credits_stop
+            cp      $FE                 ; native BC credits extension
+            jr      nz,.legacy
+            call    bank_m
+            ld      hl,CMDTAB+$FD
+            ld      c,(hl)
+            inc     hl
+            ld      e,(hl)
+            inc     hl
+            ld      d,(hl)
+            jp      mus_start
+.legacy
             and     $3F                 ; spec $00B8
             call    bank_m
             ld      l,a
@@ -366,6 +401,7 @@ mus_start   ld      a,c
             ld      a,(hl)
             inc     hl
             ld      (ix+CH_PATCH),a
+            ld      (ix+CH_REPEAT),4
             ld      (ix+CH_FLAGS),1
             ld      (ix+CH_CNT),1       ; first event on the first step
             ld      (ix+CH_CNT+1),0
@@ -380,6 +416,19 @@ mus_start   ld      a,c
             ret
 
 ; stop all music (spec $015C): every channel of every set off, silence
+credits_stop
+            call    mus_stop
+            ; The legacy stop leaves operator four of channels 3/6 alone.
+            ; Mute those carriers too at the finite CD playback boundary.
+            ld      e,0
+            ld      a,$4E
+            ld      d,$7F
+            call    ymwf
+            ld      e,2
+            ld      a,$4E
+            ld      d,$7F
+            jp      ymwf
+
 mus_stop    ld      hl,CHAN
             ld      de,16
             ld      b,24
@@ -419,7 +468,10 @@ silence     call    poll
 
 ; music step: only the highest set whose channel 0 is active plays, lower ones keep their position
 ; (spec $0236). A change of the playing set silences and steps nothing this tick (spec $027D).
-music       ld      a,(CHAN+$120)
+music       ld      a,(MB_HU_MODE)
+            or      a
+            ret     nz
+            ld      a,(CHAN+$120)
             ld      c,3
             rra
             jr      c,.f
@@ -514,6 +566,8 @@ event       ld      l,(ix+CH_PTR)
             ld      h,(ix+CH_PTR+1)
 .op         ld      a,(hl)
             inc     hl
+            cp      OP_REPEAT4
+            jr      z,.repeat4
             cp      OP_PATCH
             jr      z,.patch
             cp      OP_JUMP
@@ -577,12 +631,17 @@ event       ld      l,(ix+CH_PTR)
             push    hl
             call    loadpatch           ; a patch change takes effect at once (spec $03AA)
             pop     hl
-            jr      .op
+            jp      .op
+.repeat4    dec     (ix+CH_REPEAT)
+            jr      nz,.jump
+            inc     hl
+            inc     hl
+            jp      .op
 .jump       ld      a,(hl)
             inc     hl
             ld      h,(hl)
             ld      l,a
-            jr      .op
+            jp      .op
 .end        ld      (ix+CH_FLAGS),0     ; channel off; on channel 0 this ends the set (spec $04FB, $0236)
             scf
             ret
@@ -1280,6 +1339,189 @@ att         and     $0F                 ; a = SSG volume 0..15 -> PSG attenuatio
 .n          ld      a,(hl)
             ret
 ATTTAB      DB      15,14,14,14,14,14,14,12,11,9,8,6,5,3,2,0
+
+; HuCard snapshots are prepared by the 68000 and consumed on this timer.
+; Four 72-byte slots at $1800; a slot is published only after its full copy.
+; Per-voice packet: instrument, pitch hi/lo, pan, MUL x4, TL x4.
+hucard
+            ld      a,(MB_HU_MODE)
+            or      a
+            jr      nz,.active
+            ld      a,(HU_ACTIVE)
+            or      a
+            ret     z
+            xor     a
+            ld      (HU_ACTIVE),a
+            jp      credits_stop
+.active     ld      a,(HU_ACTIVE)
+            or      a
+            jr      nz,.clock
+            call    credits_stop
+            ld      a,1
+            ld      (HU_ACTIVE),a
+            ld      hl,$FFFF
+            ld      (HU_PHASE),hl
+            ld      hl,HU_PATCH
+            ld      b,6
+.reset      ld      (hl),$FF
+            inc     hl
+            djnz    .reset
+.clock      ld      hl,(HU_PHASE)
+            ld      de,16290
+            ld      a,(MB_REGION)
+            or      a
+            jr      z,.rate
+            ld      de,16286
+.rate       add     hl,de
+            ld      (HU_PHASE),hl
+            ret     nc
+            ld      a,(MB_HU_RD)
+            ld      c,a
+            ld      a,(MB_HU_WR)
+            cp      c
+            jr      nz,.frame
+            ld      hl,HU_UNDERRUN
+            inc     (hl)
+            ret
+.frame      ld      hl,(HU_FRAMES)
+            inc     hl
+            ld      (HU_FRAMES),hl
+            ld      l,c
+            ld      h,0
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl             ; slot * 8
+            ld      d,h
+            ld      e,l
+            add     hl,hl
+            add     hl,hl
+            add     hl,hl             ; slot * 64
+            add     hl,de             ; slot * 72
+            ld      de,HU_QUEUE
+            add     hl,de
+            push    hl
+            pop     ix
+            ld      iy,HU_PATCH
+            ld      b,6
+            ld      c,0               ; channel 0..5
+.voice      push    bc
+            ld      a,c
+            cp      3
+            ld      e,0
+            jr      c,.part
+            sub     3
+            ld      e,2
+.part       ld      c,a               ; register offset 0..2
+            ld      a,(ix+0)
+            cp      (iy+0)
+            jr      z,.levels
+            ld      (iy+0),a
+            ; Key off before changing multipliers. Source envelopes are in
+            ; carrier TLs; algorithms 5/6 keep their modulator depth fixed.
+            call    .keyoff
+            ld      a,c
+            add     a,$30
+            ld      d,(ix+4)
+            call    ymw
+            add     a,4
+            ld      d,(ix+5)
+            call    ymw
+            add     a,4
+            ld      d,(ix+6)
+            call    ymw
+            add     a,4
+            ld      d,(ix+7)
+            call    ymw
+            ld      a,c
+            add     a,$50
+            ld      d,31
+            call    .four
+            ld      a,c
+            add     a,$60
+            ld      d,0
+            call    .four
+            ld      a,c
+            add     a,$70
+            call    .four
+            ld      a,c
+            add     a,$80
+            ld      d,15
+            call    .four
+            ld      a,c
+            add     a,$90
+            ld      d,0
+            call    .four
+            ld      a,(ix+3)
+            and     $3F                 ; algorithm plus feedback, without stereo
+            ld      d,a
+            ld      a,c
+            add     a,$B0
+            call    ymw
+            call    .keycode
+            or      $F0
+            ld      d,a
+            ld      a,$28
+            push    de
+            ld      e,0
+            call    ymw
+            pop     de
+.levels     ld      a,c
+            add     a,$A4
+            ld      d,(ix+1)
+            call    ymw
+            sub     4
+            ld      d,(ix+2)
+            call    ymw
+            ld      a,(ix+3)
+            and     $C0
+            ld      d,a
+            ld      a,c
+            add     a,$B4
+            call    ymw
+            ld      a,c
+            add     a,$40
+            ld      d,(ix+8)
+            call    ymw
+            add     a,4
+            ld      d,(ix+9)
+            call    ymw
+            add     a,4
+            ld      d,(ix+10)
+            call    ymw
+            add     a,4
+            ld      d,(ix+11)
+            call    ymw
+            ld      de,12
+            add     ix,de
+            inc     iy
+            pop     bc
+            inc     c
+            dec     b
+            jp      nz,.voice
+            ld      a,(MB_HU_RD)
+            inc     a
+            and     3
+            ld      (MB_HU_RD),a
+            ret
+.four       call    ymw
+            add     a,4
+            call    ymw
+            add     a,4
+            call    ymw
+            add     a,4
+            jp      ymw
+.keycode    ld      a,e
+            add     a,a
+            add     a,c
+            ret
+.keyoff     call    .keycode
+            ld      d,a
+            ld      a,$28
+            push    de
+            ld      e,0
+            call    ymw
+            pop     de
+            ret
 
 DRVEND
             BLOCK   DRVSIZE-$

@@ -6,7 +6,7 @@ Outputs (all ignored by VCS, regenerated from the user's ROMs):
   src/gen/data.s         .incbin wrapper with exported symbols
   inc/gen/assets.h       declarations + constants
 """
-import json, struct, sys
+import json, struct, subprocess, sys
 from pathlib import Path
 import numpy as np
 
@@ -128,6 +128,39 @@ for zi, z in enumerate(zonecfg.ZONES):
                 # nametable template: palette + high priority + subtile index; 0 = empty
                 idx = sy * 4 + sx
                 attrs += struct.pack('>H', 0 if not px.any() else (0x8000 | (p << 13) | idx))
+    if zi == 0:
+        # R1's authored stone ramps assign their own meaning to pen 15.
+        # Preserve the donor before Normal-only material repairs reuse it.
+        (GEN / 'bc_r1_donor_tiles.bin').write_bytes(tiles)
+        (GEN / 'bc_r1_donor_attr.bin').write_bytes(attrs)
+        (GEN / 'bc_r1_donor_pal.bin').write_bytes(be16(
+            [v for bank in pals for v in [0]+[md_word(c) for c in bank]+[0]*(15-len(bank))]))
+    if zi in (6, 19, 20):
+        from normal_background_shading import refit_materials
+        assert zi not in home_zones and zi not in parallax_split.far_layers()
+        refit_materials(zi, tiles, attrs, pals, metas, bgt, MD)
+    if zi == 10:
+        # Keep the original subtile bank assignments: Home variants use these
+        # same assignments, and the far texture retains all displayed colors.
+        from normal_background_shading import refit_materials
+        recipe = json.loads((Path(__file__).parent/'data/normal_zone10_palette_fit.json').read_text())
+        assert list(map(int, assign)) == recipe['assignments']
+        refit_materials(zi, tiles, attrs, pals, metas, bgt, MD)
+    if zi == 16:
+        from normal_background_shading import restore_zone16_blue
+        assert zi not in home_zones and zi not in parallax_split.far_layers()
+        restore_zone16_blue(tiles, attrs, pals, metas, bgt, MD)
+    if zi in (0, 3, 5, 12, 13, 14, 16, 17, 18):
+        from normal_background_shading import restore_materials
+        assert zi not in home_zones and zi not in parallax_split.far_layers()
+        restore_materials(zi, tiles, attrs, pals, metas, bgt, MD)
+    if zi == 3:
+        from normal_background_shading import restore_local_shades
+        restore_local_shades(zi, tiles, attrs, pals, metas, bgt, MD)
+    if zi in (0, 5):
+        from normal_background_shading import refit_materials
+        assert zi not in home_zones and zi not in parallax_split.far_layers()
+        refit_materials(zi, tiles, attrs, pals, metas, bgt, MD)
     zmap = [mid[(code[r, c], color[r, c])] | (((flags[r, c] & 1) << 14) | ((flags[r, c] & 2) << 14))
             for r in range(y0, y0 + h) for c in range(x0, x0 + w)]
     palwords = []
@@ -170,6 +203,16 @@ for zi, z in enumerate(zonecfg.ZONES):
     zone_rows.append((z['name'], x0, y0, w, h, len(metas)))
     print(f"zone {z['name']}: {len(metas)} metatiles, palettes {[len(p) for p in pals]}")
 
+from normal_background_shading import restore_selective_files
+restore_selective_files(GEN, bgt, code, color, MD)
+
+# Its preview consumes the starfield and zone-12 palette generated above.
+# Generate it here so a clean build never reads stale or missing Normal assets.
+subprocess.run([sys.executable, str(ROOT / 'tools/build_organic_genesis_scroll_map.py')], check=True)
+organic_dir = ROOT / 'concepts/organic-level/genesis-scroll-map'
+organic_info = json.loads((organic_dir / 'map_layout.json').read_text())
+zone_rows.append(('organic_belly', 3, 0, *organic_info['map_metatile_grid'], organic_info['metatile_count']))
+
 header.append('typedef struct { u16 x0, y0, w, h, metas; const u8 *tiles; const u16 *tmpl; const u16 *map; const u16 *pal; } Zone;')
 header.append(f'#define ZONE_COUNT {len(zone_rows)}')
 header.append('extern const Zone zones[ZONE_COUNT];')
@@ -186,7 +229,22 @@ for n in range(len(spr)):
     for tx in range(2):
         for ty in range(2):
             raw += tile_bytes(spr[n][ty * 8:ty * 8 + 8, tx * 8:tx * 8 + 8])
-emit('sprite_pens', bytes(raw), comment='2048 x 128, arcade pens 0-15 ')
+# Keep the full development input for art builders/review tools. The cartridge
+# stores each identical fallback pattern once, with a compact code index.
+(GEN / 'sprite_pens.bin').write_bytes(raw)
+unique_pens = bytearray()
+pen_lookup = {}
+pen_indices = []
+for offset in range(0, len(raw), 128):
+    pattern = bytes(raw[offset:offset+128])
+    if pattern not in pen_lookup:
+        pen_lookup[pattern] = len(unique_pens) // 128
+        unique_pens += pattern
+    pen_indices.append(pen_lookup[pattern])
+assert b''.join(unique_pens[i*128:(i+1)*128] for i in pen_indices) == raw
+emit('sprite_pens_unique', bytes(unique_pens), comment='Deduplicated raw fallback patterns ')
+emit('sprite_pen_index', be16(pen_indices), 'u16', 'Arcade code to raw fallback pattern ')
+
 usage = json.loads((ROOT / 'tools/sprite_palette_usage.json').read_text()) if (ROOT / 'tools/sprite_palette_usage.json').exists() else {}
 
 # ---------------------------------------------------------------- player tables
@@ -213,6 +271,10 @@ for name in ('metasprites.json', 'spawns.json', 'player.json', 'player_sprites.j
     f = GEN / name
     if f.exists():
         _walk(json.loads(f.read_text()), pairs)
+# Before Christ's paired shutter flashes in a second existing sprite color.
+# Keep the complete composite resident in the bank rather than remapping it
+# on the 68000 whenever the pair touches.
+pairs.add((0x396, 7))
 expanded = set()
 for code, col in pairs:
     for add in (0, 1, 8, 9):
@@ -257,6 +319,37 @@ blocks += [_hist([((k & 0x7FF) + a) & 0x7FF for a in (0, 1, 8, 9)], k >> 11) for
 spals, assign = fit(blocks, 2, 15, fixed=[TXT_SEED2, TXT_SEED3])
 small_pal = [int(a) for a in assign[:len(keys)]]
 big_pal = [int(a) for a in assign[len(keys):]]
+# Extend BC's launcher poses using the established sprite/HUD palettes. These
+# extra keys must not participate in the global fit: changing its input would
+# recolor existing Normal sprites, HUD text and bosses as a side effect.
+def extra_palette(codes, col):
+    hist = _hist(codes, col)
+    if not hist:
+        return 0
+    from quantize import _dist
+    colors = np.array(list(hist)); weights = np.array(list(hist.values()))
+    errors = [float((_dist(colors, np.array(pal)).min(1) * weights).sum()) for pal in spals]
+    return int(np.argmin(errors))
+
+small_assign = dict(zip(keys, small_pal))
+big_assign = dict(zip(big_keys, big_pal))
+bc_matches = json.loads((ROOT / 'tools/bc_sprite_matches.json').read_text())
+bc_poses = {pose['id']: pose for pose in bc_matches['poses']}
+for match_id in bc_matches['extra_pair_matches']:
+    pose = bc_poses[match_id]
+    assert pose['size'] == 32 and pose['classification'] == 'same_family_same_pose_redrawn'
+    code, col = pose['normal_code'], pose['normal_colour']
+    assert 0 <= code <= 0x7ff and 0 <= col < 16
+    cells = [((code + add) & 0x7ff) for add in (0, 1, 8, 9)]
+    for cell in cells:
+        key = cell | (col << 11)
+        if key not in small_assign:
+            small_assign[key] = extra_palette([cell], col)
+    key = code | (col << 11)
+    if key not in big_assign:
+        big_assign[key] = extra_palette(cells, col)
+keys = sorted(small_assign); small_pal = [small_assign[key] for key in keys]
+big_keys = sorted(big_assign); big_pal = [big_assign[key] for key in big_keys]
 # per arcade colour fallback (runtime remap, bosses, front end): the palette that fits its 15 colours best
 from quantize import _dist as _qdist
 sprite_lut = bytearray(); col_pal = []
@@ -294,11 +387,6 @@ index = [0] * 32768
 for i, k in enumerate(keys):
     bank += convert(k & 0x7FF, k >> 11, small_pal[i])
     index[k] = (i + 1) | (small_pal[i] << 15)       # bit 15: PAL3
-emit('spr_bank_keys', be16(keys), 'u16', 'sorted code | colour << 11 ')
-emit('spr_bank', bytes(bank), comment='pre-converted 16x16 patterns ')
-header.append(f'#define SPR_BANK_COUNT {len(keys)}')
-print('sprite bank:', len(keys), 'patterns', len(bank) // 1024, 'KB')
-emit('spr_bank_index', be16(index), 'u16', 'code | colour << 11 -> spr_bank entry + 1, b15 = PAL3 ')
 # 32x32 composites pre-interleaved in the Genesis 4x4 sprite order (column-major: each
 # 32-px column = top cell column + bottom cell column): one 512-byte DMA per upload.
 # All four cells use the block's own palette choice.
@@ -312,6 +400,76 @@ for i, k in enumerate(big_keys):
         h = (colx & 1) * 64
         big += top[h:h + 64] + bot[h:h + 64]
     big_index[k] = (len(big) // 512) | (p << 15)
+# Reuse byte-identical packed patterns. Each lookup retains its palette bit;
+# this saves ROM space without changing any Normal or BC rendered pixel.
+def compact_patterns(data, lookup, stride):
+    unique = {}; compact = bytearray(); relocation = {}
+    for offset in range(0, len(data), stride):
+        pattern = bytes(data[offset:offset+stride])
+        if pattern not in unique:
+            compact.extend(pattern); unique[pattern] = len(compact)//stride
+        relocation[offset//stride+1] = unique[pattern]
+    for k, entry in enumerate(lookup):
+        if entry: lookup[k] = relocation[entry & 32767] | (entry & 32768)
+    return compact
+bank = compact_patterns(bank, index, 128)
+big = compact_patterns(big, big_index, 512)
+from bc_sprite_recolors import append_variants
+bc_recolors, bc_spals = append_variants(raw, MD, spals, bank, index, keys, big, big_index, INC)
+# Split the BC idle spike turret's transparent top corners without changing pens.
+spike_block = big_index[0x7d30] & 32767
+assert spike_block
+spike = big[(spike_block-1)*512:spike_block*512]
+# Column-major 4x4 source tiles: the top left/right 8x16 corners are blank.
+assert not any(spike[0:64]) and not any(spike[384:448])
+spike_strips = spike[128:192] + spike[256:320]
+spike_strips += b''.join(spike[column*128+64:column*128+128] for column in range(4))
+assert len(spike_strips) == 384
+emit('bc_spike_strips', bytes(spike_strips), comment='16x16 cap followed by 32x16 base; exact BC turret pens ')
+from bc_cap_patterns import header as cap_patterns_header
+(INC / 'bc_cap_merge_patterns.inc').write_text(cap_patterns_header(bytes(spike_strips[:128])))
+# The first surfacer pose has empty top/bottom eight-pixel rows.
+surfacer_block = big_index[0x250] & 32767
+assert surfacer_block
+surfacer = big[(surfacer_block-1)*512:surfacer_block*512]
+assert all(not any(surfacer[col*128:col*128+32]) and
+           not any(surfacer[col*128+96:col*128+128]) for col in range(4))
+surfacer_strip = b''.join(surfacer[col*128+32:col*128+96] for col in range(4))
+assert len(surfacer_strip) == 256
+emit('bc_surfacer_strip', surfacer_strip, comment='Exact middle 32x16 of BC surfacer key 0x250 ')
+# The reviewed pod pose keeps every pen in the first 24 source rows.
+pod_block = big_index[0x7ed6] & 32767
+assert pod_block
+pod = big[(pod_block-1)*512:pod_block*512]
+assert all(not any(pod[col*128+96:col*128+128]) for col in range(4))
+pod_strip = b''.join(pod[col*128:col*128+96] for col in range(4))
+assert len(pod_strip) == 384
+emit('bc_pod_strip', pod_strip, comment='Exact upper 32x24 of reviewed BC pod key 0x7ed6 ')
+
+
+emit('bc_sprite_pal', be16([w for p in bc_spals for w in [0]+[md_word(c) for c in p]]), 'u16', 'BC adds middle shades in unused sprite pens ')
+(GEN / 'bc_sprite_recolors.json').write_text(json.dumps(bc_recolors, indent=2) + '\n')
+# Tool inventory only: runtime lookup uses the populated spr_bank_index.
+assert set(keys) == {key for key, entry in enumerate(index) if entry}
+(GEN / 'spr_bank_keys.bin').write_bytes(be16(keys))
+from normal_sprite_shades import apply as apply_normal_sprite_shades
+normal_sprite_repairs = apply_normal_sprite_shades(raw, MD, bank, index, big, big_index, swords)
+from normal_sprite_rebank import apply as apply_normal_sprite_rebank
+normal_sprite_rebank = apply_normal_sprite_rebank(raw, bank, index, big, big_index, swords)
+(GEN / 'normal_sprite_rebank.json').write_text(json.dumps(normal_sprite_rebank, indent=2)+'\n')
+# The Normal palette was declared earlier; keep its one symbol and replace only
+# the two previously unused pens after BC's independent palette is finalized.
+(GEN / 'sprite_pal.bin').write_bytes(be16(swords))
+from blue_effect_shades import header as blue_effect_header
+(INC / 'blue_effect_shades.inc').write_text(blue_effect_header(swords))
+from normal_background_sprite_palette import apply as apply_background_sprite_palette
+apply_background_sprite_palette(GEN, bgt, MD)
+
+(GEN / 'normal_sprite_shade_repairs.json').write_text(json.dumps(normal_sprite_repairs, indent=2)+'\n')
+emit('spr_bank', bytes(bank), comment='pre-converted 16x16 patterns ')
+header.append(f'#define SPR_BANK_COUNT {len(keys)}')
+print('sprite bank:', len(keys), 'patterns', len(bank) // 1024, 'KB')
+emit('spr_bank_index', be16(index), 'u16', 'code | colour << 11 -> spr_bank entry + 1, b15 = PAL3 ')
 emit('spr_big_index', be16(big_index), 'u16', 'code | colour << 11 -> spr_big block + 1, b15 = PAL3 ')
 emit('spr_big', bytes(big), comment='pre-interleaved 32x32 composites, 512 bytes each ')
 print('sprite 32x32 blocks:', len(big_keys), len(big) // 1024, 'KB')
@@ -341,51 +499,103 @@ emit('txt_lut', bytes(tlut), comment='64 colours x 256 ')
 emit('txt_pal', bytes(tpal), comment='per text colour: 0 = PAL2, 1 = PAL3 ')
 
 # ---------------------------------------------------------------- levels + terrain
-import subprocess
 subprocess.run([sys.executable, str(ROOT / 'tools/build_levels.py')], check=True)
 # front end / HUD data (needs the text font above): tools/build_frontend.py
 subprocess.run([sys.executable, str(ROOT / 'tools/build_frontend.py')], check=True)
 subprocess.run([sys.executable, str(ROOT / 'tools/build_enemies.py')], check=True)
 # bosses (needs sprite_lut/sprite_pens and the zone palettes above): tools/build_bosses.py
 subprocess.run([sys.executable, str(ROOT / 'tools/build_bosses.py')], check=True)
-emit('terrain', (GEN / 'terrain.bin').read_bytes(), comment='256x256 bits, 16x16 world cells ')
+terrain_bits = (GEN / 'terrain.bin').read_bytes()
+emit('terrain', terrain_bits, comment='256x256 bits, 16x16 world cells ')
+emit('terrain_cells', bytes((b >> bit) & 1 for b in terrain_bits for bit in range(7, -1, -1)),
+     comment='256x256 byte collision lookup; same cells as terrain ')
+
 
 # ---------------------------------------------------------------- colour mode "VIVID"
-# Optional display mode (front-end COLOR option): every Genesis colour is mapped to a
-# more saturated, slightly brighter one. Index = BBBGGGRRR (3 bits each, see palette.c).
-# Neutral greys stay neutral and nothing gets darker.
-import colorsys
-vivid = []
-for w in range(512):
-    r, g, b = (w & 7), (w >> 3) & 7, (w >> 6) & 7
-    h, sat, v = colorsys.rgb_to_hsv(r / 7, g / 7, b / 7)
-    if sat > 0.05:
-        sat = min(1.0, sat * 1.40)
-    v = min(1.0, v * 1.15) if v > 0 else 0
-    nr, ng, nb = colorsys.hsv_to_rgb(h, sat, v)
-    q = [max(o, int(round(n * 7))) if sat <= 0.05 else int(round(n * 7)) for n, o in ((nr, r), (ng, g), (nb, b))]
-    if max(q) < max(r, g, b):
-        q = [r, g, b]
-    vivid.append((q[2] << 9) | (q[1] << 5) | (q[0] << 1))
-emit('vivid_lut', be16(vivid), 'u16', 'Genesis colour >> 1 -> vivid colour ')
+# Initial table; assets finishes it after BC palettes/shade metadata are available.
+# Index = BBBGGGRRR (3 bits each, see palette.c).
+from vivid_palette import base_lut
+emit('vivid_lut', be16(base_lut()), 'u16', 'RGB3 packed index -> shade-guarded Vivid colour ')
+
+# ---------------------------------------------------------------- authored Genesis-native organic stage
+# The route artwork is encoded independently from the extracted arcade zones.
+# Repack its shared 8x8 patterns into the runtime's 16-pattern 32x32 metatile
+# records, and expose it as the final zone so bg.c can stream it normally.
+organic_patterns = (organic_dir / 'tiles_8x8_genesis_4bpp.bin').read_bytes()
+organic_metas = organic_info['metatiles']
+organic_tiles = bytearray()
+organic_tmpl = bytearray()
+for meta in organic_metas:
+    for i, tid in enumerate(meta['tiles_8x8']):
+        tile = organic_patterns[tid * 32:(tid + 1) * 32]
+        organic_tiles += tile
+        pal = meta['palette_per_subtile'][i]
+        attr = 0x8000 | (pal << 13) | i
+        organic_tmpl += struct.pack('>H', 0 if not any(tile) else attr)
+emit('organic_belly_tiles', bytes(organic_tiles), comment='organic stage, 32x32 metatiles x16 Genesis 4bpp patterns ')
+emit('organic_belly_attr', bytes(organic_tmpl), 'u16', 'organic stage nametable templates ')
+emit('organic_belly_map', (organic_dir / 'map_metatiles_be.bin').read_bytes(), 'u16', 'organic stage 50x35 metatile map ')
+emit('organic_belly_pal', (organic_dir / 'background_palettes_cram.bin').read_bytes(), 'u16', 'organic stage two Genesis CRAM palettes ')
 
 # ---------------------------------------------------------------- outputs
 lines = ['/* Generated by tools/build_assets.py. */', '.section .rodata', '.align 2']
-for name in symbols:
-    # 512-byte alignment: blobs that are DMA'd in 128/512-byte units (sprite patterns, metatiles)
-    # must not straddle a 128 KB boundary, which a VDP DMA source cannot cross
-    lines += [f'.global {name}', '.balign 512', f'{name}:', f'.incbin "res/generated/{name}.bin"']
+def cpu_zone_metadata(name):
+    # bg.c/parallax.c read maps and attributes on the CPU. pal_load copies
+    # palette words into RAM before upload. These need word alignment only.
+    return name.startswith(('zone', 'organic_belly')) and name.endswith(('_attr', '_map', '_pal'))
+
+# Keep DMA resources at their original 512-byte alignment, then pack CPU-only
+# zone metadata together. Interleaving every small palette with aligned tiles
+# previously wasted space before the 32 KiB-aligned sound bank.
+cpu_sprite_tables = {'terrain', 'sprite_pen_index', 'sprite_pair_lut',
+                     'spr_bank_index', 'spr_big_index', 'sprite_lut', 'sprite_pal'}
+# These lookup tables are read by the CPU; palettes are copied to RAM before
+# DMA. Move them last so alignment padding cannot push the sound bank forward.
+ordered = [n for n in symbols if not cpu_zone_metadata(n)] + [n for n in symbols if cpu_zone_metadata(n)]
+ordered = [n for n in ordered if n not in cpu_sprite_tables] + [n for n in ordered if n in cpu_sprite_tables]
+for name in ordered:
+    if name == 'sprite_pen_index':
+        continue  # CPU-only index follows the aligned sound bank in z_cpu_tables.s.
+    # The Earth introduction streams fe_scene* resources, not this legacy
+    # world bank. Keep its generated files for source inspection, but omit
+    # the duplicate bank from the cartridge. Preserve all other zone IDs.
+    if any(name == f'zone{z}{variant}_{suffix}' for z in zonecfg.RUNTIME_OMITTED_ZONES
+           for variant in ('', 'h') for suffix in ('tiles', 'attr', 'map', 'pal')):
+        continue
+    # BC sprite colors are copied by pal_load into its RAM palette buffer;
+    # this ROM source is never sent directly to DMA.
+    alignment = 2 if cpu_zone_metadata(name) or name == 'bc_sprite_pal' or name in cpu_sprite_tables else 512
+    lines += [f'.global {name}', f'.balign {alignment}', f'{name}:', f'.incbin "res/generated/{name}.bin"']
 (SRC / 'data.s').write_text('\n'.join(lines) + '\n')
+# Keep this CPU lookup after the 32 KiB-aligned sound bank. Its payload is
+# unchanged; moving it avoids nearly a bank of padding at this ROM layout.
+(SRC / 'z_cpu_tables.s').write_text('.section .rodata\n.align 2\n'
+    '.global sprite_pen_index\n.balign 2\nsprite_pen_index:\n'
+    '.incbin "res/generated/sprite_pen_index.bin"\n')
 zl = ['/* Generated by tools/build_assets.py. */', '#include "gen/assets.h"', 'const Zone zones[ZONE_COUNT] = {']
 for zi, (name, x0, y0, w, h, n) in enumerate(zone_rows):
-    zl.append(f'    {{{x0}, {y0}, {w}, {h}, {n}, zone{zi}_tiles, zone{zi}_attr, zone{zi}_map, zone{zi}_pal}}, /* {name} */')
+    if zi in zonecfg.SHADOWED_ZONE_PARENTS:
+        parent = zonecfg.SHADOWED_ZONE_PARENTS[zi]
+        zl.append(f'    {{0, 0, 0, 0, 0, NULL, NULL, NULL, NULL}}, /* shadowed by zone{parent} */')
+        continue
+    if zi in zonecfg.SCENE_ONLY_ZONES:
+        assert zi == 23 and zi not in home_rows
+        zl.append('    {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL}, /* Earth uses fe_scene assets */')
+        continue
+    if name == 'organic_belly':
+        symbols_ = ('organic_belly_tiles', 'organic_belly_attr', 'organic_belly_map', 'organic_belly_pal')
+    else:
+        symbols_ = (f'zone{zi}_tiles', f'zone{zi}_attr', f'zone{zi}_map', f'zone{zi}_pal')
+    zl.append(f'    {{{x0}, {y0}, {w}, {h}, {n}, {symbols_[0]}, {symbols_[1]}, {symbols_[2]}, {symbols_[3]}}}, /* {name} */')
 zl.append('};')
 for zi, n in home_rows.items():
+    if zi in zonecfg.RUNTIME_OMITTED_ZONES:
+        continue
     name, x0, y0, w, h, nm = zone_rows[zi]
     zl.append(f'static const ZoneVariant zone{zi}h = {{{{{x0}, {y0}, {w}, {h}, {nm}, zone{zi}_tiles, zone{zi}_attr, '
               f'zone{zi}h_map, zone{zi}_pal}}, {n}, zone{zi}h_tiles, zone{zi}h_attr}};')
 zl.append('const ZoneVariant *const zone_home[ZONE_COUNT] = {')
-zl.append('    ' + ', '.join(f'&zone{zi}h' if zi in home_rows else 'NULL' for zi in range(len(zone_rows))) + ',')
+zl.append('    ' + ', '.join(f'&zone{zi}h' if zi in home_rows and zi not in zonecfg.RUNTIME_OMITTED_ZONES else 'NULL' for zi in range(len(zone_rows))) + ',')
 zl.append('};')
 (SRC / 'zones.c').write_text('\n'.join(zl) + '\n')
 # Home parallax tables (needs the far layers above): tools/build_parallax.py

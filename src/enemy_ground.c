@@ -246,8 +246,9 @@ void eye_blink(Enemy *e)
 void eye_death(Enemy *e)
 {
     if (e->r[0] == 0x4D)
-        for (u16 i = 4; i < 8; i++)
-            if (en_big[i].live && en_big[i].cat == 0x41) en_big[i].r[0] = 0x47;
+        for (u16 i = 0; i < N_BIG; i++)
+            if (&en_big[i] != e && en_big[i].live && en_big[i].cat == 0x41 && en_big[i].spare == e->spare)
+                en_big[i].r[0] = 0x47;
     en_set_motion(e, MOT_4D5E);
 }
 

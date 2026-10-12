@@ -1,0 +1,223 @@
+{
+  "schema": 1,
+  "repairs": [
+    {
+      "zone": 3,
+      "repaired_pixels": 74,
+      "changes": [
+        {
+          "meta": 29,
+          "subtile": 12,
+          "bank": 0,
+          "pixels": 3,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 30,
+          "subtile": 6,
+          "bank": 0,
+          "pixels": 13,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 31,
+          "subtile": 4,
+          "bank": 0,
+          "pixels": 9,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 32,
+          "subtile": 1,
+          "bank": 0,
+          "pixels": 3,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 33,
+          "subtile": 0,
+          "bank": 0,
+          "pixels": 1,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 34,
+          "subtile": 0,
+          "bank": 0,
+          "pixels": 6,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 35,
+          "subtile": 0,
+          "bank": 0,
+          "pixels": 5,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 36,
+          "subtile": 1,
+          "bank": 0,
+          "pixels": 2,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 37,
+          "subtile": 1,
+          "bank": 0,
+          "pixels": 2,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 38,
+          "subtile": 0,
+          "bank": 0,
+          "pixels": 2,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 39,
+          "subtile": 14,
+          "bank": 0,
+          "pixels": 2,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 40,
+          "subtile": 0,
+          "bank": 0,
+          "pixels": 1,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 41,
+          "subtile": 14,
+          "bank": 0,
+          "pixels": 2,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 42,
+          "subtile": 1,
+          "bank": 0,
+          "pixels": 2,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 43,
+          "subtile": 3,
+          "bank": 0,
+          "pixels": 3,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 44,
+          "subtile": 0,
+          "bank": 0,
+          "pixels": 1,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 45,
+          "subtile": 2,
+          "bank": 0,
+          "pixels": 1,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 46,
+          "subtile": 1,
+          "bank": 0,
+          "pixels": 2,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 47,
+          "subtile": 0,
+          "bank": 0,
+          "pixels": 1,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 49,
+          "subtile": 3,
+          "bank": 0,
+          "pixels": 1,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 50,
+          "subtile": 0,
+          "bank": 0,
+          "pixels": 1,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 51,
+          "subtile": 1,
+          "bank": 0,
+          "pixels": 9,
+          "source_words": [
+            3822
+          ]
+        },
+        {
+          "meta": 52,
+          "subtile": 8,
+          "bank": 0,
+          "pixels": 2,
+          "source_words": [
+            3822
+          ]
+        }
+      ],
+      "input_sha256": {
+        "tiles": "6422c0c12d530ee56323187c5ef8340efd69cc7466bcd7870f75751fcfae0d3e",
+        "attr": "69e8de87246e66d6ca9917afcab403d80de558bbbf809217cbb99350431534f6",
+        "pal": "0bf4ff6d5cdcb79350107c33f8f5d0c76c59162ef7890318faa337f63c8aa1df"
+      }
+    }
+  ]
+}

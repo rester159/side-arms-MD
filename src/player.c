@@ -1,4 +1,5 @@
 #include "player_local.h"
+#include "flow.h"
 
 /* The Mobilsuit (docs/re/flow_player.md, design in docs/player.md). Positions are Genesis screen
  * pixels of the 32x32 body's top-left; arcade sprite coordinates are these plus (96, 16).
@@ -7,7 +8,31 @@
  * player: entry glide or movement + terrain (B2:$8368), weapon pose (B2:$8511), fire + shot update
  * (B2:$86CC), body composite (B2:$8EF5). */
 
-Player players[2];
+PlayerArena player_arena;
+BcPlayerControl *peers;
+#if defined(__m68k__)
+_Static_assert(sizeof(Player) * MAX_PLAYERS == 1128 && sizeof(BcPlayerControl) == 1144,
+               "typed player debugger views");
+/* Compiler aliases remain attached to their storage across LTO partitions.
+ * They are debugger views only; C reads/writes the active union member. */
+extern Player players[MAX_PLAYERS] __attribute__((alias("player_arena"), used, externally_visible));
+extern BcPlayerControl player __attribute__((alias("player_arena"), used, externally_visible));
+#endif
+
+bool players_bc_acquire(u16 count)
+{
+    if (!count || count > MAX_PLAYERS || peers) return FALSE;
+    if (count > 1) {
+        peers = MEM_alloc((count-1)*sizeof(*peers));
+        if (!peers) return FALSE;
+    }
+    return TRUE;
+}
+
+void players_bc_release(void)
+{
+    if (peers) { MEM_free(peers); peers = NULL; }
+}
 u32 hi_score = 100000;              /* $E600 default = ranking #1 ($0B34) */
 u16 extend_setting;                  /* DSW0 bits 4-5, 0 = MAME default (100000 once) */
 bool score_enabled = TRUE;          /* $E010 */
@@ -27,8 +52,8 @@ volatile u16 prof_player[2];        /* debug: scanlines spent in players_update 
 
 void players_init(void)
 {
-    memset(players, 0, sizeof(players));
-    players[1].id = 1;
+    memset(normal_players, 0, sizeof(normal_players));
+    for (u16 i = 0; i < MAX_PLAYERS; i++) normal_players[i].id = i;
     combine_reset();
 }
 
@@ -42,6 +67,10 @@ void player_spawn(Player *p)
     bool vertical = p->vertical = level.vertical;   /* $1896: +$28 = $E040 */
     if (vertical) { p->x = (p->id ? 0x120 : 0xC0) - 96; p->y = 0 - 16; }
     else          { p->x = 0x20 - 96;                  p->y = (p->id ? 0xA0 : 0x40) - 16; }
+    if (game_player_limit() > 2) {
+        if (vertical) p->x = 48 + p->id * 64;
+        else p->y = 32 + p->id * 40;
+    }
     p->state = PL_ALIVE;
     p->in_play = TRUE;
     p->facing_left = FALSE;
@@ -77,7 +106,7 @@ void player_start(Player *p, u8 lives)
     p->lives = lives;
     p->score = 0;
     p->extend_idx = 0;
-    if (combined) { combine_join(p); return; }
+    if (player_is_combined(p)) { combine_join(p); return; }
     weapons_clear(p);
     player_spawn(p);
 }
@@ -88,7 +117,7 @@ void player_continue(Player *p, u8 lives)
     p->score = 0;
     p->extend_idx = 0;
     p->lives = lives;
-    if (combined) { combine_join(p); return; }
+    if (player_is_combined(p)) { combine_join(p); return; }
     player_spawn(p);
 }
 
@@ -118,7 +147,7 @@ void player_add_score(Player *p, u32 points)
  * slots: a partner without lives (out of play) leaves the points to the leader. */
 Player *player_credit(Player *shooter)
 {
-    return shooter->lives ? shooter : &players[!shooter->id];
+    return shooter->lives ? shooter : &normal_players[shooter->id ^ 1];
 }
 
 /* $2657: item codes */
@@ -150,7 +179,7 @@ void fx_explosion(s16 x, s16 y, u8 kind, bool bg_locked) __attribute__((weak));
  * segment and puts the ship back at its spawn point (entry glide, no terrain test meanwhile). */
 static bool energy_hit(Player *p)
 {
-    if (!p->energy || combined) return FALSE;
+    if (!p->energy || player_is_combined(p)) return FALSE;
     if (--p->energy == 0) return FALSE;                 /* the last segment: a normal death */
     sound_play(0x1B);                                   /* the "speed down" tone */
     if (fx_explosion) fx_explosion(p->x + 8, p->y + 8, 2, FALSE);    /* FX_SMALL burst */
@@ -172,7 +201,7 @@ void player_kill_now(Player *p)
 {
     if (energy_hit(p)) return;
     sound_play(0x0F);
-    if (combined) { combine_hit(); return; }       /* $2231: the robot loses a hit point */
+    if (player_is_combined(p)) { combine_hit(); return; }       /* $2231: the robot loses a hit point */
     p->state = PL_DYING;
     p->speed = 1;                           /* $2254 */
     p->death_frame = 0xFF;                  /* first frame of the animation is drawn next frame */
@@ -237,7 +266,7 @@ static void death_step(Player *p)
     p->level[p->weapon] = 0;
     p->weapon = 0;
     weapons_build_bits(p);
-    if (p->lives) p->lives--;
+    if (p->lives && !(developer_active && developer_lives)) p->lives--;
     if (p->lives) player_spawn(p);
     else p->in_play = FALSE;                /* front end: CONTINUE / GAME OVER */
 }
@@ -245,7 +274,7 @@ static void death_step(Player *p)
 static void update(Player *p)
 {
     u8 in = pad[p->id].held;
-    if (combined) { combine_update_player(p, in); return; }
+    if (player_is_combined(p)) { combine_update_player(p, in); return; }
     if (p->state == PL_DYING) { death_step(p); return; }
     if (p->state != PL_ALIVE) return;
     p->old_x = p->x; p->old_y = p->y;
@@ -287,7 +316,7 @@ static void update(Player *p)
 /* Test hook for the headless runner: the host writes an arcade item code (or $FF = kill, $FE =
  * start a game with 3 lives, $FD = score 10000 points) per player; applied at the start of the next
  * player update. */
-volatile u8 dbg_player_cmd[2];
+volatile u8 dbg_player_cmd[MAX_PLAYERS];
 
 static u16 lines_since(u16 v0)
 {
@@ -305,22 +334,20 @@ void players_update(void)
 
 static void update_all(void)
 {
-    for (u16 i = 0; i < 2; i++) {
+    for (u16 i = 0; i < game_player_limit(); i++) {
         u8 c = dbg_player_cmd[i];
         if (!c) continue;
         dbg_player_cmd[i] = 0;
-        if (c == 0xFF) player_kill(&players[i]);
-        else if (c == 0xFE) player_start(&players[i], 3);
-        else if (c == 0xFD) player_add_score(&players[i], 10000);
-        else player_apply_item(&players[i], c);
+        if (c == 0xFF) player_kill(&normal_players[i]);
+        else if (c == 0xFE) player_start(&normal_players[i], 3);
+        else if (c == 0xFD) player_add_score(&normal_players[i], 10000);
+        else player_apply_item(&normal_players[i], c);
     }
     if (combine_update()) return;           /* merge/split sequence: everything else is suspended */
-    for (u16 i = 0; i < 2; i++) if (players[i].in_play) weapon_select(&players[i]);
-    update(&players[0]);
-    update(&players[1]);
+    for (u16 i = 0; i < game_player_limit(); i++) if (normal_players[i].in_play) weapon_select(&normal_players[i]);
+    for (u16 i = 0; i < game_player_limit(); i++) update(&normal_players[i]);
     crushed = FALSE;                        /* later kills this frame (enemies, bosses) are hits */
-    players[0].prev_held = pad[0].held;
-    players[1].prev_held = pad[1].held;
+    for (u16 i = 0; i < game_player_limit(); i++) normal_players[i].prev_held = pad[i].held;
 }
 
 static void draw(const Player *p)
@@ -334,15 +361,16 @@ static void draw(const Player *p)
      * the respawn frame itself (80) is drawn because the arcade respawns after the composite */
     if (p->entry && !(p->entry & 1) && p->entry < 80) return;
     if (p->hit_blink && (p->invuln & 4)) return;   /* Boss Rush: absorbed hit, 4 frames on / 4 off */
-    spr_32(p->body_code + (p->id ? P2_CODE : 0), p->id ? P2_COLOUR : 0, p->x, p->y, 0);
+    spr_32(p->body_code + player_body_offset(p), player_colour(p), p->x, p->y, 0);
 }
 
 void players_draw(void)
 {
     u16 v0 = GET_VCOUNTER;
-    if (!combine_draw()) {
-        draw(&players[0]);
-        draw(&players[1]);
-    }
+    bool sequence = combine_draw();
+    for (u16 i = 0; i < game_player_limit(); i++)
+        if (!sequence || !combine_sequence_member(&normal_players[i])) draw(&normal_players[i]);
+    if (!sequence && combined && ((combined - 1) ^ 1) >= game_player_limit())
+        weapons_draw(&normal_players[(combined - 1) ^ 1]);
     prof_player[1] = lines_since(v0);
 }

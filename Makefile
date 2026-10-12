@@ -1,8 +1,19 @@
 JAVA ?= $(or $(wildcard /opt/homebrew/opt/openjdk/bin/java),java)
 GDK ?= $(HOME)/mars/m68k-elf
 PY := .venv/bin/python
+HUCARD_ROM ?= .local/pce-hucard/SideArms - Hyper Dyne (USA).pce
 .DEFAULT_GOAL := all
-.PHONY: all assets check-rom clean run
+.PHONY: all assets base-assets bc-data check-bc-inputs check-rom clean run
+check-bc-inputs:
+	python3 tools/check_bc_inputs.py
+# BC artwork consumes the Normal conversion, so keep this dependency ordered
+# even with make -j. A clean build must regenerate every linked BC resource.
+bc-data: base-assets
+	$(PY) tools/build_bc_data.py
+	$(PY) tools/build_bc_boss_art.py
+	$(PY) tools/build_bc_background.py
+	$(PY) tools/build_bc_ending.py
+	$(PY) tools/build_bc_caption_font.py
 all: check-rom
 	$(MAKE) assets
 	$(MAKE) -f $(GDK)/makefile.gen -f tools/cart_boot.mk JAVA=$(JAVA) LIBGCC="$(shell $(GDK)/bin/m68k-elf-gcc -m68000 -print-libgcc-file-name)"
@@ -29,9 +40,15 @@ $(GEN)/player.json: tools/extract_player.py tools/arcade_source.py | .venv/.requ
 $(GEN)/sound.json: tools/extract_sound.py tools/arcade_source.py | .venv/.requirements-installed
 	@mkdir -p $(GEN)
 	$(PY) tools/extract_sound.py
-assets: .venv/.requirements-installed $(EXTRACTED)
+assets: bc-data
+	$(PY) tools/build_cavern_palette.py
+	$(PY) tools/build_vivid_palette.py
+base-assets: check-bc-inputs .venv/.requirements-installed $(EXTRACTED)
 	$(PY) tools/build_assets.py
+	$(PY) tools/build_organic_zone.py
 	$(PY) tools/build_sound.py
+	$(PY) tools/build_hucard_score.py --rom "$(HUCARD_ROM)"
+	$(PY) tools/build_hucard_fm.py --rom "$(HUCARD_ROM)"
 run: all
 	sh tools/launch.sh
 clean:

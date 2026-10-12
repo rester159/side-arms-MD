@@ -43,24 +43,30 @@ void combine_reset(void)
     seq = SEQ_NONE; combined = 0; combined_hp = 0; robot_code = 0; fire_flash = 0;
 }
 
-static Player *leader(void) { return &players[combined - 1]; }
-static Player *partner(void) { return &players[combined == 1 ? 1 : 0]; }
+bool player_is_combined(const Player *p)
+{
+    return combined && (p->id / 2 == (combined - 1) / 2);
+}
+bool combine_sequence_member(const Player *p) { return p->id / 2 == seq_lead / 2; }
+
+static Player *leader(void) { return &normal_players[combined - 1]; }
+static Player *partner(void) { return &normal_players[(combined - 1) ^ 1]; }
 
 /* robot codes: P1-led $140.. , P2-led $180.., colour 0 ($2FE4 attr $20) */
-static u16 robot_base(void) { return combined == 1 ? 0x140 : 0x180; }
+static u16 robot_base(void) { return (combined & 1) ? 0x140 : 0x180; }
 
 void combine_start(Player *lead)
 {
     sound_play(0x0A);
-    weapons_clear(&players[0]);
-    weapons_clear(&players[1]);
     combined = lead->id + 1;
+    weapons_clear(leader());
+    weapons_clear(partner());
     seq_lead = lead->id;
     lead->invuln = 0; lead->entry = 0; lead->entry_latch = FALSE;
     tgt_y = lead->y + 8; tgt_x = lead->x;
     Player *q = partner();
     /* partner object: looks like the partner player (template $30E6/$31DA) */
-    obj_code = q->id ? 0xE2 : 0x62; obj_colour = q->id ? P2_COLOUR : 0;
+    obj_code = 0x62 + player_body_offset(q); obj_colour = player_colour(q);
     if (q->state != PL_OFF) {
         /* $2F6B: from the partner's position; the player is hidden (a dying partner's death task
          * never runs, as in the arcade) */
@@ -83,8 +89,8 @@ void combine_hit(void)
     if (seq != SEQ_NONE) return;
     if (combined_hp && --combined_hp) return;
     /* $223F: split */
-    weapons_clear(&players[0]);
-    weapons_clear(&players[1]);
+    weapons_clear(leader());
+    weapons_clear(partner());
     seq = SEQ_SPLIT; seq_t = 0;
 }
 
@@ -94,8 +100,8 @@ void combine_join(Player *p)
      * (no hit) and both come back in place */
     p->in_play = TRUE;
     if (seq == SEQ_NONE) {
-        weapons_clear(&players[0]);
-        weapons_clear(&players[1]);
+        weapons_clear(leader());
+        weapons_clear(partner());
         seq = SEQ_SPLIT; seq_t = 0;
     }
 }
@@ -127,9 +133,9 @@ static bool touching(void)
 static void merge_done(void)
 {
     Player *l = leader();
-    combined_hp = players[0].in_play && players[1].in_play ? 1 : 2;   /* $304E: $E018 == $81 */
-    weapons_build_bits(&players[0]);
-    weapons_build_bits(&players[1]);
+    combined_hp = leader()->in_play && partner()->in_play ? 1 : 2;   /* $304E: $E018 == $81 */
+    weapons_build_bits(&normal_players[seq_lead]);
+    weapons_build_bits(&normal_players[seq_lead ^ 1]);
     l->ref_y = l->y; l->ref_x = l->x + 16;
     robot_code = robot_base() + 6;
     seq = SEQ_NONE;
@@ -143,8 +149,8 @@ static void split_done(void)
     combined = 0;
     if (q->lives) { player_respawn_in_place(q); seq = SEQ_NONE; }
     else { seq = SEQ_EXPLODE; seq_t = 0; }          /* $343D: partner without lives explodes */
-    weapons_build_bits(&players[0]);
-    weapons_build_bits(&players[1]);
+    weapons_build_bits(&normal_players[seq_lead]);
+    weapons_build_bits(&normal_players[seq_lead ^ 1]);
 }
 
 /* Merge / split sequences. TRUE while one runs (the rest of the game is suspended). */
@@ -206,27 +212,27 @@ void combine_update_player(Player *p, u8 in)
     if (p == l) {
         p->old_x = p->x; p->old_y = p->y;
         u8 dir = in & 0x0F;
-        if (!dir && players[0].lives && players[1].lives)
-            dir = (pad[0].held | pad[1].held) & 0x0F;          /* $8342 */
+        if (!dir && l->lives && q->lives)
+            dir = (pad[l->id].held | pad[q->id].held) & 0x0F;          /* $8342 */
         player_move(p, dir, MOVE_TABLE[3]);
         if (crushed || !combined) return;
         weapons_pose(p);
         weapons_fire(p, in);
-        if (!q->in_play) weapons_ring(p, in);                  /* $8D25: no partner: leader fires it */
+        if (!q->in_play) weapons_ring(p, pad_fire_held[p->id]);                  /* $8D25: no partner: leader fires it */
         p->ref_y = p->y; p->ref_x = p->x + 16;                 /* $9053 */
         robot_composite();
     } else if (p->in_play) {
         p->x = l->x; p->y = l->y + 32;                         /* $9063: partner record follows */
-        weapons_ring(p, in);
+        weapons_ring(p, pad_fire_held[p->id]);
         robot_composite();
     }
 }
 
 static void draw_robot_at(const Player *l, u16 code)
 {
-    spr_32(code, 0, l->x, l->y, 0);
-    spr_16(code + 16, 0, l->x, l->y + 32, 0);
-    spr_16(code + 17, 0, l->x + 16, l->y + 32, 0);
+    spr_32(code, l->id >= 2 ? player_colour(l) : 0, l->x, l->y, 0);
+    spr_16(code + 16, l->id >= 2 ? player_colour(l) : 0, l->x, l->y + 32, 0);
+    spr_16(code + 17, l->id >= 2 ? player_colour(l) : 0, l->x + 16, l->y + 32, 0);
 }
 
 void combine_draw_robot(const Player *l)
@@ -237,14 +243,14 @@ void combine_draw_robot(const Player *l)
 bool combine_draw(void)
 {
     if (seq == SEQ_NONE) return FALSE;
-    weapons_draw(&players[0]);
-    weapons_draw(&players[1]);
-    Player *l = &players[seq_lead];
+    weapons_draw(&normal_players[seq_lead]);
+    weapons_draw(&normal_players[seq_lead ^ 1]);
+    Player *l = &normal_players[seq_lead];
     switch (seq) {
     case SEQ_TRANSFORM: case SEQ_FLY: {
         static const u8 T[4] = { 0x76, 0x72, 0x66, 0x62 };
-        u16 off = l->id ? P2_CODE : 0;
-        u8 col = l->id ? P2_COLOUR : 0;
+        u16 off = player_body_offset(l);
+        u8 col = player_colour(l);
         u16 i = seq == SEQ_TRANSFORM ? seq_t / 12 : 3;
         if (i > 3) i = 3;
         spr_32(T[i] + off, col, l->x, l->y, 0);
@@ -264,14 +270,14 @@ bool combine_draw(void)
     }
     case SEQ_SPLIT_SHOW: {                  /* $33CB: leader $62/$E2, partner $E2/$62 below */
         Player *q = partner();
-        spr_32(l->id ? 0xE2 : 0x62, l->id ? P2_COLOUR : 0, l->x, l->y, 0);
-        spr_32(q->id ? 0xE2 : 0x62, q->id ? P2_COLOUR : 0, l->x, l->y + 32, 0);
+        spr_32(0x62 + player_body_offset(l), player_colour(l), l->x, l->y, 0);
+        spr_32(0x62 + player_body_offset(q), player_colour(q), l->x, l->y + 32, 0);
         break;
     }
     case SEQ_EXPLODE: {
         /* leader already back in play; partner explodes where its body was */
-        const Player *lead = &players[seq_lead], *q = &players[!seq_lead];
-        spr_32(lead->body_code + (lead->id ? P2_CODE : 0), lead->id ? P2_COLOUR : 0, lead->x, lead->y, 0);
+        const Player *lead = &normal_players[seq_lead], *q = &normal_players[seq_lead ^ 1];
+        spr_32(lead->body_code + (player_body_offset(lead)), player_colour(lead), lead->x, lead->y, 0);
         u16 i = seq_t / 6; if (i >= PARTNER_EXPLODE_N) i = PARTNER_EXPLODE_N - 1;
         spr_32(PARTNER_EXPLODE[i], 8, q->x, q->y, 0);
         break;

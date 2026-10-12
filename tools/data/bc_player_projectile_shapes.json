@@ -1,0 +1,2756 @@
+{
+  "schema": 1,
+  "shapes": [
+    {
+      "ram": ".local/pce-reference/enemy-contacts/f002280-ram.bin",
+      "slot": 5,
+      "sat_slot": 1,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        244,
+        91
+      ],
+      "source_pose": 442,
+      "normal_code": 136,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0012223333222100",
+        "0123444444443210",
+        "1344477777744431",
+        "0123444444443210",
+        "0012223333222100",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "96a1c3d50343cae33cfe199eb89de531f43812bf14ea5ee0e8537be9460a36d6",
+      "source_hashes": {
+        "ram": "96a1c3d50343cae33cfe199eb89de531f43812bf14ea5ee0e8537be9460a36d6",
+        "sat": "59f0b6a5ae5da6e9ddd102e86547c6fb1578260721a35ba1d8300b95d1f22b6e",
+        "vram": "ba4bddeb862017b248302e394eae5c093c4ade6d028757c2040703cefb9d14f4",
+        "palette": "c3915cee3631dc315c54d9bd53e9e41500e5b7b22b14c704c401779cd349a278"
+      },
+      "decision": "new",
+      "reason": "Horizontal glowing shot; current Normal 088 is a crescent. No verified matching Normal shape found."
+    },
+    {
+      "ram": ".local/pce-reference/enemy-contacts/f002400-ram.bin",
+      "slot": 0,
+      "sat_slot": 4,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        104,
+        115
+      ],
+      "source_pose": 424,
+      "normal_code": 408,
+      "normal_colour": 7,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000001000000000",
+        "0000200000000000",
+        "0000000012200000",
+        "0000302344321000",
+        "0004034777733100",
+        "0023047777744200",
+        "0034147774474300",
+        "0024247744473300",
+        "0023414774473200",
+        "0003423447772300",
+        "0002344447342000",
+        "0000134223322000",
+        "0010011003200000",
+        "0000000030000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "b855d76855fc9e7fd45a836c616fb5e70e6c711c7bbb3a1d5eef90691f38091b",
+      "source_hashes": {
+        "ram": "b855d76855fc9e7fd45a836c616fb5e70e6c711c7bbb3a1d5eef90691f38091b",
+        "sat": "0cd53047e2dfcdaf2652bc29ba54730bce8751c7818d39470fb966f1df0b946e",
+        "vram": "0632f1c1f129a87f001b36b54270daa58d98220e6375d51f10b169f4f8971e9f",
+        "palette": "7dd445c0f61ef4fc748fe94c4c080621357c24fe731c80d6928f869625396853"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/round10-opening/f007440-ram.bin",
+      "slot": 0,
+      "sat_slot": 1,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        279,
+        121
+      ],
+      "source_pose": 426,
+      "normal_code": 409,
+      "normal_colour": 7,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000003243210000",
+        "0000023444431000",
+        "0000344777443000",
+        "0020247774743200",
+        "0000347744734200",
+        "0030147774744300",
+        "0020034774442200",
+        "0022013443243000",
+        "0003421224242000",
+        "0000000342420000",
+        "0000003212000000",
+        "0000222200000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "e5044c3efce1210da46c8fcbb5cfa32975a80b8d95241ed219983cc1de78a760",
+      "source_hashes": {
+        "ram": "e5044c3efce1210da46c8fcbb5cfa32975a80b8d95241ed219983cc1de78a760",
+        "sat": "063ca8e1aabab601377ea86b4ff0e96805a44de7a4abd0165c400b529ef94581",
+        "vram": "ea9c96e79b0ced1b250d37e6010898abedb4a1fdeaa50292017585ab4942fc2e",
+        "palette": "c3915cee3631dc315c54d9bd53e9e41500e5b7b22b14c704c401779cd349a278"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/round10-opening/f007680-ram.bin",
+      "slot": 1,
+      "sat_slot": 2,
+      "attributes": 2177,
+      "facing": 0,
+      "position": [
+        110,
+        130
+      ],
+      "source_pose": 428,
+      "normal_code": 410,
+      "normal_colour": 7,
+      "normal_flips": 1,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000002322320000",
+        "0000134443332000",
+        "0000244774432200",
+        "0003477747733000",
+        "0002377444742300",
+        "0002477444223210",
+        "0000377747432010",
+        "0000247774243000",
+        "0000033443140100",
+        "0010000011420200",
+        "0000000244310000",
+        "0000123322000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "d3bb8ec3aa1f3304c24fca5ba71c03f45dfd5d4ed29446c0fc6dea806df1d68d",
+      "source_hashes": {
+        "ram": "d3bb8ec3aa1f3304c24fca5ba71c03f45dfd5d4ed29446c0fc6dea806df1d68d",
+        "sat": "251aed327bd84fb228c15ab9b5b82125c386b759dac4b051f1ce14fa937490a4",
+        "vram": "3aea716da73f1f72f3e136d6ace46f124dfbdeb40c2b07aef5ac924a39eb19db",
+        "palette": "aa7ca67cc6434987dd0379239cd828318ea9fc41a888e96a4ad36c24c79914cc"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006240-ram.bin",
+      "slot": 6,
+      "sat_slot": 25,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        188,
+        38
+      ],
+      "source_pose": 430,
+      "normal_code": 131,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000003443000000",
+        "0000032034300000",
+        "0000120003700000",
+        "0000120003700000",
+        "0000032034300000",
+        "0000003443000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+      "source_hashes": {
+        "ram": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+        "sat": "8bd32d4ceb8f38b6e04a5ee5a09f3645b606541d75662feedfe2d9f955509443",
+        "vram": "e1924ce310ecc27c03bf1b07522a533d825c171d22ced0b4635890d4885bf0ee",
+        "palette": "6a70c633112d457009a5e37a833ec9b76b56125b4f4567948eca028e16cda7cb"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006480-ram.bin",
+      "slot": 4,
+      "sat_slot": 20,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        200,
+        32
+      ],
+      "source_pose": 432,
+      "normal_code": 131,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000220000000",
+        "0000022003300000",
+        "0000100000040000",
+        "0001000000004000",
+        "0001000000007000",
+        "0010000000000700",
+        "0010000000000700",
+        "0001000000007000",
+        "0001000000004000",
+        "0000100000040000",
+        "0000022003300000",
+        "0000000220000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "c674ca172b35e8912a7f0f5b03acb6519bacee1e8911a02cd357e2cf7f20410e",
+      "source_hashes": {
+        "ram": "c674ca172b35e8912a7f0f5b03acb6519bacee1e8911a02cd357e2cf7f20410e",
+        "sat": "ed2d0b48f7805de89d6595ce131f1d5e866fb518105c3b382c573f10bcdf3aa0",
+        "vram": "8939c191c973bdcb4b1b67bcbd55b441048a228304df5a9d4996c127f2ada46f",
+        "palette": "c4cc520c62ad258c29899d229b31bf004b241ad7ed256b2863322f6849cbd992"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f009840-ram.bin",
+      "slot": 6,
+      "sat_slot": 28,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        200,
+        32
+      ],
+      "source_pose": 434,
+      "normal_code": 142,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000002222000000",
+        "0000220000230000",
+        "0000000000000000",
+        "0010000000000300",
+        "0010000000000300",
+        "0100000000000030",
+        "0100000000000040",
+        "0100000000000040",
+        "0100000000000030",
+        "0010000000000300",
+        "0010000000000300",
+        "0000000000000000",
+        "0000220000230000",
+        "0000002222000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "4e6b85ab4e2886d580955104b87d17814865a5cf0dd58f2bb5aee6b282b3deed",
+      "source_hashes": {
+        "ram": "4e6b85ab4e2886d580955104b87d17814865a5cf0dd58f2bb5aee6b282b3deed",
+        "sat": "0a60ea5c76661bfe661910a8604b7de95ae44a00002c0a940247850489ee7f81",
+        "vram": "3a5609d8892f6fbe32eafaa66b5dc144d192f273fe74d8dfe2b02f1d1f37c0fb",
+        "palette": "8d36d4a567dbca3fe9291b34049f5c647dec5d371391ae7babf1e21bb33c59bb"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006720-ram.bin",
+      "slot": 3,
+      "sat_slot": 13,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        184,
+        32
+      ],
+      "source_pose": 436,
+      "normal_code": 143,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000020000200000",
+        "0010000000000300",
+        "0100000000000030",
+        "0000000000000000",
+        "0000000000000000",
+        "1000000000000003",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "1000000000000003",
+        "0000000000000000",
+        "0000000000000000",
+        "0100000000000030",
+        "0010000000000300",
+        "0000020000200000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "b8e15c052a9dce74a8f2ba99a1a14ecd8b3e2bc1537037ebbf45afcc2a2f4011",
+      "source_hashes": {
+        "ram": "b8e15c052a9dce74a8f2ba99a1a14ecd8b3e2bc1537037ebbf45afcc2a2f4011",
+        "sat": "eee54d7a85d81bfd7fd3a0c4d02f841873a04917760386c030e79de03c3fce51",
+        "vram": "8227a7d66d15e73ff980d8d3234037e8d62bfe61e4a457d0c1eec78ff0b4c29e",
+        "palette": "311e1fab82706c5381a53ed3cc0441c6806c5242979edfbc4001c719bca4d6c1"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/spread-stress/f003480-ram.bin",
+      "slot": 0,
+      "sat_slot": 3,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        204,
+        7
+      ],
+      "source_pose": 438,
+      "normal_code": 143,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000012344300000",
+        "0000123334730000",
+        "0001232223473000",
+        "0001320002374000",
+        "0012300000347300",
+        "0012300000347300",
+        "0001320002374000",
+        "0001232223473000",
+        "0000123334730000",
+        "0000012344300000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "cf62a553b1a0a5049a84ecf5d550070837c0738fbb8d1e2b0a269d0cf09a5f71",
+      "source_hashes": {
+        "ram": "cf62a553b1a0a5049a84ecf5d550070837c0738fbb8d1e2b0a269d0cf09a5f71",
+        "sat": "fbac61223d237228933854d29af27fc875c21b7e0e7d19ebd73c4c01306a24d0",
+        "vram": "a9bfce7842ed3290867f0cff5f7f4916dd9011d3f2d57355463d21fcdee097c8",
+        "palette": "8172a0bcf3d8983c51b2d63379cdae0d0c5db6bb332026885fca1fb8869aaf8c"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/option-bodies/f002520-ram.bin",
+      "slot": 29,
+      "sat_slot": 8,
+      "attributes": 2177,
+      "facing": 0,
+      "position": [
+        20,
+        180
+      ],
+      "source_pose": 450,
+      "normal_code": 12,
+      "normal_colour": 3,
+      "normal_flips": 1,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000002220000000",
+        "0000021712000000",
+        "0000221113100000",
+        "0000143334100000",
+        "0000014441000000",
+        "0000001110000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "8fb2c16fc333c2fab7deb31a9301387bb26c82917a471f170e4f3ea889c5608d",
+      "source_hashes": {
+        "ram": "8fb2c16fc333c2fab7deb31a9301387bb26c82917a471f170e4f3ea889c5608d",
+        "sat": "79bc79601a2687feec31d3459d40ef89a01a7d57dacf959f70fc59c9f62cf3c5",
+        "vram": "133bfb20520b2163ffa7783d82b33e9a396239f6fcc434412d09aa4cea3ec930",
+        "palette": "aa7ca67cc6434987dd0379239cd828318ea9fc41a888e96a4ad36c24c79914cc"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/option-bodies/f002280-ram.bin",
+      "slot": 28,
+      "sat_slot": 6,
+      "attributes": 2177,
+      "facing": 0,
+      "position": [
+        41,
+        4
+      ],
+      "source_pose": 452,
+      "normal_code": 13,
+      "normal_colour": 3,
+      "normal_flips": 1,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000110000000",
+        "0000011111100000",
+        "0000127712210000",
+        "0001231111231000",
+        "0001342112331000",
+        "0001234444321000",
+        "0000123333210000",
+        "0000011111100000",
+        "0000000110000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "b4d00aba260f09fcf8a3a012789bb4f35257f3bef78488054173d8de84c84c40",
+      "source_hashes": {
+        "ram": "b4d00aba260f09fcf8a3a012789bb4f35257f3bef78488054173d8de84c84c40",
+        "sat": "8f89a5043eee0060432959607054303acdaaa049639e860bea28ddeab1cc5d59",
+        "vram": "0297279fbb2dba5a78fa93d2835427601ae786eb16e4540f6eff7b5e93140d96",
+        "palette": "c3915cee3631dc315c54d9bd53e9e41500e5b7b22b14c704c401779cd349a278"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006240-ram.bin",
+      "slot": 28,
+      "sat_slot": 28,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        80,
+        92
+      ],
+      "source_pose": 454,
+      "normal_code": 14,
+      "normal_colour": 3,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000011111100000",
+        "0001121112211000",
+        "0011227771221100",
+        "0012327771232100",
+        "0123421111233210",
+        "0124743223343210",
+        "0123474444443210",
+        "0012347777432100",
+        "0011233333321100",
+        "0001122222211000",
+        "0000011111100000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+      "source_hashes": {
+        "ram": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+        "sat": "8bd32d4ceb8f38b6e04a5ee5a09f3645b606541d75662feedfe2d9f955509443",
+        "vram": "e1924ce310ecc27c03bf1b07522a533d825c171d22ced0b4635890d4885bf0ee",
+        "palette": "6a70c633112d457009a5e37a833ec9b76b56125b4f4567948eca028e16cda7cb"
+      },
+      "decision": "new",
+      "reason": "Captured fireball/ring contour is not represented by the current arc, crescent or impact substitute."
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006240-ram.bin",
+      "slot": 1,
+      "sat_slot": 20,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        224,
+        115
+      ],
+      "source_pose": 468,
+      "normal_code": 28,
+      "normal_colour": 5,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000200000000",
+        "0000000300000000",
+        "0000023432000000",
+        "0000000300000000",
+        "0000000200000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+      "source_hashes": {
+        "ram": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+        "sat": "8bd32d4ceb8f38b6e04a5ee5a09f3645b606541d75662feedfe2d9f955509443",
+        "vram": "e1924ce310ecc27c03bf1b07522a533d825c171d22ced0b4635890d4885bf0ee",
+        "palette": "6a70c633112d457009a5e37a833ec9b76b56125b4f4567948eca028e16cda7cb"
+      },
+      "decision": "recolor",
+      "reason": "Exact Genesis impact silhouette; retain Genesis pen regions and recolor their ordered shades to the captured PCE orange/yellow ramp."
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006240-ram.bin",
+      "slot": 0,
+      "sat_slot": 19,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        224,
+        115
+      ],
+      "source_pose": 470,
+      "normal_code": 31,
+      "normal_colour": 5,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000100000000",
+        "0000000200000000",
+        "0000000300000000",
+        "0000000400000000",
+        "0000000700000000",
+        "0012347774321000",
+        "0000000700000000",
+        "0000000400000000",
+        "0000000300000000",
+        "0000000200000000",
+        "0000000100000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+      "source_hashes": {
+        "ram": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+        "sat": "8bd32d4ceb8f38b6e04a5ee5a09f3645b606541d75662feedfe2d9f955509443",
+        "vram": "e1924ce310ecc27c03bf1b07522a533d825c171d22ced0b4635890d4885bf0ee",
+        "palette": "6a70c633112d457009a5e37a833ec9b76b56125b4f4567948eca028e16cda7cb"
+      },
+      "decision": "recolor",
+      "reason": "Exact Genesis impact silhouette; retain Genesis pen regions and recolor their ordered shades to the captured PCE orange/yellow ramp."
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006240-ram.bin",
+      "slot": 3,
+      "sat_slot": 22,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        200,
+        115
+      ],
+      "source_pose": 440,
+      "normal_code": 11,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0122333333332210",
+        "1234477777744321",
+        "0122333333332210",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+      "decision": "keep",
+      "reason": "Matching single-bar silhouette and existing warm shaded Genesis artwork; replaces the unrelated double-bar frame 016.",
+      "source_hashes": {
+        "ram": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+        "sat": "8bd32d4ceb8f38b6e04a5ee5a09f3645b606541d75662feedfe2d9f955509443",
+        "vram": "e1924ce310ecc27c03bf1b07522a533d825c171d22ced0b4635890d4885bf0ee",
+        "palette": "6a70c633112d457009a5e37a833ec9b76b56125b4f4567948eca028e16cda7cb"
+      }
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006240-ram.bin",
+      "slot": 28,
+      "sat_slot": 28,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        80,
+        92
+      ],
+      "source_pose": 480,
+      "normal_code": 312,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000002000000",
+        "0002013310000000",
+        "0000147743000000",
+        "0000377744210000",
+        "0124447743442100",
+        "0000244434330000",
+        "0000023444410000",
+        "0000034342100000",
+        "0000202321020000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+      "source_anchor_pose": 454,
+      "source_kind": "loaded-bank",
+      "decision": "keep",
+      "reason": "Loaded PCE option-destruction pattern. Exact existing Genesis silhouette reused.",
+      "source_hashes": {
+        "ram": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+        "sat": "8bd32d4ceb8f38b6e04a5ee5a09f3645b606541d75662feedfe2d9f955509443",
+        "vram": "e1924ce310ecc27c03bf1b07522a533d825c171d22ced0b4635890d4885bf0ee",
+        "palette": "6a70c633112d457009a5e37a833ec9b76b56125b4f4567948eca028e16cda7cb"
+      }
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006240-ram.bin",
+      "slot": 28,
+      "sat_slot": 28,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        80,
+        92
+      ],
+      "source_pose": 482,
+      "normal_code": 29,
+      "normal_colour": 5,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000022220000000",
+        "0000234443200000",
+        "0023447744332000",
+        "0134777777443100",
+        "0347777777774300",
+        "2447777777774420",
+        "3477777777777430",
+        "4477777777777440",
+        "4477777777777440",
+        "3477777777777430",
+        "2447777777774420",
+        "0347777777774300",
+        "0234477777443200",
+        "0023447774432000",
+        "0001234443210000",
+        "0000012221000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+      "source_anchor_pose": 454,
+      "source_kind": "loaded-bank",
+      "decision": "new",
+      "reason": "Loaded PCE option-destruction pattern; no exact matching Genesis silhouette verified.",
+      "source_hashes": {
+        "ram": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+        "sat": "8bd32d4ceb8f38b6e04a5ee5a09f3645b606541d75662feedfe2d9f955509443",
+        "vram": "e1924ce310ecc27c03bf1b07522a533d825c171d22ced0b4635890d4885bf0ee",
+        "palette": "6a70c633112d457009a5e37a833ec9b76b56125b4f4567948eca028e16cda7cb"
+      }
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006240-ram.bin",
+      "slot": 28,
+      "sat_slot": 28,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        80,
+        92
+      ],
+      "source_pose": 484,
+      "normal_code": 316,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000114210000000",
+        "0001342222200000",
+        "0013123333422000",
+        "0034234443332000",
+        "0023347774373200",
+        "0112377774373210",
+        "0002377744734230",
+        "0002377437743230",
+        "0011234443432430",
+        "0003123344424310",
+        "0001332222220100",
+        "0000110300110000",
+        "0000001000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+      "source_anchor_pose": 454,
+      "source_kind": "loaded-bank",
+      "decision": "keep",
+      "reason": "Loaded PCE option-destruction pattern. Exact existing Genesis silhouette reused.",
+      "source_hashes": {
+        "ram": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+        "sat": "8bd32d4ceb8f38b6e04a5ee5a09f3645b606541d75662feedfe2d9f955509443",
+        "vram": "e1924ce310ecc27c03bf1b07522a533d825c171d22ced0b4635890d4885bf0ee",
+        "palette": "6a70c633112d457009a5e37a833ec9b76b56125b4f4567948eca028e16cda7cb"
+      }
+    },
+    {
+      "ram": ".local/pce-reference/round07-reference/f006240-ram.bin",
+      "slot": 28,
+      "sat_slot": 28,
+      "attributes": 129,
+      "facing": 0,
+      "position": [
+        80,
+        92
+      ],
+      "source_pose": 486,
+      "normal_code": 31,
+      "normal_colour": 5,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000001100000000",
+        "0000100000000000",
+        "0000000000000000",
+        "0001000000000000",
+        "0000000000000000",
+        "0001100100010100",
+        "0000101000000000",
+        "0000012100000021",
+        "0000100000001003",
+        "0100002000000001",
+        "0000000010000003",
+        "0010000000000020",
+        "0001000100010100",
+        "0000111000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+      "source_anchor_pose": 454,
+      "source_kind": "loaded-bank",
+      "decision": "new",
+      "reason": "Loaded PCE option-destruction pattern; no exact matching Genesis silhouette verified.",
+      "source_hashes": {
+        "ram": "d5edbf629364bb8f17834092a7c43d9c4dc41e24126694b8c87f5f61905b14bf",
+        "sat": "8bd32d4ceb8f38b6e04a5ee5a09f3645b606541d75662feedfe2d9f955509443",
+        "vram": "e1924ce310ecc27c03bf1b07522a533d825c171d22ced0b4635890d4885bf0ee",
+        "palette": "6a70c633112d457009a5e37a833ec9b76b56125b4f4567948eca028e16cda7cb"
+      }
+    },
+    {
+      "ram": ".local/pce-reference/charge-rules/f003120-ram.bin",
+      "slot": 23,
+      "sat_slot": 10,
+      "attributes": 129,
+      "facing": 1,
+      "position": [
+        216,
+        115
+      ],
+      "source_pose": 444,
+      "normal_code": 21,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000011111",
+        "0000000112223333",
+        "0001122334444444",
+        "1112344444777777",
+        "0001122334444444",
+        "0000000112223333",
+        "0000000000011111",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "2f4a91a15f259f171143ad6a7bb48564288c56a2d80f5ea292dac0db0e806cc6",
+      "decision": "keep",
+      "directional_codes": [
+        18,
+        21
+      ],
+      "silhouette_difference_pixels": 6,
+      "reason": "Matching Genesis charged-beam segment; retain original warm shaded artwork and direction-specific frames. The tapered segment has six silhouette-pixel differences from PCE; the other two silhouettes are exact.",
+      "source_hashes": {
+        "ram": "2f4a91a15f259f171143ad6a7bb48564288c56a2d80f5ea292dac0db0e806cc6",
+        "sat": "efb2fe1bd3222292e0628ca90d7914d5c8d7a105f6963256c6db21773232cbda",
+        "vram": "5d3549bb119b9bfecdc3f7195132c4d79f7a977de2853307d1eea9d2d2e89924",
+        "palette": "6fc19b3ca4a5cfb57ff734b1f75c6762aca8062b8a9b4ac020c586c74702ac9d"
+      }
+    },
+    {
+      "ram": ".local/pce-reference/charge-rules/f003120-ram.bin",
+      "slot": 21,
+      "sat_slot": 8,
+      "attributes": 129,
+      "facing": 1,
+      "position": [
+        248,
+        115
+      ],
+      "source_pose": 446,
+      "normal_code": 20,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "1111111111111111",
+        "3333333333333333",
+        "4444444444444444",
+        "7777777777777777",
+        "4444444444444444",
+        "3333333333333333",
+        "1111111111111111",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "2f4a91a15f259f171143ad6a7bb48564288c56a2d80f5ea292dac0db0e806cc6",
+      "decision": "keep",
+      "directional_codes": [
+        17,
+        20
+      ],
+      "silhouette_difference_pixels": 0,
+      "reason": "Matching Genesis charged-beam segment; retain original warm shaded artwork and direction-specific frames. The tapered segment has six silhouette-pixel differences from PCE; the other two silhouettes are exact.",
+      "source_hashes": {
+        "ram": "2f4a91a15f259f171143ad6a7bb48564288c56a2d80f5ea292dac0db0e806cc6",
+        "sat": "efb2fe1bd3222292e0628ca90d7914d5c8d7a105f6963256c6db21773232cbda",
+        "vram": "5d3549bb119b9bfecdc3f7195132c4d79f7a977de2853307d1eea9d2d2e89924",
+        "palette": "6fc19b3ca4a5cfb57ff734b1f75c6762aca8062b8a9b4ac020c586c74702ac9d"
+      }
+    },
+    {
+      "ram": ".local/pce-reference/charge-rules/f003120-ram.bin",
+      "slot": 20,
+      "sat_slot": 7,
+      "attributes": 129,
+      "facing": 1,
+      "position": [
+        264,
+        115
+      ],
+      "source_pose": 448,
+      "normal_code": 19,
+      "normal_colour": 8,
+      "normal_flips": 0,
+      "source_rows": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000",
+        "0001111111000000",
+        "0112333332110000",
+        "2334444443321100",
+        "3444444444433210",
+        "4477777744443321",
+        "7777777777444332",
+        "4477777744443321",
+        "3444444444433210",
+        "1334444443321100",
+        "0112333332110000",
+        "0001111111000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "source_colors": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          7,
+          2,
+          0
+        ],
+        [
+          7,
+          4,
+          0
+        ],
+        [
+          7,
+          7,
+          1
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_ram_sha256": "2f4a91a15f259f171143ad6a7bb48564288c56a2d80f5ea292dac0db0e806cc6",
+      "decision": "keep",
+      "directional_codes": [
+        16,
+        19
+      ],
+      "silhouette_difference_pixels": 0,
+      "reason": "Matching Genesis charged-beam segment; retain original warm shaded artwork and direction-specific frames. The tapered segment has six silhouette-pixel differences from PCE; the other two silhouettes are exact.",
+      "source_hashes": {
+        "ram": "2f4a91a15f259f171143ad6a7bb48564288c56a2d80f5ea292dac0db0e806cc6",
+        "sat": "efb2fe1bd3222292e0628ca90d7914d5c8d7a105f6963256c6db21773232cbda",
+        "vram": "5d3549bb119b9bfecdc3f7195132c4d79f7a977de2853307d1eea9d2d2e89924",
+        "palette": "6fc19b3ca4a5cfb57ff734b1f75c6762aca8062b8a9b4ac020c586c74702ac9d"
+      }
+    }
+  ]
+}

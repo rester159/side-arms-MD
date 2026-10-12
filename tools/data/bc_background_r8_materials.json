@@ -1,0 +1,1177 @@
+{
+  "schema": 1,
+  "normal_zone": 16,
+  "source_capture": "round08-reference",
+  "source_code_sha256": "53a0efbed63658a6812b5c74f2d8d185739ace801c5ad5cffa1b0a703c447c10",
+  "policy": "Preserve Normal colors, pixels and ordered shading. Match pipe and crossed-panel quadrants. Adapt complete Normal cylinders to the PCE three-quadrant repeat by shortening the barrel; retain all four quadrants of each circular front.",
+  "patterns": {
+    "00": {
+      "normal_meta": 37,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "01": {
+      "normal_meta": 37,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "02": {
+      "normal_meta": 29,
+      "normal_quadrant": 0,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "03": {
+      "normal_meta": 29,
+      "normal_quadrant": 1,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "04": {
+      "normal_meta": 14,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "05": {
+      "normal_meta": 14,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "06": {
+      "normal_meta": 15,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "07": {
+      "normal_meta": 15,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "08": {
+      "normal_meta": 23,
+      "normal_quadrant": 0,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "09": {
+      "normal_meta": 23,
+      "normal_quadrant": 1,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "0a": {
+      "normal_meta": 24,
+      "normal_quadrant": 0,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "0b": {
+      "normal_meta": 27,
+      "normal_quadrant": 1,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "0c": {
+      "normal_meta": 14,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "0d": {
+      "normal_meta": 14,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "0e": {
+      "normal_meta": 15,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "0f": {
+      "normal_meta": 15,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "10": {
+      "normal_meta": 22,
+      "normal_quadrant": 3,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "11": {
+      "normal_meta": 23,
+      "normal_quadrant": 3,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "12": {
+      "normal_meta": 24,
+      "normal_quadrant": 2,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "13": {
+      "normal_meta": 23,
+      "normal_quadrant": 2,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "14": {
+      "normal_meta": 18,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "15": {
+      "normal_meta": 18,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "16": {
+      "normal_meta": 19,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "17": {
+      "normal_meta": 19,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "18": {
+      "normal_meta": 25,
+      "normal_quadrant": 3,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "19": {
+      "normal_meta": 26,
+      "normal_quadrant": 1,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "1a": {
+      "normal_meta": 28,
+      "normal_quadrant": 0,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "1b": {
+      "normal_meta": 27,
+      "normal_quadrant": 0,
+      "role": "Shortened cylinder body/cap; intact Normal four-quadrant circular front"
+    },
+    "1c": {
+      "normal_meta": 18,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "1d": {
+      "normal_meta": 18,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "1e": {
+      "normal_meta": 19,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "1f": {
+      "normal_meta": 19,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "20": {
+      "normal_meta": 30,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "21": {
+      "normal_meta": 30,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "22": {
+      "normal_meta": 31,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "23": {
+      "normal_meta": 31,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "24": {
+      "normal_meta": 32,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "25": {
+      "normal_meta": 32,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "26": {
+      "normal_meta": 33,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "27": {
+      "normal_meta": 33,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "28": {
+      "normal_meta": 30,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "29": {
+      "normal_meta": 30,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "2a": {
+      "normal_meta": 31,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "2b": {
+      "normal_meta": 31,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "2c": {
+      "normal_meta": 32,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "2d": {
+      "normal_meta": 32,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "2e": {
+      "normal_meta": 33,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "2f": {
+      "normal_meta": 33,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "30": {
+      "normal_meta": 34,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "31": {
+      "normal_meta": 34,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "32": {
+      "normal_meta": 35,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "33": {
+      "normal_meta": 35,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "34": {
+      "normal_meta": 36,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "35": {
+      "normal_meta": 36,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "36": {
+      "normal_meta": 37,
+      "normal_quadrant": 0,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "37": {
+      "normal_meta": 37,
+      "normal_quadrant": 1,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "38": {
+      "normal_meta": 34,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "39": {
+      "normal_meta": 34,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "3a": {
+      "normal_meta": 35,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "3b": {
+      "normal_meta": 35,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "3c": {
+      "normal_meta": 36,
+      "normal_quadrant": 2,
+      "role": "Matching pipework or crossed machinery panel"
+    },
+    "3d": {
+      "normal_meta": 36,
+      "normal_quadrant": 3,
+      "role": "Matching pipework or crossed machinery panel"
+    }
+  },
+  "cells": [
+    {
+      "cell": 0,
+      "source_descriptor": [
+        4,
+        128,
+        5,
+        128,
+        12,
+        128,
+        13,
+        128
+      ],
+      "patterns": [
+        4,
+        5,
+        12,
+        13
+      ]
+    },
+    {
+      "cell": 1,
+      "source_descriptor": [
+        6,
+        128,
+        7,
+        128,
+        14,
+        128,
+        15,
+        128
+      ],
+      "patterns": [
+        6,
+        7,
+        14,
+        15
+      ]
+    },
+    {
+      "cell": 2,
+      "source_descriptor": [
+        32,
+        128,
+        33,
+        160,
+        40,
+        160,
+        41,
+        176
+      ],
+      "patterns": [
+        32,
+        33,
+        40,
+        41
+      ]
+    },
+    {
+      "cell": 3,
+      "source_descriptor": [
+        34,
+        160,
+        35,
+        128,
+        42,
+        176,
+        43,
+        160
+      ],
+      "patterns": [
+        34,
+        35,
+        42,
+        43
+      ]
+    },
+    {
+      "cell": 4,
+      "source_descriptor": [
+        20,
+        128,
+        21,
+        128,
+        28,
+        128,
+        29,
+        128
+      ],
+      "patterns": [
+        20,
+        21,
+        28,
+        29
+      ]
+    },
+    {
+      "cell": 5,
+      "source_descriptor": [
+        22,
+        128,
+        23,
+        128,
+        30,
+        128,
+        31,
+        128
+      ],
+      "patterns": [
+        22,
+        23,
+        30,
+        31
+      ]
+    },
+    {
+      "cell": 6,
+      "source_descriptor": [
+        48,
+        160,
+        49,
+        176,
+        56,
+        160,
+        57,
+        160
+      ],
+      "patterns": [
+        48,
+        49,
+        56,
+        57
+      ]
+    },
+    {
+      "cell": 7,
+      "source_descriptor": [
+        50,
+        176,
+        51,
+        160,
+        58,
+        160,
+        59,
+        160
+      ],
+      "patterns": [
+        50,
+        51,
+        58,
+        59
+      ]
+    },
+    {
+      "cell": 8,
+      "source_descriptor": [
+        8,
+        128,
+        9,
+        128,
+        16,
+        128,
+        17,
+        128
+      ],
+      "patterns": [
+        8,
+        9,
+        16,
+        17
+      ]
+    },
+    {
+      "cell": 9,
+      "source_descriptor": [
+        10,
+        128,
+        8,
+        128,
+        18,
+        144,
+        19,
+        128
+      ],
+      "patterns": [
+        10,
+        8,
+        18,
+        19
+      ]
+    },
+    {
+      "cell": 10,
+      "source_descriptor": [
+        9,
+        128,
+        10,
+        128,
+        17,
+        128,
+        18,
+        144
+      ],
+      "patterns": [
+        9,
+        10,
+        17,
+        18
+      ]
+    },
+    {
+      "cell": 11,
+      "source_descriptor": [
+        8,
+        128,
+        9,
+        128,
+        19,
+        128,
+        17,
+        128
+      ],
+      "patterns": [
+        8,
+        9,
+        19,
+        17
+      ]
+    },
+    {
+      "cell": 12,
+      "source_descriptor": [
+        20,
+        128,
+        25,
+        128,
+        28,
+        128,
+        29,
+        128
+      ],
+      "patterns": [
+        20,
+        25,
+        28,
+        29
+      ]
+    },
+    {
+      "cell": 13,
+      "source_descriptor": [
+        26,
+        144,
+        27,
+        128,
+        30,
+        128,
+        31,
+        128
+      ],
+      "patterns": [
+        26,
+        27,
+        30,
+        31
+      ]
+    },
+    {
+      "cell": 14,
+      "source_descriptor": [
+        11,
+        128,
+        26,
+        144,
+        28,
+        128,
+        29,
+        128
+      ],
+      "patterns": [
+        11,
+        26,
+        28,
+        29
+      ]
+    },
+    {
+      "cell": 15,
+      "source_descriptor": [
+        27,
+        128,
+        11,
+        128,
+        30,
+        128,
+        31,
+        128
+      ],
+      "patterns": [
+        27,
+        11,
+        30,
+        31
+      ]
+    },
+    {
+      "cell": 16,
+      "source_descriptor": [
+        10,
+        128,
+        5,
+        128,
+        18,
+        144,
+        24,
+        128
+      ],
+      "patterns": [
+        10,
+        5,
+        18,
+        24
+      ]
+    },
+    {
+      "cell": 17,
+      "source_descriptor": [
+        2,
+        128,
+        3,
+        128,
+        30,
+        128,
+        31,
+        128
+      ],
+      "patterns": [
+        2,
+        3,
+        30,
+        31
+      ]
+    },
+    {
+      "cell": 18,
+      "source_descriptor": [
+        6,
+        128,
+        7,
+        128,
+        24,
+        128,
+        15,
+        128
+      ],
+      "patterns": [
+        6,
+        7,
+        24,
+        15
+      ]
+    },
+    {
+      "cell": 19,
+      "source_descriptor": [
+        27,
+        128,
+        2,
+        128,
+        30,
+        128,
+        31,
+        128
+      ],
+      "patterns": [
+        27,
+        2,
+        30,
+        31
+      ]
+    },
+    {
+      "cell": 20,
+      "source_descriptor": [
+        4,
+        128,
+        5,
+        128,
+        12,
+        128,
+        8,
+        128
+      ],
+      "patterns": [
+        4,
+        5,
+        12,
+        8
+      ]
+    },
+    {
+      "cell": 21,
+      "source_descriptor": [
+        6,
+        128,
+        7,
+        128,
+        9,
+        128,
+        10,
+        128
+      ],
+      "patterns": [
+        6,
+        7,
+        9,
+        10
+      ]
+    },
+    {
+      "cell": 22,
+      "source_descriptor": [
+        4,
+        128,
+        5,
+        128,
+        8,
+        128,
+        9,
+        128
+      ],
+      "patterns": [
+        4,
+        5,
+        8,
+        9
+      ]
+    },
+    {
+      "cell": 23,
+      "source_descriptor": [
+        6,
+        128,
+        7,
+        128,
+        10,
+        128,
+        8,
+        128
+      ],
+      "patterns": [
+        6,
+        7,
+        10,
+        8
+      ]
+    },
+    {
+      "cell": 24,
+      "source_descriptor": [
+        20,
+        128,
+        16,
+        128,
+        28,
+        128,
+        29,
+        128
+      ],
+      "patterns": [
+        20,
+        16,
+        28,
+        29
+      ]
+    },
+    {
+      "cell": 25,
+      "source_descriptor": [
+        17,
+        128,
+        18,
+        144,
+        25,
+        128,
+        26,
+        144
+      ],
+      "patterns": [
+        17,
+        18,
+        25,
+        26
+      ]
+    },
+    {
+      "cell": 26,
+      "source_descriptor": [
+        19,
+        128,
+        17,
+        128,
+        27,
+        128,
+        11,
+        128
+      ],
+      "patterns": [
+        19,
+        17,
+        27,
+        11
+      ]
+    },
+    {
+      "cell": 27,
+      "source_descriptor": [
+        18,
+        144,
+        19,
+        128,
+        26,
+        144,
+        27,
+        128
+      ],
+      "patterns": [
+        18,
+        19,
+        26,
+        27
+      ]
+    },
+    {
+      "cell": 28,
+      "source_descriptor": [
+        6,
+        128,
+        7,
+        128,
+        10,
+        128,
+        15,
+        128
+      ],
+      "patterns": [
+        6,
+        7,
+        10,
+        15
+      ]
+    },
+    {
+      "cell": 29,
+      "source_descriptor": [
+        17,
+        128,
+        18,
+        144,
+        11,
+        128,
+        26,
+        144
+      ],
+      "patterns": [
+        17,
+        18,
+        11,
+        26
+      ]
+    },
+    {
+      "cell": 30,
+      "source_descriptor": [
+        20,
+        128,
+        21,
+        128,
+        2,
+        128,
+        3,
+        128
+      ],
+      "patterns": [
+        20,
+        21,
+        2,
+        3
+      ]
+    },
+    {
+      "cell": 31,
+      "source_descriptor": [
+        4,
+        128,
+        5,
+        128,
+        32,
+        128,
+        33,
+        160
+      ],
+      "patterns": [
+        4,
+        5,
+        32,
+        33
+      ]
+    },
+    {
+      "cell": 32,
+      "source_descriptor": [
+        36,
+        128,
+        37,
+        128,
+        44,
+        128,
+        45,
+        128
+      ],
+      "patterns": [
+        36,
+        37,
+        44,
+        45
+      ]
+    },
+    {
+      "cell": 33,
+      "source_descriptor": [
+        38,
+        128,
+        39,
+        128,
+        46,
+        128,
+        47,
+        128
+      ],
+      "patterns": [
+        38,
+        39,
+        46,
+        47
+      ]
+    },
+    {
+      "cell": 34,
+      "source_descriptor": [
+        6,
+        128,
+        7,
+        128,
+        34,
+        160,
+        35,
+        128
+      ],
+      "patterns": [
+        6,
+        7,
+        34,
+        35
+      ]
+    },
+    {
+      "cell": 35,
+      "source_descriptor": [
+        0,
+        128,
+        0,
+        128,
+        0,
+        128,
+        0,
+        128
+      ],
+      "patterns": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cell": 36,
+      "source_descriptor": [
+        52,
+        128,
+        53,
+        128,
+        60,
+        128,
+        61,
+        128
+      ],
+      "patterns": [
+        52,
+        53,
+        60,
+        61
+      ]
+    },
+    {
+      "cell": 37,
+      "source_descriptor": [
+        54,
+        128,
+        55,
+        128,
+        0,
+        128,
+        1,
+        128
+      ],
+      "patterns": [
+        54,
+        55,
+        0,
+        1
+      ]
+    },
+    {
+      "cell": 38,
+      "source_descriptor": [
+        40,
+        160,
+        41,
+        176,
+        48,
+        160,
+        49,
+        176
+      ],
+      "patterns": [
+        40,
+        41,
+        48,
+        49
+      ]
+    },
+    {
+      "cell": 39,
+      "source_descriptor": [
+        42,
+        176,
+        43,
+        160,
+        50,
+        176,
+        51,
+        160
+      ],
+      "patterns": [
+        42,
+        43,
+        50,
+        51
+      ]
+    },
+    {
+      "cell": 40,
+      "source_descriptor": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "patterns": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cell": 41,
+      "source_descriptor": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "patterns": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "cell": 42,
+      "source_descriptor": [
+        56,
+        160,
+        57,
+        160,
+        12,
+        128,
+        13,
+        128
+      ],
+      "patterns": [
+        56,
+        57,
+        12,
+        13
+      ]
+    },
+    {
+      "cell": 43,
+      "source_descriptor": [
+        58,
+        160,
+        59,
+        160,
+        14,
+        128,
+        15,
+        128
+      ],
+      "patterns": [
+        58,
+        59,
+        14,
+        15
+      ]
+    },
+    {
+      "cell": 129,
+      "source_descriptor": [
+        128,
+        188,
+        128,
+        134,
+        188,
+        136,
+        158,
+        188
+      ],
+      "patterns": [
+        4,
+        5,
+        12,
+        13
+      ],
+      "outside_sampled_gameplay": true
+    }
+  ]
+}

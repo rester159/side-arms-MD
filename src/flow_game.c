@@ -1,8 +1,10 @@
 #include "game.h"
+#include "engine_step.h"
 #include "hud.h"
 #include "flow.h"
 #include "gen/frontend.h"
 #include "boss.h"
+#include "organic_level.h"
 
 extern BossHud boss_hud __attribute__((weak));
 
@@ -32,7 +34,7 @@ typedef struct {
     u32 best;               /* best score of this game, kept over continues ($1A96) */
 } PFlow;
 
-static PFlow pf[2];
+static PFlow pf[MAX_PLAYERS];
 static bool game_active;    /* $E010 */
 static bool stage_running;  /* $E011 */
 static bool intro_busy;     /* $E012 */
@@ -43,6 +45,7 @@ bool game_stage_running(void) { return stage_running || game_in_demo(); }
 void flow_game_reset(void)
 {
     memset(pf, 0, sizeof(pf));
+    organic_level_stop();
     game_active = stage_running = intro_busy = FALSE;
     players_init();
 }
@@ -80,9 +83,11 @@ static bool arcade_coin(u16 i, bool c_too)
  * a 2P join or a LIMITED continue takes a credit, an UNLIMITED continue is free. */
 static bool can_pay(u16 i, bool cont)
 {
+    if (i >= game_player_limit()) return FALSE;
     if (!(pad[i].pressed & IN_START)) return FALSE;
     if (game_cfg.mode == MODE_HOME) {
         if (!game_active) return TRUE;
+        if (!cont && game_player_limit() > 2) return TRUE;
         if (cont && game_cfg.cont == CONT_UNLIMITED) return TRUE;
         if (!credits) return FALSE;
         credits--;
@@ -133,7 +138,8 @@ bool flow_try_start(u16 i)
 void flow_home_start(u16 i)
 {
     new_game();
-    begin_naming(i);
+    (void)i;
+    for (u16 p = 0; p < game_player_limit(); p++) begin_naming(p);
     flow_goto(FS_INTRO);
 }
 
@@ -183,8 +189,8 @@ void flow_credit_update(void)
 static void spawn(u16 i)
 {
     /* $1823-$1871: score cleared, speed 1, weapons cleared, lives, spawn */
-    player_start(&players[i], game_cfg.lives);
-    memcpy(players[i].name, pf[i].name, 3);
+    player_start(&normal_players[i], game_cfg.lives);
+    memcpy(normal_players[i].name, pf[i].name, 3);
     pf[i].st = PS_PLAYING;
     pf[i].best = 0;
 }
@@ -224,7 +230,7 @@ static void naming(u16 i)
 static void player_flow(u16 i)
 {
     PFlow *f = &pf[i];
-    Player *p = &players[i];
+    Player *p = &normal_players[i];
     switch (f->st) {
     case PS_IDLE:
         if (game_active && can_pay(i, FALSE)) begin_naming(i);   /* join ($16B8) */
@@ -281,12 +287,14 @@ static void player_flow(u16 i)
 
 static void players_flow(void)
 {
-    for (u16 i = 0; i < 2; i++) player_flow(i);
+    for (u16 i = 0; i < game_player_limit(); i++) player_flow(i);
     if (game_active)
-        for (u16 i = 0; i < 2; i++)
-            if (players[i].score > hi_score) hi_score = players[i].score;   /* $2272 */
+        for (u16 i = 0; i < game_player_limit(); i++)
+            if (normal_players[i].score > hi_score) hi_score = normal_players[i].score;   /* $2272 */
     /* $1BD9: nobody playing, continuing or naming -> attract from the WARNING */
-    if (game_active && pf[0].st == PS_IDLE && pf[1].st == PS_IDLE) {
+    bool idle = TRUE;
+    for (u16 i = 0; i < game_player_limit(); i++) if (pf[i].st != PS_IDLE) idle = FALSE;
+    if (game_active && idle) {
         game_active = stage_running = FALSE;
         flow_goto(game_cfg.mode == MODE_HOME ? FS_HOME : FS_WARNING);
     }
@@ -300,7 +308,7 @@ static void game_panel(void)
     hp.hi = hi_score;
     hp.twoup = game_active || flow_state == FS_CREDIT || pf[1].st != PS_IDLE;    /* $12AE sets $E010 */
     if (&boss_hud && boss_hud.active) hp.boss_bars = boss_hud.bars;
-    for (u16 i = 0; i < 2; i++) {
+    for (u16 i = 0; i < game_player_limit(); i++) {
         PFlow *f = &pf[i];
         HudPlayer *h = &hp.pl[i];
         h->score = game_active;
@@ -391,7 +399,8 @@ static void stage_start(void)
 {
     hud_screen_reset();
     level_spawns_off = FALSE;           /* (a Boss Rush skips them) */
-    level_start(0);                     /* $158E: script $815C */
+    organic_level_stop();
+    level_start(0);                     /* Normal uses the original stage timeline. */
     stage_video_on();
     stage_sprites_on();
     if (enemies_clear) enemies_clear();
@@ -404,21 +413,68 @@ static void stage_start(void)
 
 bool boss_game_cleared(void) __attribute__((weak));
 
-void flow_play_update(void)
+volatile u16 prof_multi[6];
+static u16 elapsed(u16 start) { return (GET_VCOUNTER - start) & 255; }
+
+typedef struct { bool frozen; u16 stamp; } NormalStep;
+
+static inline __attribute__((always_inline)) unsigned char normal_level_phase(void *context)
 {
-    /* the combined-robot merge suspends the world ($3078) */
-    bool frozen = players_world_frozen();
-    if (!frozen) level_update();
+    NormalStep *step = context;
+    if (!step->frozen) {
+        if (organic_level_active()) organic_level_update();
+        else level_update();
+    }
+    prof_multi[0] = elapsed(step->stamp); step->stamp = GET_VCOUNTER;
+    return 0;
+}
+
+static inline __attribute__((always_inline)) unsigned char normal_player_phase(void *context)
+{
+    NormalStep *step = context;
     players_update();
-    if (!frozen) {
+    prof_multi[1] = elapsed(step->stamp); step->stamp = GET_VCOUNTER;
+    return 0;
+}
+
+static inline __attribute__((always_inline)) unsigned char normal_actor_phase(void *context)
+{
+    NormalStep *step = context;
+    if (!step->frozen) {
         if (enemies_update) enemies_update();
+        prof_multi[2] = elapsed(step->stamp); step->stamp = GET_VCOUNTER;
         if (bosses_update) bosses_update();
     }
+    prof_multi[3] = elapsed(step->stamp); step->stamp = GET_VCOUNTER;
+    return 0;
+}
+
+static inline __attribute__((always_inline)) unsigned char normal_finish_phase(void *context)
+{
+    NormalStep *step = context;
     players_flow();
+    prof_multi[4] = elapsed(step->stamp); step->stamp = GET_VCOUNTER;
+    return 0;
+}
+
+void flow_play_update(void)
+{
+    developer_normal_update();
+    NormalStep step;
+    step.stamp = GET_VCOUNTER;
+    /* The merge freezes level/actors but still updates the player sequence. */
+    extern volatile u16 dbg_warp;
+    if (dbg_warp) organic_level_stop();
+    step.frozen = players_world_frozen();
+    unsigned char status;
+    ENGINE_STEP(status, normal_level_phase(&step), normal_player_phase(&step),
+        normal_actor_phase(&step), normal_finish_phase(&step));
+    (void)status;
+    u16 stamp = step.stamp;
     if (flow_state != FS_PLAY) return;
     if (boss_game_cleared && boss_game_cleared()) {
         /* ending over: the arcade restarts the attract cycle ($0B84) */
-        for (u16 i = 0; i < 2; i++)
+        for (u16 i = 0; i < game_player_limit(); i++)
             if (pf[i].st == PS_PLAYING || pf[i].st == PS_CONTINUE) ranking_insert(pf[i].best, pf[i].name);
         game_active = stage_running = FALSE;
         memset(pf, 0, sizeof(pf));
@@ -426,6 +482,7 @@ void flow_play_update(void)
         return;
     }
     game_panel();
+    prof_multi[5] = elapsed(stamp);
 }
 
 void flow_game_draw(void)

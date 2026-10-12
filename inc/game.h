@@ -1,5 +1,6 @@
 #pragma once
 #include <genesis.h>
+#include "player.h"
 
 /* ---- input (input.c) ----------------------------------------------------- */
 enum {
@@ -10,14 +11,16 @@ enum {
     IN_START = 0x80,
 };
 typedef struct { u8 held, pressed; } Pad;
-extern Pad pad[2];                  /* logical game inputs (IN_*), after the control mapping */
+extern u8 pad_fire_held[MAX_PLAYERS]; /* mapped fire before autofire; ring repeats itself */
+extern Pad pad[MAX_PLAYERS];                  /* logical game inputs (IN_*), after the control mapping */
 void input_update(void);
+void input_configure(void);
 
 /* Physical pad (SGDK BUTTON_* bits: A B C X Y Z MODE START + directions). Menus read these
  * (A / C / Start = select, B = back), the game reads pad[]. */
 typedef struct { u16 held, pressed; } RawPad;
-extern RawPad pad_raw[2];
-extern bool pad_six[2];             /* a 6-button pad is plugged in (JOY_getJoypadType) */
+extern RawPad pad_raw[MAX_PLAYERS];
+extern bool pad_six[MAX_PLAYERS];             /* a 6-button pad is plugged in (JOY_getJoypadType) */
 
 /* Control mapping (Home OPTIONS > CONTROLS, saved in SRAM; docs/frontend.md). */
 enum { PB_A, PB_B, PB_C, PB_X, PB_Y, PB_Z, PB_COUNT };          /* physical buttons */
@@ -36,7 +39,7 @@ typedef struct {
 extern PadConfig pad_cfg;
 void input_defaults(PadConfig *c);
 void input_clear_requests(void);    /* drop pending X/Y/Z weapon requests (attract demo) */
-extern u8 pad_weapon_req[2];        /* XB_PREV..XB_AUTO pressed on X/Y/Z; consumed by weapon_select() */
+extern u8 pad_weapon_req[MAX_PLAYERS];        /* XB_PREV..XB_AUTO pressed on X/Y/Z; consumed by weapon_select() */
 
 /* ---- camera / level (level.c) ------------------------------------------- */
 typedef enum { SCROLL_RUN, SCROLL_HALT } ScrollMode;
@@ -66,6 +69,8 @@ extern u16 frame;
 void game_init(void);
 void game_update(void);
 void game_draw(void);
+/* Execute one engine-owned frame; true selects the preview's plain VBlank. */
+bool game_frame(u32 vblank, u16 start_line);
 void sound_play(u8 id);     /* arcade sound command numbers (docs/re/sound.md) */
 
 #include "video.h"

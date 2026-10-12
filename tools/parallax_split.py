@@ -198,7 +198,12 @@ def far_layer(cfg):
     for y in range(zy, zy + zh):
         for x in range(zx, zx + zw):
             c = W[y * 32:y * 32 + 32, x * 32:x * 32 + 32]
-            m = np.isin(c, list(tcol))
+            yy, xx = np.indices(c.shape)
+            reference = T[(yy + y * 32) % P, (xx + x * 32) % P]
+            # Shared palette pens can also occur in outlines or irregular
+            # texture patches. Only remove pixels reproduced by the far layer
+            # at its locked position; retain the rest on the world plane.
+            m = np.isin(c, list(tcol)) & (c == reference)
             if m.any():
                 far_cells[(x, y)] = m
     # cells seen under the HUD rows / on the playfield, per camera position
@@ -240,6 +245,22 @@ def far_layer(cfg):
         if seg_cut:                                 # legs without texture need no segment
             segs.append((int(xa), int(xb), int(cy), 0, int(k), int(cfg['den'])))
             cut |= seg_cut
+    # A source metatile can appear in several mirrored orientations. Use one
+    # conservative cut mask valid in every occurrence, rather than multiplying
+    # stored Home variants by orientation (the cartridge has a fixed 4 MiB cap).
+    code, color, flags = world()[1:]
+    common = {}
+    for c, r in cut:
+        key = (int(code[r, c]), int(color[r, c]))
+        mask = to_meta(far_cells[(c, r)], int(flags[r, c]))
+        if key in common:
+            common[key] &= mask
+        else:
+            common[key] = mask.copy()
+    for c, r in cut:
+        key = (int(code[r, c]), int(color[r, c]))
+        far_cells[(c, r)] = to_meta(common[key], int(flags[r, c]))
+    cut = {cell for cell in cut if far_cells[cell].any()}
     # plane A shows the texture wherever a cut cell is on the playfield
     show = [(cx, cy) for cx, cy, d in pos if any(c in cut for c in cells_in_view(cx, cy, HUD_TOP, HUD_BOT))]
     rect = (min(p[0] for p in show), min(p[1] for p in show), max(p[0] for p in show), max(p[1] for p in show))
@@ -344,7 +365,7 @@ def home_variant(zi, code, color, flags, mid, dark_pen):
             if cut or int(code[r, c]) in fills:
                 t = bgt[code[r, c]].copy()
                 if cut:
-                    t[to_meta(np.isin(W[r * 32:r * 32 + 32, c * 32:c * 32 + 32], list(f['tcol'])), fl)] = 15
+                    t[to_meta(f['cells'][(c, r)], fl)] = 15
                 if int(code[r, c]) in fills:
                     t[fills[int(code[r, c])]] = dark_pen(int(color[r, c]))
                 key = (m, t.tobytes())

@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "poses": [
+    {
+      "pose": "idle-right",
+      "decision": "keep_genesis",
+      "inferred": true,
+      "normal_p1_code": 34,
+      "source_capture": "play-task-round1",
+      "source_frame": 2880,
+      "source_hashes": {
+        "ram": "709db2ed61c6724322de47a9c0f76c4f6b829b9ea8bfda43c52862de5d98752d",
+        "sat": "516249f676a947a5cd9a712007e3d70c347254daff71dc2087a81df1ba72e5e0",
+        "vram": "c82ae1ddf916d8a9bc825c397413fccdc9be31c642cce7ddea6ced25f50fca4f",
+        "palette": "cab76d543ba74342da2e6689956a64abc3d7bba15ca9d7f73fac9f87e32a64bf"
+      },
+      "scope": "Visual pose/design correspondence; palettes differ and pixel identity is not claimed"
+    },
+    {
+      "pose": "firing-right",
+      "decision": "keep_genesis",
+      "inferred": true,
+      "normal_p1_code": 38,
+      "source_capture": "play-task-round1",
+      "source_frame": 4680,
+      "source_hashes": {
+        "ram": "553e4d6a85fb78d5bfa607c3de44ddd392881fe25eadc2b96810690f4906176a",
+        "sat": "6aef5c68860958dd0281de5fe02c25f46a04f236a8c4d67bc07daa2c9ad34f54",
+        "vram": "afc75fde425a27b6ee4072791d242f1193e3cafb5e0f13cf06b9da75e0e65b2e",
+        "palette": "fb268abc17e9e1a8310b36d302333340e39a4670217407695c53284572ff6e10"
+      },
+      "scope": "Visual pose/design correspondence; palettes differ and pixel identity is not claimed"
+    },
+    {
+      "pose": "entry-early",
+      "decision": "keep_genesis",
+      "inferred": true,
+      "normal_p1_code": 98,
+      "source_capture": "actor-step-capsule-pulse",
+      "source_frame": 5160,
+      "source_hashes": {
+        "ram": "36165b2edf1589197eb5c1bc0edc3a0f9d76ef8833665452f928530468867ab6",
+        "sat": "c83b41ec3455f1925b2911e27f2b77190d1b923cf9f5ddcacc826ef976a306be",
+        "vram": "658d02de5020871f6916aafddf76ba1384df81170628a1b250213361fe6a2a9f",
+        "palette": "b5317d0ef3c4ca8f7366d5f46ea795e6ec798a8b1b6c14a836f6c643f29ac8d2"
+      },
+      "scope": "Visual pose/design correspondence; palettes differ and pixel identity is not claimed"
+    },
+    {
+      "pose": "entry-late",
+      "decision": "keep_genesis",
+      "inferred": true,
+      "normal_p1_code": 114,
+      "source_capture": "play-task-round1",
+      "source_frame": 2040,
+      "source_hashes": {
+        "ram": "251f87580367b315b73bd2016b217a79abcf18b770506aba57c4979f94009a22",
+        "sat": "a23ca162d1d33b9291d58539739fd85e7ca1656dfedf00b578cb83389c6443f0",
+        "vram": "3eb8f762e69b40d01354320f924f07627f600ac74986533a5ad2c161254f383e",
+        "palette": "d92154d53e6f6f049abf52f4c04b74225cc47a87d4dcef50114b3826ac558aff"
+      },
+      "scope": "Visual pose/design correspondence; palettes differ and pixel identity is not claimed"
+    }
+  ],
+  "late_entry_previous_code": 118,
+  "late_entry_reason": "PCE side-facing horn/body orientation matches Normal 0x72, not the front-facing 0x76",
+  "remaining": "Complete weapon correspondence remains unreviewed; P2/P3/P4 are multiplayer variants, not PCE player identities",
+  "death_sequence": {
+    "source_shapes": "bc_player_death_shapes.json",
+    "normal_flash_code": 422,
+    "imported_poses": [
+      46336,
+      47104,
+      47488,
+      47872
+    ],
+    "timing_unchanged": true,
+    "palette_approximation": true
+  }
+}

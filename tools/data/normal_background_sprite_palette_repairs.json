@@ -1,0 +1,293 @@
+{
+  "schema": 1,
+  "description": "Exact source RGB3 restoration using existing Normal sprite palette banks. Fixed approved tiles only; no palette or runtime changes.",
+  "sprite_palette_sha256": "3f79592c861226a1e9f6116a161b8bd4eadf2d70271a9d35da12772faec46241",
+  "records": [
+    {
+      "zone": 1,
+      "kind": "base",
+      "changes": [
+        {
+          "meta": 60,
+          "owner": 60,
+          "subtile": 14,
+          "bank": 3,
+          "source_words": [
+            14
+          ],
+          "pixels": 3
+        },
+        {
+          "meta": 127,
+          "owner": 127,
+          "subtile": 6,
+          "bank": 2,
+          "source_words": [
+            174
+          ],
+          "pixels": 8
+        },
+        {
+          "meta": 128,
+          "owner": 128,
+          "subtile": 4,
+          "bank": 2,
+          "source_words": [
+            174
+          ],
+          "pixels": 8
+        },
+        {
+          "meta": 155,
+          "owner": 155,
+          "subtile": 7,
+          "bank": 3,
+          "source_words": [
+            174
+          ],
+          "pixels": 9
+        },
+        {
+          "meta": 159,
+          "owner": 159,
+          "subtile": 5,
+          "bank": 2,
+          "source_words": [
+            174
+          ],
+          "pixels": 3
+        }
+      ],
+      "exact_pixels": 31,
+      "input_sha256": {
+        "zone1_attr.bin": "8404aaf538d6797596ba24526b1efd9a9bec9501e1d00f690aabb665d331eb00",
+        "zone1_tiles.bin": "c175263f270608597f184264f2c4b84119e49450709f210675c74a5de666c7cb",
+        "zone1_pal.bin": "d4644cbecfc68f479cbf603de4fe642e024f1dc885ab0d2d1cc46f89bdbfc1dd"
+      },
+      "output_sha256": {
+        "zone1_tiles.bin": "0fd092055491139b9d306b267741d2d49b1143e0a505f312a1464ee820993fe3",
+        "zone1_attr.bin": "981314bfd4effe25cf25d69900dd98adcc14244511de094615cc465e43909ac5"
+      }
+    },
+    {
+      "zone": 6,
+      "kind": "base",
+      "changes": [
+        {
+          "meta": 34,
+          "owner": 34,
+          "subtile": 5,
+          "bank": 2,
+          "source_words": [
+            174
+          ],
+          "pixels": 12
+        },
+        {
+          "meta": 35,
+          "owner": 35,
+          "subtile": 4,
+          "bank": 2,
+          "source_words": [
+            174
+          ],
+          "pixels": 12
+        }
+      ],
+      "exact_pixels": 24,
+      "input_sha256": {
+        "zone6_attr.bin": "fb8764f5c2c04ee62f005a32382d6d62d9a2b22ababc0b70f695d98d1cd36d8c",
+        "zone6_tiles.bin": "70e9a03756e4758b76bd739fb5d274931b943d8adefa85d55e3f2b52d5c4069b",
+        "zone6_pal.bin": "17fdd987d5c3ea8d4422bd9157fee344c43dfa7f2b7896e4453009d704dd9437"
+      },
+      "output_sha256": {
+        "zone6_tiles.bin": "e0dcd681a4fd745230445a0fb94415a4f43478174f4cd48109ccb6b7aed8fc32",
+        "zone6_attr.bin": "092645854f4cda4cd5f9fd3b7be2b0b0a20bb0051ff266938314e840dd8be91e"
+      }
+    },
+    {
+      "zone": 8,
+      "kind": "base",
+      "changes": [
+        {
+          "meta": 4,
+          "owner": 4,
+          "subtile": 15,
+          "bank": 2,
+          "source_words": [
+            2112
+          ],
+          "pixels": 5
+        },
+        {
+          "meta": 13,
+          "owner": 13,
+          "subtile": 0,
+          "bank": 2,
+          "source_words": [
+            2112
+          ],
+          "pixels": 5
+        },
+        {
+          "meta": 14,
+          "owner": 14,
+          "subtile": 11,
+          "bank": 2,
+          "source_words": [
+            2656
+          ],
+          "pixels": 1
+        },
+        {
+          "meta": 17,
+          "owner": 17,
+          "subtile": 4,
+          "bank": 2,
+          "source_words": [
+            2112
+          ],
+          "pixels": 2
+        }
+      ],
+      "exact_pixels": 13,
+      "input_sha256": {
+        "zone8_attr.bin": "a806c2a26699d492613998d3680d8e5cada04352fc54a55732eff04fab996085",
+        "zone8_tiles.bin": "4937d91ec5aa4d179ad7a7b0b92c7716caf67073c37f4cee917f0040a1396fc3",
+        "zone8_pal.bin": "dd8c59993b57e6a27d952df9438bfa901c0fca9d57684f34bc7a757cf6bf9651"
+      },
+      "output_sha256": {
+        "zone8_tiles.bin": "4b49ed83b7eb8b8036d0b1c963c8ebb469b1f56f6fe3995d66d6aa1efd6c5657",
+        "zone8_attr.bin": "bc4bc429cba477008fedabcfa9c121a07fd41592dfdfb86ab6ba4cde3791dfb5"
+      }
+    },
+    {
+      "zone": 8,
+      "kind": "home",
+      "changes": [
+        {
+          "meta": 3,
+          "owner": 13,
+          "subtile": 0,
+          "bank": 2,
+          "source_words": [
+            2112
+          ],
+          "pixels": 5
+        },
+        {
+          "meta": 4,
+          "owner": 17,
+          "subtile": 4,
+          "bank": 2,
+          "source_words": [
+            2112
+          ],
+          "pixels": 2
+        }
+      ],
+      "exact_pixels": 7,
+      "input_sha256": {
+        "zone8h_attr.bin": "1d447fe7b2c72ae57d373dd8f0ca033fefe9dd153d4741804c5f6aa7eb6cd93b",
+        "zone8h_tiles.bin": "a7055988aacfe9a41f8ed64beecdb3733f73cbfaf107fc235fa223cfa624dc2d",
+        "zone8_pal.bin": "dd8c59993b57e6a27d952df9438bfa901c0fca9d57684f34bc7a757cf6bf9651"
+      },
+      "output_sha256": {
+        "zone8h_tiles.bin": "6ffe50f7d5fd7704d09681d9de70ece0890acae55cbb0925489babcf6ba02664",
+        "zone8h_attr.bin": "369a0889b85087d25c522f2961c14af1c5ebd492511bcb03bb4104547eeb47b5"
+      }
+    },
+    {
+      "zone": 10,
+      "kind": "base",
+      "changes": [
+        {
+          "meta": 12,
+          "owner": 12,
+          "subtile": 11,
+          "bank": 2,
+          "source_words": [
+            66
+          ],
+          "pixels": 1
+        },
+        {
+          "meta": 12,
+          "owner": 12,
+          "subtile": 15,
+          "bank": 2,
+          "source_words": [
+            2112
+          ],
+          "pixels": 5
+        },
+        {
+          "meta": 59,
+          "owner": 59,
+          "subtile": 8,
+          "bank": 2,
+          "source_words": [
+            2656
+          ],
+          "pixels": 22
+        },
+        {
+          "meta": 66,
+          "owner": 66,
+          "subtile": 8,
+          "bank": 3,
+          "source_words": [
+            174
+          ],
+          "pixels": 3
+        }
+      ],
+      "exact_pixels": 31,
+      "input_sha256": {
+        "zone10_attr.bin": "64e007cc1fb386e22b63d93ca56a6590305e5bb110768e764267dc2614607b6f",
+        "zone10_tiles.bin": "cd9a8b30474f887ceb331e0b11ec7fa2f4e190935913c6a0ba8599cd4c337166",
+        "zone10_pal.bin": "8b8eca62a9cde1d9e8d31cf7e4da7a692e4c7357d972e88a906c307e7704d957"
+      },
+      "output_sha256": {
+        "zone10_tiles.bin": "f084cb55b5a996c7f5d9053563c29ad2a5271ab9210e323c7c5c44a0177662c7",
+        "zone10_attr.bin": "e71dd15100a9135ee1aa84e40ab3651a4ae1e16768a0e8c6b9f85eeeecee2e45"
+      }
+    },
+    {
+      "zone": 14,
+      "kind": "base",
+      "changes": [
+        {
+          "meta": 82,
+          "owner": 82,
+          "subtile": 12,
+          "bank": 3,
+          "source_words": [
+            4
+          ],
+          "pixels": 4
+        },
+        {
+          "meta": 91,
+          "owner": 91,
+          "subtile": 15,
+          "bank": 3,
+          "source_words": [
+            4
+          ],
+          "pixels": 7
+        }
+      ],
+      "exact_pixels": 11,
+      "input_sha256": {
+        "zone14_attr.bin": "7627a6491d62ea2ad97662750f960517a2c2c75c6a58366efc6bc51c840a4035",
+        "zone14_tiles.bin": "6f2465d030aa992ef527acc3e13a80a79a07f52e392634b77a230451859f58a1",
+        "zone14_pal.bin": "3119833e3975cdaa262c4dd656c37ef76a836e435ce1525f1f76c31a287ff019"
+      },
+      "output_sha256": {
+        "zone14_tiles.bin": "f9fec2748a95c9e81b9f388c37c315d0ff76df3dda6d55b8833339fdbab4623c",
+        "zone14_attr.bin": "9d95b638182432c9cca9faebc991cbdbb7047ada445fa260779d01564665e728"
+      }
+    }
+  ]
+}

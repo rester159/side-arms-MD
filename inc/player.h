@@ -2,6 +2,11 @@
 #include <genesis.h>
 /* Owned by the player/weapons module (player.c, weapons.c, combined.c). Design: docs/player.md. */
 
+#define MAX_PLAYERS 4
+extern u16 player_limit;            /* applied Home slot count, 2 in Arcade */
+static inline u16 game_player_limit(void) { return player_limit; }
+u16 game_scale_health(u16 base);
+
 #define MAX_SHOTS 9                 /* arcade: 9 shot records per player (+$E0..+$1DF) */
 typedef struct {
     s16 x, y, vx, vy;               /* screen pixels of the 16x16 sprite, px/frame */
@@ -21,7 +26,7 @@ enum { WPN_NONE, WPN_BIT, WPN_SG, WPN_MBL, WPN_3WAY, WPN_AUTO };   /* selected s
 typedef enum { PL_OFF, PL_ALIVE, PL_DYING } PlayerState;
 typedef struct {
     PlayerState state;
-    u8 id;                          /* 0 = P1, 1 = P2 */
+    u8 id;                          /* 0-3 = P1-P4 */
     s16 x, y;                       /* screen position of the 32x32 body (top-left) */
     s16 old_x, old_y;
     bool facing_left;
@@ -54,7 +59,8 @@ typedef struct {
     bool hit_blink;                 /* the invulnerability after an absorbed hit blinks the body */
 } Player;
 
-extern Player players[2];
+bool player_is_combined(const Player *p);
+#include "player_storage.h"
 void players_init(void);
 void player_spawn(Player *p);                   /* respawn $1871: entry glide, 80 f invulnerable */
 void player_start(Player *p, u8 lives);         /* new game for p ($1839): speed 1, no weapons, score 0 */
@@ -81,7 +87,7 @@ extern u16 extend_setting;           /* DSW0 bits 4-5: 0 = 100000 once (arcade d
 extern bool score_enabled;          /* arcade $E010: FALSE in the attract demo (no score, $2272) */
 
 /* Combined "Side Arms" robot (combined.c) */
-extern u8 combined;                 /* $E014: 0, or leader id + 1 (1 = P1-led $41, 2 = P2-led $42) */
+extern u8 combined;                 /* 0, or leader id + 1; one merged pair (P1/P2 or P3/P4) */
 extern u8 combined_hp;              /* $E015: hits the robot can take */
 bool players_world_frozen(void);    /* TRUE while the merge/split sequence runs: the arcade suspends every
                                        other task ($3078), so level scroll and enemies must not update */

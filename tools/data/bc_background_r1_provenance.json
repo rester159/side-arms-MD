@@ -1,0 +1,183 @@
+{
+  "classification": "new_authored_contours_not_verified_normal_metatile_identity",
+  "generator_dependencies": [
+    "original Normal bgtiles code30, palette0 pens2/3/4/5 before palette fitting",
+    "zone0_tiles.bin meta79 rock texture",
+    "zone0_attr.bin PAL1+priority validation",
+    "bc_background_r1_contours.json"
+  ],
+  "source_console_graphics_consumed_by_asset_generator": false,
+  "reference_only_capture_sha256": {
+    "code-002160.bin": "c5623ff8faab5175a48afeda4c7ab032d018295107fe74c71d30c7c8e2fe0c0a",
+    "f002880-vram.bin": "c82ae1ddf916d8a9bc825c397413fccdc9be31c642cce7ddea6ced25f50fca4f",
+    "f002880-palette.bin": "cab76d543ba74342da2e6689956a64abc3d7bba15ca9d7f73fac9f87e32a64bf"
+  },
+  "reference_quadrants": {
+    "20": [
+      {
+        "pattern": "31",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "3A",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "39",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "42",
+        "palette": 9,
+        "collision": 0
+      }
+    ],
+    "21": [
+      {
+        "pattern": "3B",
+        "palette": 10,
+        "collision": 0
+      },
+      {
+        "pattern": "3C",
+        "palette": 10,
+        "collision": 0
+      },
+      {
+        "pattern": "35",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "36",
+        "palette": 9,
+        "collision": 0
+      }
+    ],
+    "22": [
+      {
+        "pattern": "3F",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "31",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "37",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "39",
+        "palette": 9,
+        "collision": 0
+      }
+    ],
+    "3A": [
+      {
+        "pattern": "3A",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "3B",
+        "palette": 10,
+        "collision": 0
+      },
+      {
+        "pattern": "42",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "35",
+        "palette": 9,
+        "collision": 0
+      }
+    ],
+    "3B": [
+      {
+        "pattern": "3C",
+        "palette": 10,
+        "collision": 0
+      },
+      {
+        "pattern": "3F",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "36",
+        "palette": 9,
+        "collision": 0
+      },
+      {
+        "pattern": "37",
+        "palette": 9,
+        "collision": 0
+      }
+    ]
+  },
+  "proven_reference_relations": [
+    "3A=20.right+21.left, 1024RGBpixels",
+    "3B=21.right+22.left, 1024RGBpixels",
+    "22.right=20.left, 512RGBpixels"
+  ],
+  "authored_geometry": "Hand-authored polygons interpret the reviewed warm band and stone relief; not pixel-exact silhouette or whole-cell match.",
+  "material_reuse": {
+    "stone": "Normal zone0 meta34 pen texture; explicit PAL1 relief remapping",
+    "rock": "Normal zone0 meta79 lower-half texture in authored nodule polygons; existing PAL1 pens1,2,12,13,14"
+  },
+  "changed_source_cells": [
+    "20",
+    "21",
+    "22",
+    "3A",
+    "3B"
+  ],
+  "unchanged": [
+    "all32palettewords",
+    "all63cellpalette/priorityattributes",
+    "all58otherR1cellimages",
+    "allR2..R10generatedCbytes",
+    "sourceIDsandcollisiontables",
+    "scrollingandgameplaycode"
+  ],
+  "resource_bytes": {
+    "before_tiles": 26112,
+    "after_tiles": 27648,
+    "before_templates": 1632,
+    "after_templates": 1728,
+    "before_unique_metas": 51,
+    "after_unique_metas": 54
+  },
+  "inputs_sha256": {
+    "res/generated/zone0_tiles.bin": "a931ed115821151e12f1d298b2b94294b60d9c8a8bfec192476e795cd1735812",
+    "res/generated/zone0_attr.bin": "50f6f3e1d66aa228e343a66dddd80292c5e55e3542af82b5235bde07ca88a74f",
+    "res/generated/vivid_lut.bin": "56f7e4ad7534c8240cda913ef2205b63f8177562d122b267a33f1bcf3ebf01bc",
+    "tools/build_bc_background.py": "e8464eae3e2e39c6b0c8ca27d488c15f64a68fd83b2f0ce2db1d9ead61fc71f9",
+    "tools/inspect_bc_background.py": "677da0ad17efa9de691a585e83d42ee42e6829c41b77c9aeb3bd9e3e26866ce1",
+    ".local/bc-asset-matching-review/source-quadrant-manifest.json": "66f6d5efcfad255dceab2bec849b90666203a30c54730439c9803f9b25a57862",
+    ".local/bc-asset-matching-review/r1-remaster-requirements.json": "d865eab265d84a8f66bf7ff77ccb5156f3caa9b189e4e1a0005118907513973b"
+  },
+  "corrected_cell_pixels_sha256": {
+    "20": "9ac1f602700d84de82665b7f3a4b5018c3dd117b3b8116b5b26f764f806e1cc0",
+    "21": "3519718826a63dbb9b371685777fe7f913e50dfd14deaa0ce11ab79c8049258f",
+    "22": "37a4399054c56f3a0e953e54878f760da8409d4278d1f01c96ac296707175b15",
+    "3A": "52c4e38cbc7ff2ad6ae3b38070dd72e28bee6183271604d906125336f728369b",
+    "3B": "2a883715cab1be73c97a48d006a7335bd18a0e3d9eeef0bc9610d3ddff1ab95c"
+  },
+  "limitations": [
+    "No native ROM build or runtime performance/render QA.",
+    "Reference capture verifies quadrant identity at its palette state; does not prove all later visual states.",
+    "23 and other surrounding cells remain drafts; this correction is not whole-stage remaster.",
+    "Atlas assesses authored contour placement; no pixel-exact source silhouette claim."
+  ],
+  "stone_shading_note": "All four original stone levels remain distinct in each authored ramp. Base RGB3 232 is restored using unused R1 pen15; original bright445 remains approximated as444. Contours and warm rock geometry are unchanged."
+}

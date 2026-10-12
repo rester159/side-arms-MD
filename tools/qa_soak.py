@@ -10,7 +10,7 @@ limit. Measures, per section: frames the 68000 dropped (`frame_counter` vs runne
 worst `prof_line`, sprites the display list had to drop (`spr_dbg_dropped`), crushes, hangs
 (frame_counter frozen for 60 frames = 68000 exception), and saves a contact sheet of screenshots.
 Run with SIDEARMS_BUILD=dir to test a snapshot build."""
-import argparse, os, re, struct, subprocess, sys
+import argparse, os, re, struct, subprocess, sys, tempfile
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -35,11 +35,16 @@ O(BossHud, active) O(BossHud, bars)
 int s_Player = sizeof(Player);
 '''
     tmp = ROOT / '.local/qa'; tmp.mkdir(parents=True, exist_ok=True)
-    (tmp / 'off.c').write_text(src)
-    subprocess.run([str(GDK / 'bin/m68k-elf-gcc'), '-m68000', '-w', '-I', str(BUILD / 'inc'), '-I', str(GDK / 'inc'),
-                    '-I', str(GDK / 'res'), '-S', '-o', str(tmp / 'off.s'), str(tmp / 'off.c')], check=True)
+    # Different snapshot builds can have different native layouts. Keep each
+    # compilation isolated so concurrent QA processes cannot exchange offsets.
+    with tempfile.TemporaryDirectory(prefix='offsets-', dir=tmp) as directory:
+        work = Path(directory)
+        (work / 'off.c').write_text(src)
+        subprocess.run([str(GDK / 'bin/m68k-elf-gcc'), '-m68000', '-w', '-I', str(BUILD / 'inc'), '-I', str(GDK / 'inc'),
+                        '-I', str(GDK / 'res'), '-S', '-o', str(work / 'off.s'), str(work / 'off.c')], check=True)
+        assembly = (work / 'off.s').read_text()
     o, name = {}, None
-    for line in (tmp / 'off.s').read_text().splitlines():
+    for line in assembly.splitlines():
         m = re.match(r'^(\w+):', line)
         if m:
             name = m.group(1); continue

@@ -29,6 +29,11 @@
 #define FR_PRELOAD  6                   /* frame metatiles made resident per frame */
 
 static const Zone *zone;
+static bool stage_map;
+static const u8 *stage_cells;
+static const u16 *stage_remap;
+static u16 stage_column_offsets[128];
+static const u8 * const *stage_sources;
 static s16 cam_x, cam_y;
 static s16 lx0, ly0, lx1, ly1;          /* loaded cell rect, inclusive; empty if lx1 < lx0 */
 static bool enabled = TRUE;
@@ -59,6 +64,9 @@ static u16 fr_render;                   /* next frame image to render */
 static u16 fr_meta[64];
 static u16 fr_nmeta, fr_next;
 static u16 *fr_img;                     /* nframes x full 64x32 plane images, or NULL */
+static u16 *fr_cells;                   /* optional cell cache, all four orientations */
+static u8 *fr_slots;                    /* last shadow slot per wheel cell, when images do not fit */
+static s16 fr_shadow_frame = -1;        /* invalidated by every ordinary shadow writer */
 static s16 fr_shown, fr_pending = -1;
 static void frames_drop(void);
 
@@ -115,12 +123,19 @@ static void flush_cache(void)
 void bg_init(void)
 {
     zone = NULL;
+    stage_map = FALSE;
+    stage_cells = NULL; stage_remap = NULL;
+    stage_sources = NULL;
+    zone_id = 0xFFFF; zone_stale = FALSE;
     flush_cache();
     dirty_all = FALSE;
 }
 
 static void set_zone(u16 z, bool keep)
 {
+    stage_map = FALSE;
+    stage_cells = NULL; stage_remap = NULL;
+    stage_sources = NULL;
     static u8 shown[BG_SLOTS];
     release_held();
     sw_state = 0;
@@ -148,6 +163,42 @@ static void set_zone(u16 z, bool keep)
 
 void bg_set_zone(u16 z) { set_zone(z, FALSE); }
 
+void bg_set_stage(const Zone *art, const u8 *cells, const u16 *remap,
+                  const u8 * const *sources, u16 min_cell_x)
+{
+    bg_frames_end();
+    release_held();
+    sw_state = 0;
+    stage_map = TRUE;
+    stage_cells = cells; stage_remap = remap;
+    stage_sources = sources;
+    /* Resolve the visual border once, and precompute the column bit layout.
+     * Streaming then uses one lookup instead of a bounds branch and shifts. */
+    u16 mirror_shaft = min_cell_x & 0x8000;
+    u16 max_cell_x = (min_cell_x >> 8) & 127;
+    min_cell_x &= 255;
+    for (u16 x = 0; x < 128; ++x) {
+        u16 source_x = x < min_cell_x ? min_cell_x : x;
+        if (max_cell_x && source_x > max_cell_x) source_x = max_cell_x;
+        stage_column_offsets[x] = (source_x & 7) | ((source_x >> 3) << 6);
+        /* Extend a 256px vertical shaft into the centered wide-screen margins.
+         * Reflect its edge cells, not unrelated data from the next map block. */
+        if (mirror_shaft) {
+            if (min_cell_x) {
+                /* Horizontal stage entrance: join the wall to its reflection
+                 * in the extra left column instead of exposing another map. */
+                if (x + 1 == min_cell_x) stage_column_offsets[x] |= 0x4000;
+            } else if (x == 127 || x == 8)
+                stage_column_offsets[x] = 0x4000 | (x == 127 ? 0 : 7);
+        }
+    }
+    zone = art; zone_id = 0xFFFF; zone_stale = FALSE;
+    ext_tiles = NULL; ext_tmpl = NULL;
+    ext_scroll = FALSE;
+    flush_cache();
+    if (zone) pal_load(0, zone->pal, 32);
+}
+
 static u8 acquire(u16 meta)
 {
     u8 s = meta_slot[meta];
@@ -158,7 +209,7 @@ static u8 acquire(u16 meta)
         if (slot_refs[i]) continue;
         if (slot_meta[i] != 0xFFFF) meta_slot[slot_meta[i]] = NO_SLOT;
         slot_meta[i] = meta; meta_slot[meta] = i; slot_refs[i] = 1;
-        const u8 *src = meta < zone->metas ? zone->tiles + (u32)meta * 512
+        const u8 *src = meta < zone->metas ? (stage_sources ? stage_sources[meta] : zone->tiles + (u32)meta * 512)
                                            : (fr ? fr->extra_tiles : ext_tiles) + (u32)(meta - zone->metas) * 512;
         DMA_queueDmaFast(DMA_VRAM, (void *)src, (VRAM_BG_TILE + i * 16) * 32, 256, 2);
         misses++;
@@ -170,45 +221,59 @@ static u8 acquire(u16 meta)
 /* Nametable words of map entry e (meta | b14 hflip | b15 vflip) whose
  * metatile sits in cache slot s; stride = words per destination row.
  * Hot path (88 cells per camera jump, 8 per scrolled strip): one unrolled
- * loop per flip case. Template words are 0 (blank) or priority | palette |
- * tile 0-15, so adding base | flip bits cannot carry into the flip bits. */
-#define CW(d, v) do { u16 _v = (v); (d) = _v ? _v + b : 0; } while (0)
-static void cell_words(u16 e, u8 s, u16 *dst, u16 stride)
+ * loop per flip case. Templates may already flip shared characters: compose
+ * those flips with XOR, since adding them can carry into palette bits. */
+#define CW(d, v) do { u16 _v = (v); (d) = _v ? (_v + b) ^ flip : 0; } while (0)
+static void __attribute__((optimize("Os"))) cell_words(u16 e, u8 s, u16 *dst, u16 stride)
 {
     u16 meta = e & 0x0FFF;
     const u16 *t = meta < zone->metas ? zone->tmpl + meta * 16 : (fr ? fr->extra_tmpl : ext_tmpl) + (meta - zone->metas) * 16;
     u16 b = VRAM_BG_TILE + s * 16;
+    u16 flip = (e & 0xC000) >> 3;
     switch (e & 0xC000) {
     case 0:
         for (u16 y = 0; y < 4; y++, dst += stride, t += 4) { CW(dst[0], t[0]); CW(dst[1], t[1]); CW(dst[2], t[2]); CW(dst[3], t[3]); }
         break;
     case 0x4000:
-        b |= TILE_ATTR_HFLIP_MASK;
         for (u16 y = 0; y < 4; y++, dst += stride, t += 4) { CW(dst[0], t[3]); CW(dst[1], t[2]); CW(dst[2], t[1]); CW(dst[3], t[0]); }
         break;
     case 0x8000:
-        b |= TILE_ATTR_VFLIP_MASK; t += 12;
+        t += 12;
         for (u16 y = 0; y < 4; y++, dst += stride, t -= 4) { CW(dst[0], t[0]); CW(dst[1], t[1]); CW(dst[2], t[2]); CW(dst[3], t[3]); }
         break;
     default:
-        b |= TILE_ATTR_HFLIP_MASK | TILE_ATTR_VFLIP_MASK; t += 12;
+        t += 12;
         for (u16 y = 0; y < 4; y++, dst += stride, t -= 4) { CW(dst[0], t[3]); CW(dst[1], t[2]); CW(dst[2], t[1]); CW(dst[3], t[0]); }
         break;
     }
 }
 #undef CW
 
+static u16 stage_entry(s16 cx, s16 cy)
+{
+    u16 x = (u16)cx & 127, y = (u16)cy & 127;
+    u16 column = stage_column_offsets[x];
+    u16 index = (column & 0x3ff) | ((y & 7) << 3) | ((y >> 3) << 10);
+    return stage_remap[stage_cells[index]] ^ (column & 0x4000);
+}
+
 static void load_cell(s16 cx, s16 cy)
 {
+    fr_shadow_frame = -1;
     u16 rx = cx & (RING_W - 1), ry = cy & (RING_H - 1);
     u16 *dst = &shadow[ry * 4][rx * 4];
     u8 s = NO_SLOT;
     s16 zx = cx - zone->x0, zy = cy - zone->y0;
-    if (zx >= 0 && zy >= 0 && zx < (s16)zone->w && zy < (s16)zone->h) {
-        u16 e = zone->map[zy * zone->w + zx];
+    if (stage_cells || (zx >= 0 && zy >= 0 && zx < (s16)zone->w && zy < (s16)zone->h)) {
+        u16 e;
+        if (stage_cells) e = stage_entry(cx, cy);
+        else e = zone->map[zy * zone->w + zx];
+        /* Stage art must be self-contained; invalid/unmapped cells are blank. */
+        if (stage_map && (e & 0x0FFF) >= zone->metas) goto blank;
         s = acquire(e & 0x0FFF);
         if (s != NO_SLOT) cell_words(e, s, dst, 64);
     }
+blank:
     if (s == NO_SLOT)
         for (u16 y = 0; y < 4; y++, dst += 64) dst[0] = dst[1] = dst[2] = dst[3] = 0;
     cell_slot[ry][rx] = s;
@@ -329,7 +394,7 @@ static void band_update(void)
 /* the band for the current camera (NULL: none), and its camera x */
 static const ParBand *band_want(s16 *x)
 {
-    if (!home || fr || !zone) return NULL;
+    if (!home || fr || !zone || stage_map) return NULL;
 #if PAR_BAND_COUNT                              /* none in 1.0 (docs/parallax.md) */
     for (u16 i = 0; i < PAR_BAND_COUNT; i++) {
         const ParBand *b = &par_bands[i];
@@ -360,7 +425,7 @@ void bg_set_home(bool on)
 {
     if (on == home) return;
     home = on;
-    zone_stale = zone != NULL;
+    zone_stale = zone != NULL && !stage_map;
 }
 
 void bg_scroll_external(bool on) { ext_scroll = on; }
@@ -380,8 +445,17 @@ void bg_enable(bool on)
     for (s16 y = ly0; y <= ly1; y++)
         for (s16 x = lx0; x <= lx1; x++) drop_cell(x, y);
     lx0 = 1; lx1 = 0; ly0 = 1; ly1 = 0;
+    fr_shadow_frame = -1;
     memset(shadow, 0, sizeof(shadow));
     dirty_all = TRUE;
+}
+
+u16 *bg_scene_page(void)
+{
+    bg_enable(FALSE);
+    fr_shadow_frame = -1;
+    memset(shadow, 0, 32 * 32 * sizeof(u16));
+    return &shadow[0][0];
 }
 
 static bool zone_has(const Zone *z, s16 cx, s16 cy)
@@ -393,6 +467,7 @@ static bool zone_has(const Zone *z, s16 cx, s16 cy)
  * leaves one only through a teleport (or into empty map). */
 static void auto_zone(void)
 {
+    if (stage_map) return;
     s16 cx = (cam_x + SCREEN_W / 2) >> 5, cy = (cam_y + SCREEN_H / 2) >> 5;
     if (zone && zone_has(zone, cx, cy)) return;
     for (u16 i = 0; i < ZONE_COUNT; i++)
@@ -411,6 +486,7 @@ static void release_cells(const u8 *o)
  * rewritten, the ring outside the rect is never visible, so no plane clear. */
 static void load_all(s16 x0, s16 y0, s16 x1, s16 y1)
 {
+    fr_shadow_frame = -1;
     pre_drop();
     u8 old[RING_H][RING_W];
     bool released = FALSE;
@@ -425,8 +501,9 @@ static void load_all(s16 x0, s16 y0, s16 x1, s16 y1)
             u16 *dst = &shadow[ry * 4][rx * 4];
             s16 zx = x - zone->x0;
             u8 sl = NO_SLOT;
-            if (mrow && zx >= 0 && zx < (s16)zone->w) {
-                u16 e = mrow[zx];
+            if (stage_cells || (mrow && zx >= 0 && zx < (s16)zone->w)) {
+                u16 e = stage_cells ? stage_entry(x, y) : mrow[zx];
+                if (stage_map && (e & 0x0FFF) >= zone->metas) goto blank;
                 sl = acquire(e & 0x0FFF);
                 if (sl == NO_SLOT && !released) {       /* cache full: release the old view now */
                     release_cells(&old[0][0]);
@@ -439,6 +516,7 @@ static void load_all(s16 x0, s16 y0, s16 x1, s16 y1)
                 }
                 if (sl != NO_SLOT) cell_words(e, sl, dst, 64);
             }
+blank:
             if (sl == NO_SLOT)
                 for (u16 k = 0; k < 4; k++, dst += 64) dst[0] = dst[1] = dst[2] = dst[3] = 0;
             cell_slot[ry][rx] = sl;
@@ -512,6 +590,9 @@ void bg_release_blocks(void)
 static void frames_drop(void)
 {
     if (fr_img) { MEM_free(fr_img); fr_img = NULL; }
+    if (fr_slots) { MEM_free(fr_slots); fr_slots = NULL; }
+    if (fr_cells) { MEM_free(fr_cells); fr_cells = NULL; }
+    fr_shadow_frame = -1;
     fr_state = 0;
     fr_pending = -1;
 }
@@ -522,26 +603,85 @@ void bg_frames_begin(const BgFrames *f)
     if (!zone || zone_id != f->zone) bg_set_zone(f->zone);
     fr = f; fr_state = 1; fr_next = 0; fr_nmeta = 0; fr_shown = -1;
     u16 n = f->w * f->h * f->nframes;
-    for (u16 i = 0; i < n; i++) {
-        u16 m = f->maps[i] & 0x0FFF, k = 0;
-        while (k < fr_nmeta && fr_meta[k] != m) k++;
-        if (k == fr_nmeta && fr_nmeta < 64) fr_meta[fr_nmeta++] = m;
+    /* Preserve first-use preload order without scanning the growing list
+     * for every cell in every pose. Map IDs occupy twelve bits. */
+    u8 seen[512];
+    memset(seen, 0, sizeof(seen));
+    for (u16 i = 0; i < n && fr_nmeta < 64; i++) {
+        u16 m = f->maps[i] & 0x0FFF;
+        u8 bit = 1u << (m & 7);
+        if (!(seen[m >> 3] & bit)) {
+            seen[m >> 3] |= bit;
+            fr_meta[fr_nmeta++] = m;
+        }
     }
 }
 
 bool bg_frames_ready(void) { return fr_state == 2; }
 
+/* The map orientation occupies the top two bits. A short rotate moves
+ * them to the low bits without the 68000's long variable shift. */
+static inline u16 frame_orientation(u16 e)
+{
+#if defined(__m68k__)
+    __asm__("rol.w #2,%0" : "+d"(e) : : "cc");
+    return e & 3;
+#else
+    return e >> 14;
+#endif
+}
+
+static void cached_frame_cell(u16 e, u8 s, u16 *dst)
+{
+    /* Keep every orientation resident: alternating wheel frames must not
+     * evict each other's flipped cells. All byte offsets fit signed words. */
+    u16 index = (u16)s * 4 + frame_orientation(e);
+    u16 *entry = (u16 *)((u8 *)fr_cells + (s16)(index * 34));
+    u16 tag = (e & 0x0FFF) + 1;
+    if (entry[16] != tag) {
+        cell_words(e, s, entry, 4);
+        entry[16] = tag;
+    }
+    const u16 *t = entry;
+#if defined(__m68k__)
+        /* Both word-aligned buffers permit native long moves on 68000. */
+        __asm__ volatile (
+            "move.l 0(%0),0(%1)\n\tmove.l 4(%0),4(%1)\n\t"
+            "move.l 8(%0),128(%1)\n\tmove.l 12(%0),132(%1)\n\t"
+            "move.l 16(%0),256(%1)\n\tmove.l 20(%0),260(%1)\n\t"
+            "move.l 24(%0),384(%1)\n\tmove.l 28(%0),388(%1)"
+            : : "a"(t), "a"(dst) : "memory", "cc");
+#else
+        for (u16 y = 0; y < 4; y++, dst += 64, t += 4) {
+            dst[0] = t[0]; dst[1] = t[1]; dst[2] = t[2]; dst[3] = t[3];
+        }
+#endif
+}
+
+
 /* Write rows j0..j1-1 of frame n's cells into a 64x32 nametable image (ring layout). */
 static void frame_cells(u16 n, u16 *plane, u16 j0, u16 j1)
 {
     const u16 *m = fr->maps + (n * fr->h + j0) * fr->w;
+    bool track = fr_slots && plane == &shadow[0][0];
+    bool reuse = track && fr_shadow_frame >= 0;
+    const u16 *old = fr->maps + ((reuse ? fr_shadow_frame : n) * fr->h + j0) * fr->w;
+    u16 cell = j0 * fr->w;
     for (u16 j = j0; j < j1; j++) {
         u16 ry = (fr->cy + j) & (RING_H - 1);
-        for (u16 i = 0; i < fr->w; i++, m++) {
+        for (u16 i = 0; i < fr->w; i++, m++, old++, cell++) {
             u16 rx = (fr->cx + i) & (RING_W - 1);
             u8 s = meta_slot[*m & 0x0FFF];
-            u16 *dst = plane + ry * 4 * 64 + rx * 4;
-            if (s != NO_SLOT) cell_words(*m, s, dst, 64);
+            if (track) {
+                if (reuse && *m == *old && fr_slots[cell] == s) continue;
+                fr_slots[cell] = s;
+            }
+            u16 offset = (ry << 9) | (rx << 3);
+            u16 *dst = (u16 *)((u8 *)plane + (s16)offset);
+            if (s != NO_SLOT) {
+                if (fr_cells) cached_frame_cell(*m, s, dst);
+                else cell_words(*m, s, dst, 64);
+            }
             else for (u16 y = 0; y < 4; y++, dst += 64) dst[0] = dst[1] = dst[2] = dst[3] = 0;
         }
     }
@@ -555,7 +695,13 @@ static bool frames_render(void)
     if (!fr_img) {
         fr_img = MEM_alloc(fr->nframes * sizeof(shadow));
         fr_render = 0;
-        if (!fr_img) return TRUE;                   /* no heap: frames are drawn into the shadow */
+        if (!fr_img) {
+            if (fr->w <= RING_W && fr->h <= RING_H)
+                fr_slots = MEM_alloc(fr->w * fr->h);
+            fr_cells = MEM_alloc(BG_SLOTS * 4 * 17 * sizeof(u16));
+            if (fr_cells) memset(fr_cells, 0, BG_SLOTS * 4 * 17 * sizeof(u16));
+            return TRUE;                          /* shadow caches or original uncached fallback */
+        }
     }
     /* a slice per call so no frame overruns: the copy, then 2 cell rows at a time */
     u16 steps = 1 + (fr->h + 1) / 2;
@@ -576,10 +722,18 @@ static void frames_preload(void)
 
 void bg_frames_show(u16 n)
 {
-    if (fr_state != 2 || n == (u16)fr_shown || n >= fr->nframes) return;
+    /* Once preparation has started, the pinned cells can already display
+     * a turn. Do not delay animation until all full-plane images are built. */
+    if ((fr_state != 2 && !(fr_state == 3 && fr_img)) ||
+        n == (u16)fr_shown || n >= fr->nframes) return;
     fr_shown = n;
-    if (fr_img) { fr_pending = n; return; }         /* sent by send() */
+    u16 steps = 1 + (fr->h + 1) / 2;
+    if (fr_img && (fr_state == 2 || fr_render >= (n + 1) * steps)) {
+        fr_pending = n; return;                   /* fully prepared: sent by send() */
+    }
+    fr_pending = -1;                              /* replace any earlier request */
     frame_cells(n, &shadow[0][0], 0, fr->h);
+    fr_shadow_frame = n;
     dirty_all = TRUE;
 }
 

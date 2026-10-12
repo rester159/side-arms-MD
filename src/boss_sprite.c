@@ -144,7 +144,7 @@ static void dead(void) { b.on = FALSE; }
 static void bar_lost(void)
 {
     b.bars--;
-    boss_hud_set(TRUE, b.bars, 20);
+    boss_hud_set(TRUE, b.bars, game_scale_health(20));
     if (!b.bars) {
         /* $6B4E: last bar - clear the screen, explosions, 4 POW, flash 40 times */
         s16 cy = (u8)(b.y + 16), cx2 = (u8)((b.x >> 1) + 0x18);
@@ -161,7 +161,7 @@ static void bar_lost(void)
     }
     if (b.bars == 1) b.score_idx = LAST_SCORE[b.type];
     b.immune = b.nocontact = TRUE;      /* death sets flags |= 3 ($2DEE) until decide() */
-    b.hp = 20;
+    b.hp = game_scale_health(20);
     b.c11 = 6;                           /* $6B0F: 6 x (c8, c15) */
     flash();
 }
@@ -222,11 +222,11 @@ void sboss_start(u8 type)
     sound_play(0x32 + type);
     b.on = TRUE; b.type = type;
     b.y = 0x60; b.x = 0x140;                        /* template: y $60, x $40 + bit 8 */
-    b.bars = BARS[type]; b.hp = 20; b.score_idx = 0x38;
+    b.bars = BARS[type]; b.hp = game_scale_health(20); b.score_idx = 0x38;
     b.immune = b.nocontact = TRUE;                  /* flags $87 */
     b.c11 = 0x40;
     boss_shift = 32;
-    boss_hud_set(TRUE, b.bars, 20);                 /* $0897 */
+    boss_hud_set(TRUE, b.bars, game_scale_health(20));                 /* $0897 */
     bc_reserve(type == 2 ? 24 : 16);                /* 8 per body colour; the death blasts reuse them */
     bs_reserve(3);                                  /* beams, missiles */
     step(1, 0, 0, NORMAL[type], intro_b);

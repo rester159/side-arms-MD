@@ -7,6 +7,10 @@
 #define P2_CODE  0x80                       /* P2 body codes = P1 + $80 (B2:$8FB8) */
 #define P2_COLOUR 4                         /* descriptor $1D24 attr */
 
+static inline u16 player_body_offset(const Player *p) { return (p->id & 1) ? P2_CODE : 0; }
+static inline u8 player_colour(const Player *p) { return p->id == 2 ? 3 : p->id == 3 ? 7 : p->id ? P2_COLOUR : 0; }
+bool combine_sequence_member(const Player *p);
+
 extern u8 fire_flash;                       /* $E016: robot muzzle flash, set by every fire */
 
 static inline bool is_leader(const Player *p) { return combined == p->id + 1; }

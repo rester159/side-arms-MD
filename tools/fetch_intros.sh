@@ -54,4 +54,5 @@ void boot_intros(void)
     capcom_splash();        /* CAPCOM logo + FM jingle */
 }
 C
+python3 "$root/tools/patch_intro_skip.py"
 echo "intros copied to src/intro/"

@@ -2,6 +2,7 @@
 #include "game.h"
 #include "hud.h"
 #include "flow.h"
+#include "sound.h"
 #include "gen/frontend.h"
 
 /* Top-level flow: boot screen (Arcade / Home, flow_menu.c) -> Arcade: INSERT COIN screen and the
@@ -37,6 +38,14 @@ u8 game_bullet_speed(u8 music, u8 dflt)
     return fe_bullet_speed[k * 8 + (d & 7)];
 }
 
+u16 player_limit = 2;
+
+u16 game_scale_health(u16 base)
+{
+    u16 n = game_player_limit();
+    return n == 4 ? (base * 9 + 3) / 4 : n == 3 ? (base * 3 + 1) / 2 : base;
+}
+
 void flow_apply_config(void)
 {
     if (game_cfg.mode == MODE_ARCADE) {
@@ -54,6 +63,9 @@ void flow_apply_config(void)
         game_cfg.allow_continue = home_cfg.cont != CONT_OFF;
         game_cfg.demo_sounds = TRUE;
     }
+    sound_set_music_source(game_cfg.mode == MODE_HOME ? home_cfg.music : 0);
+    player_limit = game_cfg.mode == MODE_HOME && home_cfg.players >= 1 && home_cfg.players <= 4 ? home_cfg.players : 2;
+    input_configure();
     extend_setting = game_cfg.bonus;    /* player.c bonus-life table (DSW0 bits 4-5) */
     video_set_parallax(game_cfg.mode == MODE_HOME && home_cfg.parallax);   /* Home only (docs/parallax.md) */
     pal_set_mode(game_cfg.color);
@@ -73,6 +85,8 @@ static void settings_defaults(void)
     home_cfg.cont = CONT_LIMITED;
     home_cfg.credits = 3;
     home_cfg.parallax = 1;
+    home_cfg.players = 2;
+    home_cfg.music = 0;
     game_cfg.mode = MODE_ARCADE;
     game_cfg.color = COLOR_VIVID;
     input_defaults(&pad_cfg);
@@ -85,25 +99,29 @@ static void settings_defaults(void)
  *   0-3   magic: "SAR1" (v1, ranking only) or "SAR2" (v2)
  *   4-38  ranking: 5 x {score u32, 3 arcade char codes}            (same in v1 and v2)
  *   39    ranking checksum                                          (same in v1 and v2)
- *   40    settings version: 1, 2 or 3 (SET_VERSION)
- *   41-60 settings: DIP x5, Home x5, COLOR, last mode, controls x8 (versions 1-3)
- *   61-65 versions 2-3: Boss Rush record: bosses defeated, fight time in frames (u32, big endian)
- *   66    version 3: Home PARALLAX (0 / 1)
- *   61 / 66 / 67  settings checksum (version 1 / 2 / 3)
- * A v1 save keeps its ranking (settings take their defaults and are written as v3 on the next
+ *   40    settings version: 1-5 (SET_VERSION)
+ *   41-60 settings: DIP x5, Home x5, COLOR, last mode, controls x8 (versions 1-5)
+ *   61-65 versions 2-5: Boss Rush record: bosses defeated, fight time in frames (u32, big endian)
+ *   66    versions 3-5: Home PARALLAX (0 / 1)
+ *   67    versions 4-5: Home PLAYERS (1-4)
+ *   68    version 5: Home MUSIC (0 Arcade / 1 PC Engine)
+ *   61 / 66 / 67 / 68 / 69 settings checksum (versions 1 / 2 / 3 / 4 / 5)
+ * A v1 save keeps its ranking (settings take their defaults and are written as v5 on the next
  * save); a version-1 settings block keeps its settings (the record starts empty), a version-2
- * block its settings and record (PARALLAX starts ON); a bad checksum, an unknown settings
+ * block its settings and record (PARALLAX starts ON); pre-v4 saves default to two players; pre-v5 saves keep Arcade music; a bad checksum, an unknown settings
  * version or an out-of-range value resets that block. */
 #define SRAM_MAGIC_V1 0x53415231UL      /* "SAR1" */
 #define SRAM_MAGIC    0x53415232UL      /* "SAR2" */
 #define RANK_OFS      4
 #define RANK_LEN      (5 * 7)
 #define SET_OFS       (RANK_OFS + RANK_LEN + 1)
-#define SET_VERSION   3
+#define SET_VERSION   5
 #define SET_VALUES    20                /* settings bytes after the version byte */
 #define SET_LEN_V1    (1 + SET_VALUES)
 #define SET_LEN_V2    (SET_LEN_V1 + 5)  /* + Boss Rush record */
-#define SET_LEN       (SET_LEN_V2 + 1)  /* + Home PARALLAX */
+#define SET_LEN_V3    (SET_LEN_V2 + 1)
+#define SET_LEN_V4    (SET_LEN_V3 + 1)  /* + Home PLAYERS */
+#define SET_LEN       (SET_LEN_V4 + 1)  /* + Home MUSIC */
 #define RUSH_MAX_BOSSES 16
 
 static u8 sram_sum(const u8 *b, u16 n)
@@ -139,6 +157,8 @@ static void sram_save(void)
     sb[SET_LEN_V1] = rush_best.bosses;
     sb[SET_LEN_V1 + 1] = t >> 24; sb[SET_LEN_V1 + 2] = t >> 16; sb[SET_LEN_V1 + 3] = t >> 8; sb[SET_LEN_V1 + 4] = t;
     sb[SET_LEN_V2] = home_cfg.parallax;
+    sb[SET_LEN_V3] = home_cfg.players;
+    sb[SET_LEN_V4] = home_cfg.music;
     SRAM_enable();
     SRAM_writeLong(0, SRAM_MAGIC);
     for (u16 i = 0; i < RANK_LEN; i++) SRAM_writeByte(RANK_OFS + i, rb[i]);
@@ -170,7 +190,7 @@ void sram_load(void)
     SRAM_disable();
     rank_ok = rank_ok && rank_sum == sram_sum(rb, RANK_LEN);
     /* settings version 1 (21 bytes + checksum) or 2 (26 bytes + checksum) */
-    u16 len = !v2 ? 0 : sb[0] == 1 ? SET_LEN_V1 : sb[0] == 2 ? SET_LEN_V2 : sb[0] == SET_VERSION ? SET_LEN : 0;
+    u16 len = !v2 ? 0 : sb[0] == 1 ? SET_LEN_V1 : sb[0] == 2 ? SET_LEN_V2 : sb[0] == 3 ? SET_LEN_V3 : sb[0] == 4 ? SET_LEN_V4 : sb[0] == SET_VERSION ? SET_LEN : 0;
     bool set_ok = len && sb[len] == sram_sum(sb, len);
     for (u16 i = 0; set_ok && i < SET_VALUES; i++)
         if (sb[1 + i] < SET_MIN[i] || sb[1 + i] > SET_MAX[i]) set_ok = FALSE;
@@ -182,18 +202,21 @@ void sram_load(void)
         }
     if (set_ok)
         for (u16 i = 0; i < SET_VALUES; i++) *SET_VAL[i] = sb[1 + i];
-    if (set_ok && len == SET_LEN && sb[SET_LEN_V2] <= 1) home_cfg.parallax = sb[SET_LEN_V2];
+    if (set_ok && len >= SET_LEN_V3 && sb[SET_LEN_V2] <= 1) home_cfg.parallax = sb[SET_LEN_V2];
     if (set_ok && len >= SET_LEN_V2 && sb[SET_LEN_V1] <= RUSH_MAX_BOSSES) {
         const u8 *b = sb + SET_LEN_V1 + 1;
         rush_best.bosses = sb[SET_LEN_V1];
         rush_best.frames = ((u32)b[0] << 24) | ((u32)b[1] << 16) | ((u16)b[2] << 8) | b[3];
     }
+    if (set_ok && len >= SET_LEN_V4 && sb[SET_LEN_V3] >= 1 && sb[SET_LEN_V3] <= 4) home_cfg.players = sb[SET_LEN_V3];
+    if (set_ok && len == SET_LEN && sb[SET_LEN_V4] <= 1) home_cfg.music = sb[SET_LEN_V4];
     hi_score = ranking[0].score;     /* $E600 = top ranking score */
 }
 
 /* $1C02: compare with the 5 entries from the bottom up, shift, insert. */
 u8 ranking_insert(u32 score, const u8 name[3])
 {
+    if (developer_active) return 0;
     if (score <= ranking[4].score) return 0;
     s16 i = 4;
     while (i > 0 && score > ranking[i - 1].score) { ranking[i] = ranking[i - 1]; i--; }
@@ -208,7 +231,7 @@ void flow_goto(FlowState s)
 {
     flow_state = s;
     switch (s) {
-    case FS_SELECT:   menu_select_enter(); break;
+    case FS_SELECT:   developer_active = FALSE; menu_select_enter(); break;
     case FS_SETUP:    menu_setup_enter(); break;
     case FS_CONTROLS: menu_controls_enter(); break;
     case FS_SOUND:    menu_sound_enter(); break;
@@ -221,6 +244,7 @@ void flow_goto(FlowState s)
     case FS_INTRO:    flow_intro_enter(); break;
     case FS_PLAY:     break;
     case FS_RUSH:     break;
+    case FS_BC:       break;
     case FS_RUSH_END: flow_rush_end_enter(); break;
     }
 }
@@ -234,7 +258,9 @@ void flow_init(void)
     flow_goto(FS_SELECT);
 }
 
-void flow_update(void)
+/* Keep menu/Normal flow dispatch separate from the main frame. LTO's
+ * changing BC call graph must not inflate the shared frame's stack/code. */
+void __attribute__((noinline)) flow_update(void)
 {
     /* soft reset: A+B+C+Start on pad 1 -> boot screen */
     if ((pad[0].held & (IN_FIRE_L | IN_FIRE_R | IN_WEAPON | IN_START)) == (IN_FIRE_L | IN_FIRE_R | IN_WEAPON | IN_START)
@@ -252,6 +278,7 @@ void flow_update(void)
     case FS_SOUND:    menu_sound_update(); break;
     case FS_COIN:     flow_coin_update(); break;
     case FS_HOME:     menu_home_update(); break;
+    case FS_BC:       break; /* session requested here starts next engine frame */
     case FS_WARNING:  flow_warning_update(); break;
     case FS_TITLE:    flow_title_update(); break;
     case FS_DEMO:     flow_demo_update(); break;

@@ -9,12 +9,16 @@ mkdir -p "$dst"
 rsync -a --delete --exclude out --exclude .venv --exclude reports --exclude reference --exclude .local --exclude rom "$root/" "$dst/"
 ln -sfn "$root/.venv" "$dst/.venv"
 ln -sfn "$root/rom" "$dst/rom"
+mkdir -p "$dst/.local"
+ln -sfn "$root/.local/pce-reference" "$dst/.local/pce-reference"
+mkdir -p "$dst/.local/pce-hucard"
+ln -sfn "$root/.local/pce-hucard/SideArms - Hyper Dyne (USA).pce" "$dst/.local/pce-hucard/SideArms - Hyper Dyne (USA).pce"
 cd "$dst"
-GDK=${GDK:-$HOME/mars/m68k-elf}
-JAVA=$(ls /opt/homebrew/opt/openjdk/bin/java 2>/dev/null || echo java)
-.venv/bin/python tools/build_assets.py > /dev/null
 rm -f out/release/rom.bin out/release/rom.out
-make -f "$GDK/makefile.gen" -f tools/cart_boot.mk JAVA="$JAVA" LIBGCC="$("$GDK"/bin/m68k-elf-gcc -m68000 -print-libgcc-file-name)" 2>&1 | grep -E "error|warning: (impl|incompatible)" || true
+if ! make > build.log 2>&1; then
+    tail -40 build.log >&2
+    echo "BUILD FAILED: $dst/build.log" >&2
+    exit 1
+fi
 test -f out/release/rom.bin || { echo "BUILD FAILED" >&2; exit 1; }
-.venv/bin/python tools/finalize_rom.py out/release/rom.bin
 echo "$dst/out/release/rom.bin"

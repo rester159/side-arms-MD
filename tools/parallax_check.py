@@ -19,32 +19,36 @@ from run_rom import PAD, ROOT
 FS_PLAY, FS_HOME = 7, 9
 
 
-def start_home(r, parallax=True):
-    """boot -> HOME (cursor down, START) -> START GAME -> stage 1. parallax=False pokes the Home
-    PARALLAX setting to OFF on the boot screen (flow_apply_config picks it up with HOME)."""
+def start_home(r, parallax=True, players=1):
+    """Enter Normal through Home and its player-count dialog; preserve real setup."""
+    def tap(button):
+        r.run(5, PAD[button]); r.run(20)
+    r.run(2600)
+    tap('DOWN'); tap('A')
+    assert r.u32('flow_state') == FS_HOME, 'Home menu did not open'
+    if not parallax:
+        for _ in range(3): tap('DOWN')
+        tap('A')
+        assert r.u32('flow_state') == 1, 'Home options did not open'
+        for _ in range(6): tap('DOWN')
+        tap('LEFT'); tap('B')
+        assert r.read('home_cfg', 1, 6) == b'\0'
+        for _ in range(3): tap('UP')
+    tap('A')
+    assert r.read('player_dialog', 1) == b'\1'
+    # Fresh SRAM defaults to two players; select the requested party size.
+    for _ in range((players - 2) % 4): tap('DOWN')
+    tap('A')
     for f in range(12000):
-        st = r.u32('flow_state'); fc = r.u32('frame_counter')
-        if st == FS_PLAY:
+        if r.u32('flow_state') == FS_PLAY:
             return f
         k = f % 40
-        mask = 0
-        if fc == 0:
-            pass
-        elif st == 0:                                   # boot screen: cursor to HOME, START
-            if not parallax:
-                r.write('home_cfg', [0], offset=5)      # HomeSettings.parallax
-            home = r.read('cursor', 1)[0] == 1
-            mask = (PAD['START'] if home else PAD['DOWN']) if k < 4 else 0
-        elif st == FS_HOME:
-            mask = PAD['START'] if k < 4 else 0
-        else:                                           # NAMING / intro: START, A
-            mask = PAD['START'] if k < 4 else PAD['A'] if 20 <= k < 24 else 0
-        r.run(1, mask)
+        r.run(1, PAD['START'] if k < 4 else PAD['A'] if 20 <= k < 24 else 0)
     raise SystemExit('front end did not reach FS_PLAY (home)')
 
 
-def use_home(parallax=True):
-    qa_soak.start_game = lambda r: start_home(r, parallax)
+def use_home(parallax=True, players=1):
+    qa_soak.start_game = lambda r: start_home(r, parallax, players)
 
 
 def shots(o):
@@ -85,7 +89,7 @@ def shots(o):
 if __name__ == '__main__':
     a = argparse.ArgumentParser()
     a.add_argument('cmd', choices=['soak', 'shots'])
-    a.add_argument('--players', type=int, default=1)
+    a.add_argument('--players', type=int, choices=(1, 2), default=1)
     a.add_argument('--sections', default='0-9')
     a.add_argument('--frames', type=int, default=6000)
     a.add_argument('--arcade', action='store_true')
@@ -96,7 +100,7 @@ if __name__ == '__main__':
     a.add_argument('--out', default=str(ROOT / 'reports/parallax'))
     o = a.parse_args()
     if not o.arcade:
-        use_home(not o.off)
+        use_home(not o.off, o.players if o.cmd == 'soak' else 1)
     if o.cmd == 'shots':
         shots(o)
         sys.exit()

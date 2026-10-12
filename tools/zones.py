@@ -43,6 +43,22 @@ for run in _runs():
 for name, r in EXTRA:
     ZONES.append({'name': name, 'rect': _cells([r]), 'start': None})
 
+# Kept as offline source assets; the intro uses the deduplicated fe_scene bank.
+# The runtime table retains an empty slot so later zone IDs remain stable.
+SCENE_ONLY_ZONES = frozenset(i for i, z in enumerate(ZONES) if z['name'] == 'earth')
+
+# The camera selectors choose the first containing zone, and the wheel frame
+# descriptors use zones 1/8/20. This later, wholly contained run cannot become
+# active. Keep its source files and numeric slot for inspection, but omit its
+# duplicate cartridge bank (including its Home cutouts).
+SHADOWED_ZONE_PARENTS = {2: 1}
+for child, parent in SHADOWED_ZONE_PARENTS.items():
+    x, y, w, h = ZONES[child]['rect']
+    px, py, pw, ph = ZONES[parent]['rect']
+    assert parent < child and px <= x and py <= y
+    assert px+pw >= x+w and py+ph >= y+h
+RUNTIME_OMITTED_ZONES = SCENE_ONLY_ZONES | frozenset(SHADOWED_ZONE_PARENTS)
+
 if __name__ == '__main__':
     for i, z in enumerate(ZONES):
         print(i, z)

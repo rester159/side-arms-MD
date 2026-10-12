@@ -135,3 +135,173 @@ Other checks:
 - One-line glitches at the HUD's window split (the H-interrupt's register write lands a line early
   or late depending on the instruction being executed) appear on isolated frames, with or without
   parallax; they move between frames when CPU timing changes.
+
+## Source-fidelity correction (October 2026)
+
+The far-layer cut mask now removes a pixel only when the repeating texture
+reproduces its original source value at the locked position. Shared palette pens
+also occur in irregular texture patches and outlines, so palette membership alone
+was insufficient. Intersecting the mask across all mirrored uses of each source
+metatile preserves one stored variant per metatile. `tools/qa_parallax_cut_fidelity.py`
+checks the actual generated variants, all 326 cut cells, and the HUD exclusion.
+The correction preserves 16,463 previously replaced source pixels without changing
+runtime code or ROM size. The 5,000-update four-player stage-five comparison is
+unchanged at 5,005 video frames; it does not establish full speed or the requested
+all-level extension.
+
+## October 9 expansion audit
+
+The generic whole-zone 32-pixel texture splitter was evaluated for all 24 Normal
+zones. Only the already active section-5 cave layer passed. Other zones would
+hide visible stars or lacked a HUD-safe horizontal segment. An independent
+pixel-by-pixel route check found that the previously proposed repeated materials
+in zones 1, 14, 16 and 19 have no visible material pixels along their camera
+routes. This rules out those generic candidates, not bespoke layer designs.
+Evidence: `.local/parallax-route-audit/whole-zone-study.json` and
+`candidates.json`.
+
+BC uses source collision attributes, not Normal's zone geometry. The new
+`tools/audit_bc_parallax.py --output PATH` resolves every linked BC cell and
+classifies it using the same attribute selection as `bc_terrain_solid`.
+Collision-free/nonempty counts for rounds 1–10 are 58, 41, 16, 8, 25, 61, 44,
+44, 42 and 20. These counts include defensive margin fills and are **not**
+parallax eligibility: visibility, attached enemies/platforms, joins and streaming
+costs remain to be checked. Rounds 8 and 10 provide useful next candidates for
+assembly-level inspection. Evidence: `bc-collision-materials.json` beside the
+Normal audit, bound to cartridge `f97004d1`.
+
+A far-map setup experiment replaced per-entry modulo with a wrapping column
+counter. In a protected four-player Normal section-5 replay it retained all
+5,001 state, sprite and full VDP-memory snapshots (including 1,545 far-layer
+snapshots), but regressed 5,005 to 5,006 video frames for 5,000 updates. It was
+rejected and source/cartridge `f97004d1` restored. Evidence:
+`.local/parallax-wrap-current/rejected.json`. `qa_normal_fixed_updates.py` now
+supports `--vdp-trace` for VRAM/CRAM/VSRAM comparisons; this does not cover
+mid-scanline register timing or certify full speed.
+
+### BC Round 8 separation study
+
+The linked R8 backing is a 64×64 repeat made from cells 0/1/4/5. The complete
+224-pixel route strip was decoded across x=512..3135. A whole-character split
+can move 474,688 of 587,776 pixels while exactly reconstructing the original
+at zero offset, but visibly leaves stationary background fragments around the
+cylinders. A pixel-equality split is also rejected: shared dark colors cause
+holes in the cylinders, and reused cells yield 85 phase-dependent masks.
+Neither prototype is linked into the cartridge.
+
+There is a usable transition interval: cameras x=535..2583 at y=1792. At half
+speed, its ending offset is 1,024 pixels (16 complete periods), and the rendered
+endpoint exactly rejoins the original image before the irregular right-edge
+map cells. This solves only the boundary transition. Explicit foreground masks,
+VRAM/storage allocation and native timing remain necessary. Evidence and
+rejected previews: `.local/bc-r8-parallax-study/study.json` and `index.html`.
+
+The inspected final-round chamber has a fixed camera and a static face over
+rib texture; camera-relative parallax would not move that inspected view.
+This is not a proposal to introduce unrelated idle background animation.
+
+A source-tile polygon study protects the larger cylinder regions but still
+changes 24,544 original pixels at aligned phase; the contours are provisional
+and rejected for production. The repeated backing and foreground use the same
+13 RGB3 colors, so color-only masking cannot identify ownership. Evidence:
+`.local/bc-r8-parallax-study/source-foreground.png` and
+`authored-contours-study.json`. The `f97004d1` test build excludes this work.
+
+### Whole-backdrop experiment
+
+Moving the intact Round 8 background at half speed avoids foreground masking,
+but changes the landmark sequence. At stage x=2816, the normal background
+camera is 2784; the prototype samples x=1632. Later unique machinery therefore
+does not appear at its intended stage position. Collision-free artwork is not
+necessarily a disposable repeat. The prototype is rejected on that basis.
+
+Its 1,000-update protected four-player HuCard sample matches every simulation
+and workload record. Video frames change from 1,799 to 1,797, while mean scene
+ticks increase from 938,973 to 941,226; this is mixed bounded timing evidence,
+not a performance improvement claim. The accepted `67846589` cartridge is
+restored byte-for-byte. Evidence: `.local/bc-r8-backdrop-depth/rejected.json`;
+the prototype remains archived under `candidate/`. Further parallax work needs
+separate layers that retain the original landmarks and respect the Home toggle.
+
+### BC Round9 whole-backdrop study
+
+The linked horizontal route strip x512..3135, y2048..2271 appears to repeat
+its ribbed machinery every96 pixels. The middle three tile rows contain
+irregular machine cells, however. Full-height checks at periods16/32/48/64/
+96/128/192 find no useful scrolling corridor. An exhaustive all-phase scan
+finds only320-pixel repeating spans at48/96/192 pixels, leaving zero camera
+travel for a320-pixel view. Eighty cells also carry floor collision
+attributes. A whole-backdrop scroll is therefore rejected: it would move
+nonrepeating machinery relative to its stage position, like the earlier R8
+problem. This is an offline artifact/geometry result, not a performance result.
+Evidence: `.local/bc-r9-parallax-study/period.json` and route previews. Separate
+foreground masks would still need art, collision/attachment and native timing
+validation; no new parallax is enabled.
+
+### BC Round5 source-aware separation study
+
+Current8d5e4ffc's reused Normal materials permit a more specific mask thanR8:
+source palette21 opaque pixels and palette11's blue pens0/8/9/10/11. Over
+world rectangle[512,1024,3136,1536],319788 pixels meet that source rule.
+A16px texture matches297331;22457 nonperiodic blue pixels remain foreground.
+Keeping those residuals reconstructs every original pixel exactly at zero
+offset. In inspected previews the residuals include a hatched ceiling strip
+and rock-edge details. Moving the backing preserves the rock silhouettes;
+complete ownership/attachment review is not claimed.
+
+Canonical8x8 pattern comparison across all linked BC cells estimates100 new
+characters,3200 raw pattern bytes, plus at most2336 bytes of cell templates.
+This excludes packing/alignment, tables, the far map and runtime code; it is
+not a linker or VRAM proof. No runtime change is installed.
+
+The next obstacle is the Window HUD: it replaces planeA on its rows, so a
+naive planeB cut would reveal black behind transparent glyph pixels instead
+of the moving backing. A safe design must preserve those backgrounds without
+foreground loss or extra frame-cost regression. Merely moving the intact
+background or silently changing the HUD is not the proposed solution. Native
+Home-toggle, phase-transition, storage and3P/4P performance checks remain.
+Evidence: `.local/bc-r5-parallax-study/` (`split.json`, `storage.json`,
+`status.json`, and animated offline `index.html`).
+
+### Round5 HUD-row protection check on 082f88aa
+
+The linked Round5 reconstruction and source mask are byte-identical to the
+earlier study. The repeating texture has two colors and sixteen distinct
+columns, so horizontal phase changes are visible. Restoring the original
+background in the sixteen Window rows would prevent holes, but attach that
+strip to the foreground while the backing below moves independently.
+
+An offline check of ten measured campaign camera positions at all sixteen
+relative horizontal phases finds new boundary discontinuities in 30 of 160
+cases (up to 42 pixels across the boundary). At most 1,209 background pixels
+inside the protected strip differ from the intended moving layer. The
+comparison excludes HUD glyphs and is not a runtime or performance test.
+This workaround is rejected; no additional BC parallax is installed.
+Evidence: `.local/bc-r5-hud-protection-082f88aa/hud-protection.json`,
+repeatable `check.py`, and `hud-strip-comparison.png` in the same directory.
+Compositing or a different layer arrangement would still need palette,
+storage, foreground-priority and native timing validation.
+
+## Cavern color split
+
+Normal zone 10 uses two background palettes across the organic cave boundary
+(world x >= 1536, y >= 2048). This preserves the source pink/purple shade ramps
+while retaining the existing metatile count and far texture. It applies with
+or without Home parallax. tools/build_cavern_palette.py runs after BC donor
+conversion, so Before Christ keeps its own material conversion. The generator
+rebuilds route masks from levels.json, checks source asset hashes, and produces
+the palette constants consumed by src/palette.c. No optimizer or exploratory
+.local script is needed to build the assets.
+
+VBlank restores the displayed picture's starting colors only when its raster
+split changed them. Queued pictures become current after their DMA completes.
+The raster handler writes ten colors in alternate HBlanks within the verified
+unused-color interval. cave_dma_busy excludes the whole queued-DMA setup and
+transfer; the existing v1.4 flush_guard still protects HUD register changes.
+Repeated video frames repeat the color split even when simulation is late.
+
+The verified 4P route takes 10,313 video frames for 10,000 updates, compared
+with 10,108 before this shading restoration (about 2% additional duration).
+This is a shading-fidelity tradeoff, not a claim of improved frame rate.
+The route masks cover normal authored traversal; developer teleports outside
+that traversal are not guaranteed to preserve all original colors.

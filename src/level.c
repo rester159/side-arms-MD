@@ -2,6 +2,7 @@
 #include "boss.h"
 #include "gen/level_data.h"
 #include "gen/assets.h"
+#include "level_storage.h"
 
 /* Camera timeline. The arcade auto-scrolls 1 px every second frame on each
  * moving axis (arcade $2001-$2041, run when $E003 is odd) and fires each
@@ -19,6 +20,11 @@
  * section, whose first record is the same teleport. */
 
 Level level;
+BcStage level_bc;
+#if defined(__m68k__)
+_Static_assert(sizeof(BcStage) == 24, "BC level debugger view");
+extern BcStage stage __attribute__((alias("level_bc"), used, externally_visible));
+#endif
 u8 level_bullet_speed = 3;              /* $E050 speed level (3-6), loaded with the stage music */
 bool level_spawns_off;                  /* Boss Rush (port): the script's enemy spawn records are skipped */
 volatile u16 dbg_warp;                  /* test hook: (section + 1) | (boss ordinal << 8), see level_warp() */
@@ -160,7 +166,17 @@ void level_update(void)
 /* Arcade terrain bitmap (B2:$A000, test $84B5): 1 bit per 16x16 world cell. */
 bool terrain_solid(s16 wx, s16 wy)
 {
-    u16 cx = (u16)wx >> 4, cy = (u16)wy >> 4;
-    if (cx > 255 || cy > 255) return FALSE;
-    return (terrain[cy * 32 + (cx >> 3)] >> (7 - (cx & 7))) & 1;
+    u16 x = wx, y = wy;
+    if ((x | y) & 0xF000) return FALSE;
+#if defined(__m68k__)
+    /* Both coordinates are within 0..4095. Build the row/column bytes
+     * directly, retaining a zero-extended index for the original table. */
+    u32 index = y;
+    u16 column = x >> 4;
+    __asm__("lsl.w #4,%0\n\tmove.b %1,%0"
+        : "+&d"(index) : "d"(column) : "cc");
+    return terrain_cells[index];
+#else
+    return terrain_cells[((y & 0x0FF0) << 4) | (x >> 4)];
+#endif
 }

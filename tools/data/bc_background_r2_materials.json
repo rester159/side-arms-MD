@@ -1,0 +1,9348 @@
+{
+  "schema": 1,
+  "status": "adapted-normal-material-composition",
+  "normal_zone": 1,
+  "source_palette_banks": [
+    2,
+    3
+  ],
+  "cells": [
+    {
+      "cell": 0,
+      "characters": [
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        0,
+        128,
+        0,
+        128,
+        0,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "8/00",
+        "2": "8/00",
+        "3": "8/00"
+      }
+    },
+    {
+      "cell": 1,
+      "characters": [
+        {
+          "meta": 41,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 13,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        16,
+        129,
+        1,
+        129,
+        16,
+        129,
+        1,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/10",
+        "1": "8/01",
+        "2": "8/10",
+        "3": "8/01"
+      }
+    },
+    {
+      "cell": 2,
+      "characters": [
+        {
+          "meta": 34,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        1,
+        129,
+        39,
+        129,
+        8,
+        128,
+        9,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/01",
+        "1": "8/27",
+        "2": "8/08",
+        "3": "8/09"
+      }
+    },
+    {
+      "cell": 3,
+      "characters": [
+        {
+          "meta": 35,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        47,
+        129,
+        39,
+        129,
+        11,
+        129,
+        11,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2f",
+        "1": "8/27",
+        "2": "8/0b",
+        "3": "8/0b"
+      }
+    },
+    {
+      "cell": 4,
+      "characters": [
+        {
+          "meta": 43,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        24,
+        129,
+        25,
+        129,
+        34,
+        129,
+        34,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/18",
+        "1": "8/19",
+        "2": "8/22",
+        "3": "8/22"
+      }
+    },
+    {
+      "cell": 5,
+      "characters": [
+        {
+          "meta": 42,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        26,
+        129,
+        27,
+        129,
+        34,
+        129,
+        35,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/1a",
+        "1": "8/1b",
+        "2": "8/22",
+        "3": "8/23"
+      }
+    },
+    {
+      "cell": 6,
+      "characters": [
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        0,
+        128,
+        27,
+        128,
+        0,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "8/00",
+        "2": "8/1b",
+        "3": "8/00"
+      }
+    },
+    {
+      "cell": 7,
+      "characters": [
+        {
+          "meta": 41,
+          "subtile": 1,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 0,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 1,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 0,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 5,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 4,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 5,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 4,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 9,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 8,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 9,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 8,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 13,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 12,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 13,
+          "flip": 1
+        },
+        {
+          "meta": 41,
+          "subtile": 12,
+          "flip": 1
+        }
+      ],
+      "source_descriptor": [
+        16,
+        129,
+        17,
+        129,
+        16,
+        129,
+        17,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/10",
+        "1": "8/11",
+        "2": "8/10",
+        "3": "8/11"
+      }
+    },
+    {
+      "cell": 8,
+      "characters": [
+        {
+          "meta": 23,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        42,
+        129,
+        42,
+        129,
+        34,
+        129,
+        34,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2a",
+        "1": "8/2a",
+        "2": "8/22",
+        "3": "8/22"
+      }
+    },
+    {
+      "cell": 9,
+      "characters": [
+        {
+          "meta": 43,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        42,
+        129,
+        43,
+        129,
+        34,
+        129,
+        34,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2a",
+        "1": "8/2b",
+        "2": "8/22",
+        "3": "8/22"
+      }
+    },
+    {
+      "cell": 10,
+      "characters": [
+        {
+          "meta": 38,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        25,
+        129,
+        26,
+        129,
+        34,
+        129,
+        34,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/19",
+        "1": "8/1a",
+        "2": "8/22",
+        "3": "8/22"
+      }
+    },
+    {
+      "cell": 11,
+      "characters": [
+        {
+          "meta": 23,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 23,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        26,
+        129,
+        26,
+        129,
+        34,
+        129,
+        34,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/1a",
+        "1": "8/1a",
+        "2": "8/22",
+        "3": "8/22"
+      }
+    },
+    {
+      "cell": 12,
+      "characters": [
+        {
+          "meta": 34,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        47,
+        129,
+        39,
+        129,
+        10,
+        129,
+        2,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2f",
+        "1": "8/27",
+        "2": "8/0a",
+        "3": "8/02"
+      }
+    },
+    {
+      "cell": 13,
+      "characters": [
+        {
+          "meta": 53,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        50,
+        144,
+        0,
+        128,
+        0,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "9/32",
+        "2": "8/00",
+        "3": "8/00"
+      }
+    },
+    {
+      "cell": 14,
+      "characters": [
+        {
+          "meta": 50,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        32,
+        144,
+        33,
+        144,
+        48,
+        144,
+        0,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/20",
+        "1": "9/21",
+        "2": "9/30",
+        "3": "8/00"
+      }
+    },
+    {
+      "cell": 15,
+      "characters": [
+        {
+          "meta": 37,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        6,
+        129,
+        7,
+        129,
+        14,
+        128,
+        15,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/06",
+        "1": "8/07",
+        "2": "8/0e",
+        "3": "8/0f"
+      }
+    },
+    {
+      "cell": 16,
+      "characters": [
+        {
+          "meta": 35,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        42,
+        129,
+        42,
+        129,
+        47,
+        129,
+        39,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2a",
+        "1": "8/2a",
+        "2": "8/2f",
+        "3": "8/27"
+      }
+    },
+    {
+      "cell": 17,
+      "characters": [
+        {
+          "meta": 50,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        50,
+        144,
+        32,
+        144,
+        0,
+        128,
+        40,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/32",
+        "1": "9/20",
+        "2": "8/00",
+        "3": "9/28"
+      }
+    },
+    {
+      "cell": 18,
+      "characters": [
+        {
+          "meta": 48,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        33,
+        144,
+        0,
+        144,
+        0,
+        128,
+        0,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/21",
+        "1": "9/00",
+        "2": "8/00",
+        "3": "9/00"
+      }
+    },
+    {
+      "cell": 19,
+      "characters": [
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        0,
+        128,
+        0,
+        144,
+        41,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "8/00",
+        "2": "9/00",
+        "3": "9/29"
+      }
+    },
+    {
+      "cell": 20,
+      "characters": [
+        {
+          "meta": 48,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        40,
+        144,
+        0,
+        144,
+        40,
+        144,
+        0,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/28",
+        "1": "9/00",
+        "2": "9/28",
+        "3": "9/00"
+      }
+    },
+    {
+      "cell": 21,
+      "characters": [
+        {
+          "meta": 54,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        40,
+        144,
+        0,
+        128,
+        40,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "9/28",
+        "2": "8/00",
+        "3": "9/28"
+      }
+    },
+    {
+      "cell": 22,
+      "characters": [
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 55,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        144,
+        0,
+        144,
+        0,
+        128,
+        56,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/00",
+        "1": "9/00",
+        "2": "8/00",
+        "3": "9/38"
+      }
+    },
+    {
+      "cell": 23,
+      "characters": [
+        {
+          "meta": 51,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        41,
+        144,
+        0,
+        128,
+        57,
+        144,
+        58,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/29",
+        "1": "8/00",
+        "2": "9/39",
+        "3": "9/3a"
+      }
+    },
+    {
+      "cell": 24,
+      "characters": [
+        {
+          "meta": 52,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        49,
+        144,
+        0,
+        144,
+        49,
+        144,
+        0,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/31",
+        "1": "9/00",
+        "2": "9/31",
+        "3": "9/00"
+      }
+    },
+    {
+      "cell": 25,
+      "characters": [
+        {
+          "meta": 54,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        49,
+        144,
+        0,
+        128,
+        49,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "9/31",
+        "2": "8/00",
+        "3": "9/31"
+      }
+    },
+    {
+      "cell": 26,
+      "characters": [
+        {
+          "meta": 53,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        144,
+        50,
+        144,
+        0,
+        144,
+        0,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/00",
+        "1": "9/32",
+        "2": "9/00",
+        "3": "8/00"
+      }
+    },
+    {
+      "cell": 27,
+      "characters": [
+        {
+          "meta": 50,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 50,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        32,
+        144,
+        33,
+        144,
+        40,
+        144,
+        0,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/20",
+        "1": "9/21",
+        "2": "9/28",
+        "3": "8/00"
+      }
+    },
+    {
+      "cell": 28,
+      "characters": [
+        {
+          "meta": 51,
+          "subtile": 3,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 2,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 1,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 0,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 7,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 6,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 5,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 4,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 11,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 10,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 9,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 8,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 15,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 14,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 13,
+          "flip": 1
+        },
+        {
+          "meta": 51,
+          "subtile": 12,
+          "flip": 1
+        }
+      ],
+      "source_descriptor": [
+        49,
+        144,
+        0,
+        128,
+        57,
+        144,
+        58,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/31",
+        "1": "8/00",
+        "2": "9/39",
+        "3": "9/3a"
+      }
+    },
+    {
+      "cell": 29,
+      "characters": [
+        {
+          "meta": 52,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        49,
+        144,
+        56,
+        144,
+        57,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "9/31",
+        "2": "9/38",
+        "3": "9/39"
+      }
+    },
+    {
+      "cell": 30,
+      "characters": [
+        {
+          "meta": 48,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        0,
+        144,
+        58,
+        144,
+        0,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "9/00",
+        "2": "9/3a",
+        "3": "8/00"
+      }
+    },
+    {
+      "cell": 31,
+      "characters": [
+        {
+          "meta": 37,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 37,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        14,
+        128,
+        15,
+        128,
+        0,
+        128,
+        0,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/0e",
+        "1": "8/0f",
+        "2": "8/00",
+        "3": "8/00"
+      }
+    },
+    {
+      "cell": 32,
+      "characters": [
+        {
+          "meta": 48,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 48,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        144,
+        0,
+        144,
+        58,
+        144,
+        56,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/00",
+        "1": "9/00",
+        "2": "9/3a",
+        "3": "9/38"
+      }
+    },
+    {
+      "cell": 33,
+      "characters": [
+        {
+          "meta": 51,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 51,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        144,
+        41,
+        144,
+        56,
+        144,
+        57,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/00",
+        "1": "9/29",
+        "2": "9/38",
+        "3": "9/39"
+      }
+    },
+    {
+      "cell": 34,
+      "characters": [
+        {
+          "meta": 52,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 52,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        0,
+        128,
+        41,
+        144,
+        0,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "8/00",
+        "2": "9/29",
+        "3": "9/00"
+      }
+    },
+    {
+      "cell": 35,
+      "characters": [
+        {
+          "meta": 53,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 53,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        50,
+        144,
+        32,
+        144,
+        0,
+        144,
+        48,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/32",
+        "1": "9/20",
+        "2": "9/00",
+        "3": "9/30"
+      }
+    },
+    {
+      "cell": 36,
+      "characters": [
+        {
+          "meta": 38,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        26,
+        129,
+        26,
+        129,
+        34,
+        129,
+        34,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/1a",
+        "1": "8/1a",
+        "2": "8/22",
+        "3": "8/22"
+      }
+    },
+    {
+      "cell": 37,
+      "characters": [
+        {
+          "meta": 42,
+          "subtile": 3,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 2,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 1,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 0,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 7,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 6,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 5,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 4,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 11,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 10,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 9,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 8,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 15,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 14,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 13,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 12,
+          "flip": 1
+        }
+      ],
+      "source_descriptor": [
+        27,
+        128,
+        0,
+        128,
+        35,
+        129,
+        27,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/1b",
+        "1": "8/00",
+        "2": "8/23",
+        "3": "8/1b"
+      }
+    },
+    {
+      "cell": 38,
+      "characters": [
+        {
+          "meta": 54,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        40,
+        144,
+        0,
+        144,
+        48,
+        144
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "9/28",
+        "2": "9/00",
+        "3": "9/30"
+      }
+    },
+    {
+      "cell": 39,
+      "characters": [
+        {
+          "meta": 34,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        23,
+        129,
+        23,
+        129,
+        23,
+        129,
+        23,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/17",
+        "1": "8/17",
+        "2": "8/17",
+        "3": "8/17"
+      }
+    },
+    {
+      "cell": 40,
+      "characters": [
+        {
+          "meta": 35,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        47,
+        129,
+        39,
+        129,
+        11,
+        129,
+        12,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2f",
+        "1": "8/27",
+        "2": "8/0b",
+        "3": "8/0c"
+      }
+    },
+    {
+      "cell": 41,
+      "characters": [
+        {
+          "meta": 43,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        43,
+        129,
+        35,
+        129,
+        47,
+        129,
+        43,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2b",
+        "1": "8/23",
+        "2": "8/2f",
+        "3": "8/2b"
+      }
+    },
+    {
+      "cell": 42,
+      "characters": [
+        {
+          "meta": 44,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 44,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        4,
+        128,
+        5,
+        129,
+        0,
+        128,
+        4,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/04",
+        "1": "8/05",
+        "2": "8/00",
+        "3": "8/04"
+      }
+    },
+    {
+      "cell": 43,
+      "characters": [
+        {
+          "meta": 34,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        23,
+        129,
+        23,
+        129,
+        5,
+        129,
+        23,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/17",
+        "1": "8/17",
+        "2": "8/05",
+        "3": "8/17"
+      }
+    },
+    {
+      "cell": 44,
+      "characters": [
+        {
+          "meta": 35,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        47,
+        129,
+        39,
+        129,
+        23,
+        129,
+        47,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2f",
+        "1": "8/27",
+        "2": "8/17",
+        "3": "8/2f"
+      }
+    },
+    {
+      "cell": 45,
+      "characters": [
+        {
+          "meta": 35,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        47,
+        129,
+        39,
+        129,
+        39,
+        129,
+        47,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2f",
+        "1": "8/27",
+        "2": "8/27",
+        "3": "8/2f"
+      }
+    },
+    {
+      "cell": 46,
+      "characters": [
+        {
+          "meta": 34,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        47,
+        129,
+        39,
+        129,
+        9,
+        129,
+        11,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2f",
+        "1": "8/27",
+        "2": "8/09",
+        "3": "8/0b"
+      }
+    },
+    {
+      "cell": 47,
+      "characters": [
+        {
+          "meta": 43,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        47,
+        129,
+        43,
+        129,
+        39,
+        129,
+        47,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2f",
+        "1": "8/2b",
+        "2": "8/27",
+        "3": "8/2f"
+      }
+    },
+    {
+      "cell": 48,
+      "characters": [
+        {
+          "meta": 44,
+          "subtile": 3,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 2,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 1,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 0,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 7,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 6,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 5,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 4,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 11,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 10,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 9,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 8,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 15,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 14,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 13,
+          "flip": 1
+        },
+        {
+          "meta": 44,
+          "subtile": 12,
+          "flip": 1
+        }
+      ],
+      "source_descriptor": [
+        4,
+        128,
+        5,
+        129,
+        0,
+        128,
+        18,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/04",
+        "1": "8/05",
+        "2": "8/00",
+        "3": "8/12"
+      }
+    },
+    {
+      "cell": 49,
+      "characters": [
+        {
+          "meta": 34,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 34,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        23,
+        129,
+        23,
+        129,
+        9,
+        129,
+        11,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/17",
+        "1": "8/17",
+        "2": "8/09",
+        "3": "8/0b"
+      }
+    },
+    {
+      "cell": 50,
+      "characters": [
+        {
+          "meta": 35,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 35,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        23,
+        129,
+        23,
+        129,
+        11,
+        129,
+        12,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/17",
+        "1": "8/17",
+        "2": "8/0b",
+        "3": "8/0c"
+      }
+    },
+    {
+      "cell": 51,
+      "characters": [
+        {
+          "meta": 41,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 41,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        47,
+        129,
+        7,
+        129,
+        10,
+        129,
+        7,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2f",
+        "1": "8/07",
+        "2": "8/0a",
+        "3": "8/07"
+      }
+    },
+    {
+      "cell": 52,
+      "characters": [
+        {
+          "meta": 43,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        24,
+        129,
+        25,
+        129,
+        39,
+        129,
+        24,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/18",
+        "1": "8/19",
+        "2": "8/27",
+        "3": "8/18"
+      }
+    },
+    {
+      "cell": 53,
+      "characters": [
+        {
+          "meta": 39,
+          "subtile": 3,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 2,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 1,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 0,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 7,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 6,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 5,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 4,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 11,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 10,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 9,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 8,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 15,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 14,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 13,
+          "flip": 1
+        },
+        {
+          "meta": 39,
+          "subtile": 12,
+          "flip": 1
+        }
+      ],
+      "source_descriptor": [
+        16,
+        129,
+        17,
+        129,
+        24,
+        129,
+        25,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/10",
+        "1": "8/11",
+        "2": "8/18",
+        "3": "8/19"
+      }
+    },
+    {
+      "cell": 54,
+      "characters": [
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 0,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 42,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        128,
+        0,
+        128,
+        26,
+        129,
+        27,
+        128
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/00",
+        "1": "8/00",
+        "2": "8/1a",
+        "3": "8/1b"
+      }
+    },
+    {
+      "cell": 55,
+      "characters": [
+        {
+          "meta": 59,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        19,
+        208,
+        20,
+        208,
+        59,
+        208,
+        46,
+        192
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/13",
+        "1": "13/14",
+        "2": "13/3b",
+        "3": "12/2e"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 56,
+      "characters": [
+        {
+          "meta": 57,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        36,
+        161,
+        37,
+        161,
+        44,
+        161,
+        45,
+        161
+      ]
+    },
+    {
+      "cell": 57,
+      "characters": [
+        {
+          "meta": 58,
+          "subtile": 12,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 13,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 14,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 15,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 8,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 9,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 10,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 11,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 4,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 5,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 6,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 7,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 0,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 1,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 2,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 3,
+          "flip": 2
+        }
+      ],
+      "source_descriptor": [
+        28,
+        161,
+        29,
+        161,
+        30,
+        161,
+        30,
+        161
+      ]
+    },
+    {
+      "cell": 58,
+      "characters": [
+        {
+          "meta": 58,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 58,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        30,
+        161,
+        30,
+        161,
+        28,
+        161,
+        29,
+        161
+      ]
+    },
+    {
+      "cell": 59,
+      "characters": [
+        {
+          "meta": 60,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 60,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        51,
+        208,
+        38,
+        208,
+        59,
+        208,
+        46,
+        192
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/33",
+        "1": "13/26",
+        "2": "13/3b",
+        "3": "12/2e"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 60,
+      "characters": [
+        {
+          "meta": 61,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        52,
+        177,
+        53,
+        177,
+        60,
+        160,
+        61,
+        160
+      ]
+    },
+    {
+      "cell": 61,
+      "characters": [
+        {
+          "meta": 58,
+          "subtile": 12,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 13,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 14,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 15,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 8,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 9,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 10,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 11,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 7,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        28,
+        161,
+        29,
+        161,
+        21,
+        177,
+        21,
+        177
+      ],
+      "assembly_reason": "Circular fixture above the horizontal rail, rather than the upside-down rail/fixture tile."
+    },
+    {
+      "cell": 62,
+      "characters": [
+        {
+          "meta": 56,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 56,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        21,
+        177,
+        21,
+        177,
+        19,
+        208,
+        20,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "2": "13/13",
+        "3": "13/14"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 63,
+      "characters": [
+        {
+          "meta": 63,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        38,
+        208,
+        51,
+        208,
+        46,
+        192,
+        59,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/26",
+        "1": "13/33",
+        "2": "12/2e",
+        "3": "13/3b"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 64,
+      "characters": [
+        {
+          "meta": 64,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 64,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 64,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 64,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 64,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 64,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 64,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 64,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 12,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 13,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 14,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 15,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 8,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 9,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 10,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 11,
+          "flip": 2
+        }
+      ],
+      "source_descriptor": [
+        0,
+        208,
+        20,
+        208,
+        54,
+        160,
+        55,
+        160
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/00",
+        "1": "13/14"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades.",
+      "assembly_reason": "Lower half is the same upper cap as cell 4d, beneath isolated BC machinery."
+    },
+    {
+      "cell": 65,
+      "characters": [
+        {
+          "meta": 65,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 65,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 65,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 65,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 65,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 65,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 65,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 65,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 12,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 13,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 14,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 15,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 8,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 9,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 10,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 11,
+          "flip": 2
+        }
+      ],
+      "source_descriptor": [
+        19,
+        160,
+        20,
+        208,
+        54,
+        160,
+        55,
+        160
+      ],
+      "bc_cave_quadrants": {
+        "1": "13/14",
+        "0": "10/13"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades.",
+      "assembly_reason": "Lower half is the same upper cap as cell 4d, beneath isolated BC machinery."
+    },
+    {
+      "cell": 66,
+      "characters": [
+        {
+          "meta": 66,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 66,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 66,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 66,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 66,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 66,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 66,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 66,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 12,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 13,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 14,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 15,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 8,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 9,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 10,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 11,
+          "flip": 2
+        }
+      ],
+      "source_descriptor": [
+        19,
+        208,
+        0,
+        208,
+        54,
+        160,
+        55,
+        160
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/13",
+        "1": "13/00"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades.",
+      "assembly_reason": "Lower half is the same upper cap as cell 4d, beneath isolated BC machinery."
+    },
+    {
+      "cell": 67,
+      "characters": [
+        {
+          "meta": 67,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        208,
+        19,
+        208,
+        0,
+        208,
+        0,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/00",
+        "1": "13/13",
+        "2": "13/00",
+        "3": "13/00"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 68,
+      "characters": [
+        {
+          "meta": 61,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 7,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        62,
+        177,
+        63,
+        177,
+        36,
+        161,
+        37,
+        161
+      ],
+      "assembly_reason": "Upper blue housing joined to the horizontal lamp, using the corresponding Normal upper halves."
+    },
+    {
+      "cell": 69,
+      "characters": [
+        {
+          "meta": 58,
+          "subtile": 12,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 13,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 14,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 15,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 8,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 9,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 10,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 11,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 4,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 5,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 6,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 7,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 0,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 1,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 2,
+          "flip": 2
+        },
+        {
+          "meta": 58,
+          "subtile": 3,
+          "flip": 2
+        }
+      ],
+      "source_descriptor": [
+        22,
+        177,
+        22,
+        177,
+        28,
+        161,
+        29,
+        161
+      ]
+    },
+    {
+      "cell": 70,
+      "characters": [
+        {
+          "meta": 68,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 68,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        19,
+        208,
+        0,
+        208,
+        0,
+        208,
+        0,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/13",
+        "1": "13/00",
+        "2": "13/00",
+        "3": "13/00"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 71,
+      "characters": [
+        {
+          "meta": 69,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 69,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        208,
+        20,
+        208,
+        0,
+        208,
+        19,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/00",
+        "1": "13/14",
+        "2": "13/00",
+        "3": "13/13"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 72,
+      "characters": [
+        {
+          "meta": 70,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 70,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        208,
+        0,
+        208,
+        20,
+        208,
+        19,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/00",
+        "1": "13/00",
+        "2": "13/14",
+        "3": "13/13"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 73,
+      "characters": [
+        {
+          "meta": 71,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 71,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        20,
+        208,
+        0,
+        208,
+        0,
+        208,
+        0,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/14",
+        "1": "13/00",
+        "2": "13/00",
+        "3": "13/00"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 74,
+      "characters": [
+        {
+          "meta": 67,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 67,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        208,
+        0,
+        208,
+        20,
+        208,
+        0,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/00",
+        "1": "13/00",
+        "2": "13/14",
+        "3": "13/00"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 75,
+      "characters": [
+        {
+          "meta": 59,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        51,
+        208,
+        38,
+        208,
+        20,
+        208,
+        19,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/33",
+        "1": "13/26",
+        "2": "13/14",
+        "3": "13/13"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 76,
+      "characters": [
+        {
+          "meta": 57,
+          "subtile": 12,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 13,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 14,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 15,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 8,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 9,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 10,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 11,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 4,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 5,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 6,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 7,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 0,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 1,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 2,
+          "flip": 2
+        },
+        {
+          "meta": 57,
+          "subtile": 3,
+          "flip": 2
+        }
+      ],
+      "source_descriptor": [
+        44,
+        161,
+        45,
+        161,
+        36,
+        161,
+        37,
+        161
+      ],
+      "assembly_reason": "Inverted lamp-and-rod housing: use the complete vertically flipped Normal housing."
+    },
+    {
+      "cell": 77,
+      "characters": [
+        {
+          "meta": 61,
+          "subtile": 12,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 13,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 14,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 15,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 8,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 9,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 10,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 11,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 4,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 5,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 6,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 7,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 0,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 1,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 2,
+          "flip": 2
+        },
+        {
+          "meta": 61,
+          "subtile": 3,
+          "flip": 2
+        }
+      ],
+      "source_descriptor": [
+        54,
+        160,
+        55,
+        160,
+        62,
+        177,
+        63,
+        177
+      ]
+    },
+    {
+      "cell": 78,
+      "characters": [
+        {
+          "meta": 63,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 63,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        0,
+        208,
+        0,
+        208,
+        0,
+        208,
+        19,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/00",
+        "1": "13/00",
+        "2": "13/00",
+        "3": "13/13"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 79,
+      "characters": [
+        {
+          "meta": 57,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 57,
+          "subtile": 15,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        44,
+        161,
+        45,
+        161,
+        52,
+        177,
+        53,
+        177
+      ],
+      "assembly_reason": "Lower blue housing joined to the vertical rods, using the corresponding Normal lower halves."
+    },
+    {
+      "cell": 80,
+      "characters": [
+        {
+          "meta": 61,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 15,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        60,
+        160,
+        61,
+        160,
+        0,
+        208,
+        20,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "2": "13/00",
+        "3": "13/14"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades.",
+      "assembly_reason": "Upper half is the same lower cap as cell 3c, above isolated BC machinery."
+    },
+    {
+      "cell": 81,
+      "characters": [
+        {
+          "meta": 61,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 15,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 61,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        60,
+        160,
+        61,
+        160,
+        19,
+        208,
+        0,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "2": "13/13",
+        "3": "13/00"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades.",
+      "assembly_reason": "Upper half is the same lower cap as cell 3c, above isolated BC machinery."
+    },
+    {
+      "cell": 82,
+      "characters": [
+        {
+          "meta": 59,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 59,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        19,
+        208,
+        20,
+        208,
+        20,
+        208,
+        0,
+        208
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/13",
+        "1": "13/14",
+        "2": "13/14",
+        "3": "13/00"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    },
+    {
+      "cell": 83,
+      "characters": [
+        {
+          "meta": 43,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        43,
+        129,
+        35,
+        129,
+        39,
+        129,
+        43,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/2b",
+        "1": "8/23",
+        "2": "8/27",
+        "3": "8/2b"
+      }
+    },
+    {
+      "cell": 84,
+      "characters": [
+        {
+          "meta": 42,
+          "subtile": 3,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 2,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 1,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 0,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 7,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 6,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 5,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 4,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 11,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 10,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 9,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 8,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 15,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 14,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 13,
+          "flip": 1
+        },
+        {
+          "meta": 42,
+          "subtile": 12,
+          "flip": 1
+        }
+      ],
+      "source_descriptor": [
+        27,
+        128,
+        0,
+        0,
+        35,
+        129,
+        26,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/1b",
+        "2": "8/23",
+        "3": "8/1a",
+        "1": "0/00"
+      }
+    },
+    {
+      "cell": 85,
+      "characters": [
+        {
+          "meta": 38,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 38,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        34,
+        129,
+        34,
+        129,
+        42,
+        129,
+        42,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/22",
+        "1": "8/22",
+        "2": "8/2a",
+        "3": "8/2a"
+      }
+    },
+    {
+      "cell": 86,
+      "characters": [
+        {
+          "meta": 43,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 43,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        34,
+        129,
+        35,
+        129,
+        42,
+        129,
+        43,
+        129
+      ],
+      "bc_cave_quadrants": {
+        "0": "8/22",
+        "1": "8/23",
+        "2": "8/2a",
+        "3": "8/2b"
+      }
+    },
+    {
+      "cell": 87,
+      "characters": [
+        {
+          "meta": 54,
+          "subtile": 0,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 1,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 2,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 3,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 4,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 5,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 6,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 7,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 8,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 9,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 10,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 11,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 12,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 13,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 14,
+          "flip": 0
+        },
+        {
+          "meta": 54,
+          "subtile": 15,
+          "flip": 0
+        }
+      ],
+      "source_descriptor": [
+        41,
+        144,
+        0,
+        0,
+        49,
+        144,
+        0,
+        0
+      ],
+      "bc_cave_quadrants": {
+        "0": "9/29",
+        "2": "9/31",
+        "1": "0/00",
+        "3": "0/00"
+      }
+    },
+    {
+      "cell": 88,
+      "characters": [
+        {
+          "meta": 56,
+          "subtile": 12,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 13,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 14,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 15,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 8,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 9,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 10,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 11,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 4,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 5,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 6,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 7,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 0,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 1,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 2,
+          "flip": 2
+        },
+        {
+          "meta": 56,
+          "subtile": 3,
+          "flip": 2
+        }
+      ],
+      "source_descriptor": [
+        19,
+        208,
+        20,
+        208,
+        22,
+        177,
+        22,
+        177
+      ],
+      "bc_cave_quadrants": {
+        "0": "13/13",
+        "1": "13/14"
+      },
+      "background_machine_reason": "BC small machinery and its empty spacing have no matching complete Normal assembly; preserve their geometry with Normal machinery blue, olive and red shades."
+    }
+  ],
+  "notes": [
+    "BC cave contours and background formations use distinct Normal brown/cyan ramps; empty source quadrants remain empty.",
+    "Eight small-machine BC patterns replace unrelated fragments across 62 quadrant placements, preserving empty spacing and distinct Normal blue/olive/red material shades.",
+    "Compound lamp housings and cap/rail combinations use corresponding Normal halves. Geometry, joins and shade ramps are checked by qa_bc_r2_materials.py; material correspondence is inferred from the references."
+  ],
+  "source_code_sha256": "e92440b9147076912453e77942ca48f6e150cb7512974037196df6dce10eabbe",
+  "bc_cave_art": {
+    "classification": "bc-specific-cave-and-small-machinery-contours",
+    "source_rgb3_banks": {
+      "8": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0
+        ],
+        [
+          4,
+          1,
+          0
+        ],
+        [
+          5,
+          2,
+          0
+        ],
+        [
+          6,
+          3,
+          0
+        ],
+        [
+          7,
+          4,
+          1
+        ],
+        [
+          7,
+          5,
+          2
+        ],
+        [
+          7,
+          6,
+          3
+        ]
+      ],
+      "9": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          1,
+          5
+        ],
+        [
+          0,
+          0,
+          6
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "0": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          7,
+          7,
+          7
+        ],
+        [
+          1,
+          2,
+          2
+        ],
+        [
+          2,
+          3,
+          3
+        ],
+        [
+          6,
+          5,
+          6
+        ],
+        [
+          5,
+          0,
+          0
+        ],
+        [
+          7,
+          5,
+          0
+        ],
+        [
+          3,
+          4,
+          3
+        ]
+      ],
+      "12": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          3,
+          1
+        ],
+        [
+          2,
+          3,
+          2
+        ],
+        [
+          5,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          3
+        ],
+        [
+          0,
+          2,
+          4
+        ]
+      ],
+      "13": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          1,
+          3
+        ],
+        [
+          0,
+          1,
+          4
+        ],
+        [
+          5,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          1,
+          3,
+          1
+        ]
+      ],
+      "10": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          4,
+          3
+        ],
+        [
+          3,
+          5,
+          2
+        ],
+        [
+          4,
+          6,
+          3
+        ],
+        [
+          5,
+          7,
+          4
+        ],
+        [
+          7,
+          7,
+          6
+        ],
+        [
+          0,
+          3,
+          5
+        ],
+        [
+          3,
+          6,
+          7
+        ]
+      ]
+    },
+    "source_pen_to_normal_pen": {
+      "8": [
+        15,
+        6,
+        7,
+        8,
+        9,
+        5,
+        10,
+        11
+      ],
+      "9": [
+        15,
+        13,
+        1,
+        2,
+        3,
+        12,
+        4,
+        15
+      ],
+      "0": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15
+      ],
+      "12": [
+        15,
+        1,
+        2,
+        3,
+        4,
+        12,
+        7,
+        8
+      ],
+      "13": [
+        15,
+        7,
+        8,
+        9,
+        10,
+        12,
+        2,
+        3
+      ],
+      "10": [
+        15,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        11
+      ]
+    },
+    "normal_palette": 2,
+    "normal_pen_color_overrides": {
+      "13": [
+        0,
+        0,
+        1
+      ]
+    },
+    "patterns": {
+      "8/00": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "8/10": "5676554333344432657655443345433366765544334643336676554432454343677554433246434376555442345533437665444336543434766544333545443476554433455443447665443334554344776554423455434577655433334543547776553423444343777654433354324467655544334233435665544333432343",
+      "8/01": "3333443244432122333443324432223343534323443233343344233444223324333433345421234234433344542233423434334543213444234434544442143123433354444323212255334334343213424443233444212142354333434323223235434343433212423543244313321123343344332231112134332321332110",
+      "8/27": "4553544434344544445444334323344444443344444432333443344555554443434345566665544533455666666655454455677777665444445677776665543345577766666554334466776666554433555676666543443544555666553443343445555544444344334455544342434443344444444334444433233434434554",
+      "8/08": "3433334232223101444344332121221143444333222110114444332221212100443333222021100044323320121100003322221211100000333221211000000023222110000000002211111000000000222101000000000002111000000000002111000000000000010000000000000010000000000000000000000000000000",
+      "8/09": "3432345544334444233234544344455412332344344555441123334445556542011233445656542200112334556554220001123455554223000011244554322300000122344322330000001223332233000000112332222300000001122212230000000011221122000000000111011200000000000000110000000000000001",
+      "8/2f": "4454244455534453333445556554344424455677655443344456677665544323455677765544433255667766545343334566776544333454445666654445454444456554435454543444554334456655433444442456776544333333456766554443333244576654444333234445554443333433344454454334444443444455",
+      "8/0b": "5433245443457454333245543456554422244543456765433334554356765432333454556665532123344455676543211233455675543211112345655533321111123455444322112111234345432111321123346543211233211245654311123221023455331123221101234432011221100022332100121100000122100001",
+      "8/18": "7766555332322434766655333232444476565334234334437765433234334453676544423454345465655432344543456665543323444334666455433245543376566554334465447766565545344654677665665445345566776666555555566576564565565566677766665665646666577766666665665677667777676667",
+      "8/19": "3243433443122100232434334432311133232424334323113333334234343222543323211134123145533233221333224445443123223223344445431232234434343354312234335434443544243224655454443442233355455454553344446655554444554344664656555544554576666666655544456676677667667644",
+      "8/22": "6666565666656666557667665676676654656667656566555565556556666545455566566655555534455554555554542334444444454442223333333333321333212334454343334433334554444444554443445555544565553234456756665765432344456766655654323444655556444333234444633333322222223333",
+      "8/1a": "1110011111110001222112122122111122222234232212223432332332222222112322222213233222333332333443333334443334465644444565444655555355565565553234553324545442333222333324233332443344433233444545445544434445545455556555454656456555766556566666566666766676766676",
+      "8/1b": "0000000000000000110000000000000001100000000000002111100000000000221111000000000011221110000000003212221100000000433211211000000042332211100000003324332111000000223543322110000032234431212100002332323322101000544345342121100035443443321111004354334321210100",
+      "8/23": "6544434423442111665444323433232155545443244423325555355433143123454455554432312255554445542323124555554354433331343455435444233233434455354442333334444553244323433343455432433254234425543313225543343141333123555434341123341245544333331341433444443333123344",
+      "8/11": "3242332221101010345443223210110032443323220101002444323221101010244432232211110022454333221010102345433332210100334454332201110043245433322011105334543321010110434443223220110033244332212101103243432322101010324434322101111033433322201101103232332221011110",
+      "8/2a": "3322122222122333222223333322122222233455433332212335556655434343345366776755554454565555566675555543344345566667433345555544555444566555665554545556566665666555664667666766575666676666766666666666665556766556655555566655466565455555455555544555444444454554",
+      "8/2b": "3222443332233333323344444222233332232244444222234343332244433333444443433324433254444444433344335555454554433442665555555544334355666555555443445454566655554334555544656555543466665555665544356667676655544455555666655544335554555555444346665454444334456665",
+      "8/0a": "5442335533334434332345565333345622345565542334561345556654323445134556665432334523456665544323452345666554432344123556654443233422245655443323343223555443322233333445444323322333444443223443222334444324455432123344344455534411233444555443540112334545344554",
+      "8/02": "6444444322344443545465422354645445676533345665445666543445576543667653445676554357654345566654325565444567654432556544557654432255654556655433234554456765433224344455765543324333435655443323422334554443323432323334433323332244333323323332214444333343322210",
+      "9/32": "0000000011223100000000000111233300000000001111230000000000122112000000000002321000000000000023320000000000000234000000000000210000000000000021100000000000000232000000000000002300000000000002100000000000000211000000000000002200000000000000020000000000000002",
+      "9/20": "0010000000000000000100000000000030012100000000013320121110011112223343322233443321113333436432114321100011111100344444321100023302223444432334441111111224444322332111102333220000344444332200001002234333322223321133344664433223333223222223241222334444443333",
+      "9/21": "0000000221100000020023321100000023333211000000003322110000000000212122000000000012311220000000002322322000000000322322000000000033322000000000002211100000000000001121000000000011122100000000002121100000000000231000000000000041000000000000002000000000000000",
+      "9/30": "0111233334220232001222222000232101112000022332100122322222332100001233444331110001012222221012100221011110002310023332111122310000234333333310000002346644321100000113333113210000021011023321000002220033321000000023333431000000000234631000000000002221000000",
+      "8/06": "0112345444445544001233445444554400112334444556540001123456445565000123335543456500112344555445560012233345543456001123233345435500112233443443450011233445433445000123445554344600122345576443560012344556654556001234455676546600123444566765660011234445566767",
+      "8/07": "2233445432323210322334442232321043233332332421104422232343432110544322345443210055434344543221006554324454322100665422334532210066554323444321007665543234432100766654422344311076657443233432107655442222333210766355322233221076543543212321107654355432322100",
+      "8/0e": "0002233334444567000122233344556600001222333455560000111233454333000001233443345600000112333444440000001112343333000000112343222300000001132123450000000012123444000000001112333400000000001233330000000000122233000000000001222200000000000001110000000000000000",
+      "8/0f": "7654444321222100655545544221210054445445432110003333444443211000544333334211000056554332211000003444543311100000333344321100000054433321100000005443222100000000443322100000000033332100000000003322100000000000222100000000000011000000000000000000000000000000",
+      "9/28": "1110012221001111123211000112331201233444633321211001123333321120130000111111122012421000122232100224443223332120120134444321123213100022221123320233221122233321112344433344322112102234643211221311022222201322022210000011232102333222223432100123346334433100",
+      "9/00": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "9/29": "0000011222000000000002364320000000001343333200000001233300222000001233222101200000123223333110000011234466432000000133333334320000132211112333200132000122100330012101222222002000111334443321200012332222233200012333321110020012320024664321002320224333333320",
+      "9/38": "0000000000000002000000000000002300000000000000230000000000000012000000000000110000000000000121000000000000013121000000000001133300000000000011130000000000000100000000000000111100000000001123330000000001233332000000001233211300000001232122330000001232111332",
+      "9/39": "1123454443321022100222222220012121200000020113323322222222224320123345454234323200122332234322231100011344322011322223454323322033344543212233311123331211001223001122333311101221344444433321002433333323333442332110000001233322100122221001221001233333321001",
+      "9/3a": "0000000000000000210000000000000032100000000000003221000000000000133110000000000021321000000000003211100000000000122000000000000000110000000000003110100000000000233101100000000011122110000000001001121000000000311001110000000033211000000000002332211100000000",
+      "9/31": "0223321111223100133201221000231012202222221012100212334443311100002332222233210000200111233332100012346642002321023333333422022102322211112231101321012210002310121022222210121002023344433111000023322222332100012001112333321001023466420023210233333334220222",
+      "8/17": "2333325554445555522325565545565554345566655567655434566766566755433455677666765443344556776776543323455667776654342344556677654432333455566665432342344556665433344333445555433245542334455433245654333344433234566542333333213445554322333244233454334322244442",
+      "8/0c": "3213332334444443322343323344453221224432332345542122344223334455211223432242344412112234223322331221122332243323223211223223443222332111232234432233220122322344233221101122223433221100011122233221100000111222222100000000111222100000000000111100000000000001",
+      "8/04": "1112234332213433012122343332134301121223443322340011212334443333000111223333433200011212233224430000112122333233000001111222322200000011211223330000000112212223000000001112212200000000011112210000000000011122000000000000011200000000000000110000000000000001",
+      "8/05": "3434566554345566334567665544456643445575543345664334455544334555443444444333445554334444344334443443333334553344334432234565433333443333456654333324432345676544433244324556765434323433445566653343223334455555234433232344444422344331222333431123443331223333",
+      "8/12": "1122333233221123111223322333221101112233322332210011223333222210001112233332210000011132332221000000112222221000000001112211100000000011111100000000000111100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "0/00": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "13/13": "0000000000000000000012344321000000050000000000000000123443210000000000000000000003030123444443210131012667776620102011026777621012330100266622001244305022221200123432012677620001222010267762000011110326666200002333332666620000022222006260000000000000000000",
+      "13/14": "0000010101000000000002020200000000000303030000000066030303066000067762020267760006776101016776002343250000234432234321232123443223432123212344322343200000234432067760010567760006776202026776000066030303066000000003030300000000000202020000000000010101000000",
+      "13/3b": "0000000000000000000077777023320000007666602332000222767760233200020076776023320002027666602332000202000000233200022333300523320000322223002332000321111230233200032100123023320003211112302332000032222300233200000333305023320000000000002332000000000000000000",
+      "12/2e": "0000606060600000000601060606005000060106060600000006010606060000001010101010100010202020202020112030303030303022303030303030303330303030303030332030303030303022102020202020201100101010101010000006010606060050000605060606000000060106060600000000606060600000",
+      "13/33": "0000000000000000012334443321000000000000000000000012344432100000000000000004400000011232110220000000000000044000000012321002200000000000050440000050023200022000000000000123321000000232012332100000000001233260000000400123321000000000012332100123321001233210",
+      "13/26": "0000000000000000006060600000002000606067777000300767676754722240076767674571114000606067777066300060606000007720000000000000770001234432100066000000000002223224012344321011111201234432100000120123443210111112000050000222222401234432100000000000000000000000",
+      "13/00": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "10/13": "0000000000000000000012344321000000050000000000000000123443210000000000000000000003030123444443210131012667776620102011026777621012330100266622001244305022221200123432012677620001222010267762000011110326666200002333332666620000022222006260000000000000000000"
+    },
+    "source_vram_sha256": "5917b59e74f9aaa3dbea0c76c629995bf7600b84f91580289936bce431fbbae9",
+    "source_palette_sha256": "0b2ab75f7590a9f97057b5d356aadcd559fe1234538bcf0749683383bdd4e86c",
+    "reason": "Narrow columns, continuous slopes and thin background formations differ from the Normal blocks. Use BC geometry with distinct Normal brown/cyan shade ramps; add one dark-blue step in an unused slot.",
+    "source_normal_palettes": {
+      "0": 2,
+      "8": 2,
+      "9": 2,
+      "12": 3,
+      "13": 3,
+      "10": 3
+    }
+  }
+}

@@ -3,7 +3,7 @@
 /* SGDK header template: the fixed-size text fields are deliberately not NUL-terminated */
 #pragma GCC diagnostic ignored "-Wunterminated-string-initialization"
 
-/* Plain cartridge: no bank mapper, odd-byte SRAM at $200001-$20FFFF switched by $A130F1.
+/* Plain cartridge: no bank mapper, odd-byte SRAM at $200001-$2007FF switched by $A130F1.
  *
  * The console name is fixed to "SEGA MEGA DRIVE" on purpose. SGDK's template writes "SEGA SSF"
  * whenever the (shared) SGDK install is built with ENABLE_BANK_SWITCH=1, and Genesis Plus GX,
@@ -23,12 +23,12 @@ const ROMHeader rom_header = {
     "JD              ",
     0x00000000,
     0x000FFFFF,                     /* ROM end: set to the real size by tools/finalize_rom.py */
-    0xE0FF0000,
-    0xE0FFFFFF,
+    0x00FF0000,
+    0x00FFFFFF,
     "RA",
     0xF820,
     0x00200001,                     /* odd-byte SRAM, matching SGDK's SRAM byte accessors */
-    0x0020FFFF,
+    0x002007FF,                     /* 1 KiB (saves use < 100 bytes); aligned like Black Tiger v1.7 for flash carts */
     "            ",
     "SAVE: HIGH SCORES AND SETTINGS          ",
     "JUE             "

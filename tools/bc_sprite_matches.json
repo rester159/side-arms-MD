@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "family": "BC launcher / water-surfacing robot",
+  "source_base_ref": "0x3688",
+  "source_pattern_base": "0x0308",
+  "source_palette": 5,
+  "identity_scope": "Visually verified family and corresponding static poses; PCE and Normal pixels are not identical. Decoded-bank-only entries do not establish live timing or sequencing.",
+  "source_bank_evidence": {
+    "capture": ".local/pce-reference/play-task-round1",
+    "frame": 3720,
+    "files": {
+      "f003720-vram.bin": "d94d4b5e4cfbc772c4818e337392f01e9e9a606f43329b73b034d31c40f250ef",
+      "f003720-palette.bin": "d1823463a76bdcf4b91a898cad6c98265bbbe565496df21bb733b3904ca2fb19"
+    },
+    "review": ".local/bc-asset-matching-review/trooper-identity/independent-review.md"
+  },
+  "poses": [
+    {
+      "id": "bc_launcher_airborne_curl",
+      "source_offset": 0,
+      "source_offset_hex": "0x00",
+      "normal_code": 592,
+      "normal_code_hex": "0x250",
+      "normal_colour": 0,
+      "size": 32,
+      "source_flips_xor": 1,
+      "preserve_source_vertical_flip": true,
+      "classification": "same_family_same_pose_redrawn",
+      "pose_semantics": "Curled airborne body",
+      "evidence": {
+        "kind": "decoded_resident_bank_only",
+        "pattern_sha256": "88d0e1edf658547d2e075d9f6acfa73187590d6ed2ccd43c4de5bbdbee08e05c"
+      }
+    },
+    {
+      "id": "bc_launcher_airborne_descent",
+      "source_offset": 8,
+      "source_offset_hex": "0x08",
+      "normal_code": 594,
+      "normal_code_hex": "0x252",
+      "normal_colour": 0,
+      "size": 32,
+      "source_flips_xor": 1,
+      "preserve_source_vertical_flip": true,
+      "classification": "same_family_same_pose_redrawn",
+      "pose_semantics": "Tucked descending body",
+      "evidence": {
+        "kind": "decoded_resident_bank_only",
+        "pattern_sha256": "a156e078814ea2453e841efe7388afbf3712cbf872d06b0130aa2d9400db45f6"
+      }
+    },
+    {
+      "id": "bc_launcher_standing",
+      "source_offset": 16,
+      "source_offset_hex": "0x10",
+      "normal_code": 576,
+      "normal_code_hex": "0x240",
+      "normal_colour": 0,
+      "size": 32,
+      "source_flips_xor": 1,
+      "preserve_source_vertical_flip": true,
+      "classification": "same_family_same_pose_redrawn",
+      "pose_semantics": "Standing, gun extended",
+      "evidence": {
+        "kind": "decoded_resident_bank_only",
+        "pattern_sha256": "7c8267f902e7d7b1934cae77a71199629afb483000120cfad5f29e94844cdc9b"
+      }
+    },
+    {
+      "id": "bc_launcher_standing_fire",
+      "source_offset": 24,
+      "source_offset_hex": "0x18",
+      "normal_code": 578,
+      "normal_code_hex": "0x242",
+      "normal_colour": 0,
+      "size": 32,
+      "source_flips_xor": 1,
+      "preserve_source_vertical_flip": true,
+      "classification": "same_family_same_pose_redrawn",
+      "pose_semantics": "Standing with muzzle flash",
+      "evidence": {
+        "kind": "decoded_resident_bank_only",
+        "pattern_sha256": "af609485819a4de8c16f9911b6287a2bbbd2d06526e6dac3501b039b9907caa3"
+      }
+    },
+    {
+      "id": "bc_launcher_water_ring",
+      "source_offset": 32,
+      "source_offset_hex": "0x20",
+      "normal_code": 598,
+      "normal_code_hex": "0x256",
+      "normal_colour": 0,
+      "size": 32,
+      "source_flips_xor": 0,
+      "preserve_source_vertical_flip": true,
+      "classification": "same_family_same_pose_redrawn",
+      "pose_semantics": "Wide water surface ring",
+      "evidence": {
+        "kind": "live_actor_sat_and_decoded_bank",
+        "pattern_sha256": "690255532bff61e981161996b71472be0edcc86ed36d9a8e639874b477f3fe1e",
+        "live_sample": {
+          "frame": 3000,
+          "actor_slot": 4,
+          "attributes": "0x1185",
+          "sprite": "0x328",
+          "sprite_base": "0x308",
+          "x": 225,
+          "y": 184,
+          "sat_slots": [
+            5
+          ],
+          "sat_words": [
+            232,
+            241,
+            808,
+            4485
+          ],
+          "code_sha256": "c5623ff8faab5175a48afeda4c7ab032d018295107fe74c71d30c7c8e2fe0c0a",
+          "ram_sha256": "1e0ba1bdc64c678810ec54e3824244524c05a4a2f5ce479a0bc4c6837ba7303e",
+          "sat_sha256": "46066970f5f70d10746914478fa3a048e9eab6c70bab75965dce8495ba126e14"
+        }
+      }
+    },
+    {
+      "id": "bc_launcher_water_emerge",
+      "source_offset": 40,
+      "source_offset_hex": "0x28",
+      "normal_code": 612,
+      "normal_code_hex": "0x264",
+      "normal_colour": 0,
+      "size": 32,
+      "source_flips_xor": 0,
+      "preserve_source_vertical_flip": true,
+      "classification": "same_family_same_pose_redrawn",
+      "pose_semantics": "Raised torso and gun over splash",
+      "evidence": {
+        "kind": "live_actor_sat_and_decoded_bank",
+        "pattern_sha256": "cd57589ce408c70a1cdfb0df0a813c404d2e151ec29fcb77370cafbb36995cb3",
+        "live_sample": {
+          "frame": 3720,
+          "actor_slot": 0,
+          "attributes": "0x1985",
+          "sprite": "0x330",
+          "sprite_base": "0x308",
+          "x": 19,
+          "y": 184,
+          "sat_slots": [
+            1
+          ],
+          "sat_words": [
+            232,
+            35,
+            816,
+            6533
+          ],
+          "code_sha256": "c5623ff8faab5175a48afeda4c7ab032d018295107fe74c71d30c7c8e2fe0c0a",
+          "ram_sha256": "04b06fe137b2cf59c9efc7532acc1fc44e9a25891fa1a933094e705bfdd59d04",
+          "sat_sha256": "04ca4491f53de0475e6ed29a866c1ed7b297b246877e71e07bf22b2c359f75d9"
+        }
+      }
+    },
+    {
+      "id": "bc_launcher_water_fire",
+      "source_offset": 48,
+      "source_offset_hex": "0x30",
+      "normal_code": 614,
+      "normal_code_hex": "0x266",
+      "normal_colour": 0,
+      "size": 32,
+      "source_flips_xor": 0,
+      "preserve_source_vertical_flip": true,
+      "classification": "same_family_same_pose_redrawn",
+      "pose_semantics": "Water surface firing with muzzle flash",
+      "evidence": {
+        "kind": "decoded_resident_bank_only",
+        "pattern_sha256": "c8f8468d9b6e4361493d2451556701a7c4db53a4132f9fd603083bfd5398c3da"
+      }
+    }
+  ],
+  "extra_pair_matches": [
+    "bc_launcher_standing",
+    "bc_launcher_standing_fire"
+  ],
+  "palette_policy": "Fit only existing Normal keys first; convert named extra pairs into those established palettes without changing existing assignments or patterns."
+}
