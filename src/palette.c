@@ -1,18 +1,21 @@
 #include "palette.h"
 #include "gen/assets.h"
 #include "bg.h"
+#include "bc_background.h"
 #include "cave_palette.h"
 
 /* COLOR option. ARCADE = colours as converted from the arcade palette.
  * VIVID = each colour mapped through vivid_lut (build time: saturation x1.4,
  * brightness x1.15, greys kept neutral). Build-time shade guards keep Standard
- * colors where boosting would merge/reverse an ordered material ramp. This
- * remains an optional deviation from the arcade colors, with no extra runtime
+ * colors where boosting would merge/reverse an ordered material ramp.
+ * Normal stage 1 retains the original Vivid boost for background and sprites.
+ * Vivid remains an optional deviation from the arcade colors, with no extra runtime
  * work; it cannot restore shades lost in the earlier asset conversion. */
 
 u8 color_mode = COLOR_VIVID;
 static u16 source[64];              /* palettes as loaded (before the mode mapping) */
 static u16 shown[64];
+static const u16 *classic_background;
 static u8 current_fade = 7;
 static u32 background_revision = 1;
 
@@ -23,13 +26,22 @@ static void push(u16 index, u16 count)
 {
     if (index < 32 && count) ++background_revision;
     for (u16 i = index; i < index + count; i++)
-        shown[i] = color_mode == COLOR_VIVID ? vivid_lut[lut_index(source[i])] : source[i];
+        shown[i] = color_mode != COLOR_VIVID ? source[i] :
+            classic_background && i < 32 ? classic_background[i] :
+            classic_background == zone0_vivid_pal && i >= 32 ? sprite0_vivid_pal[i - 32] :
+            vivid_lut[lut_index(source[i])];
     PAL_setColors(index, shown + index, count, DMA_QUEUE);
 }
 
 void pal_load(u16 index, const u16 *cols, u16 count)
 {
     current_fade = 7;
+    if (index == 0 && count >= 32) {
+        bool was_classic = classic_background == zone0_vivid_pal;
+        classic_background = cols == zone0_pal ? zone0_vivid_pal :
+                             cols == bc_bg_palette ? bc_bg_vivid_palette : NULL;
+        if (was_classic != (classic_background == zone0_vivid_pal)) push(32, 32);
+    }
     memcpy(source + index, cols, count * 2);
     push(index, count);
 }

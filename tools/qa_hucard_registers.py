@@ -17,17 +17,19 @@ def expected_writes(packet, previous):
         voice = packet[channel*12:channel*12+12]
         part, offset = 1+channel//3, channel%3
         key = offset + (4 if part == 2 else 0)
-        if voice[0] != previous[channel]:
+        changed = voice[0] != previous[channel]
+        if changed:
             writes.append((1, 0x28, key))
             for slot in range(4):
                 writes.append((part, 0x30+offset+4*slot, voice[4+slot]))
             for base, value in [(0x50,31),(0x60,0),(0x70,0),(0x80,15),(0x90,0)]:
                 writes.extend((part,base+offset+4*slot,value) for slot in range(4))
-            writes.extend([(part,0xb0+offset,voice[3]&0x3f),(1,0x28,0xf0|key)])
+            writes.append((part,0xb0+offset,voice[3]&0x3f))
             previous[channel] = voice[0]
         writes.extend([(part,0xa4+offset,voice[1]),(part,0xa0+offset,voice[2]),
                        (part,0xb4+offset,voice[3]&0xc0)])
         writes.extend((part,0x40+offset+4*slot,voice[8+slot]) for slot in range(4))
+        if changed: writes.append((1,0x28,0xf0|key))
     return writes
 
 

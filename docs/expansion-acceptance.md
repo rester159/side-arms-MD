@@ -5372,3 +5372,223 @@ installed core headlessly, without the RetroArch frontend settings/save states.
 
 Local evidence: `.local/bc-developer-final/report.json`, `bosses.png`, and the
 per-round menu screenshots, boss observations, results and entry audio.
+
+
+## v2.1: first-stage Vivid and PC Engine audio (October 12)
+
+Normal stage 1 uses the v1.2 background conversion again. Its linked tiles,
+attributes, map and base palette match byte ranges in the saved v1.2 cartridge;
+its dedicated 32-word Vivid palette uses the original v1.2 transform. Standard
+mode also uses that restored first-stage base conversion. All other consumers
+retain the prior shared Vivid LUT byte-for-byte. BC's ten rendered background
+banks, palettes and collision data compare equal to v2.0.
+
+HuCard carrier levels are raised by eight YM total-level steps (6 dB); modulator
+depth, score timing and PSG effects are unchanged. Matched 180-frame Sound Test
+recordings show roughly 4–5.5 dB more measured RMS through Genesis Plus GX,
+depending on the track and the chip's nonlinear output. On instrument changes,
+the Z80 now loads pitch, stereo and total levels before key-on. Previously it
+keyed on using the previous pitch/levels. This removes a transition hazard;
+it is not proof that the user's particular reported end-of-boss glitch was
+reproduced or that all audible artifacts are resolved.
+
+Validation:
+- `tools/qa_v21_first_stage.py` compares against the user-supplied v1.2 ROM,
+  checks the unchanged shared LUT and all ten BC background banks.
+- 524,288 FM packet renders cover all 16-bit period values, both regions and
+  repeated/changed cache keys. MAME verifies actual chip writes for stage,
+  boss and clear tracks, including the corrected key-on ordering.
+- All 21 tracks pass 600-frame audio checks in NTSC and PAL: clock, queue,
+  audible output, no clipping, stop, return to Arcade and exit to Options.
+- Final-ROM Developer Normal stage 1 reaches and defeats the boss with assisted
+  hit tests, plays the clear jingle and reaches stage 2. No queue underruns or
+  clipped samples; peak 13,652. Four live CRAM checks verify the restored first
+  stage and the normal palette policy in stage 2.
+- Final-ROM Developer BC stage 1 clears with controller-driven shooting and no
+  injected defeat. All ten BC palettes also pass native Standard/Vivid checks.
+
+Local evidence: `.local/v21/first-stage.json`, `final-normal/`, `final-bc1/`,
+`final-music/`, `final-music-pal/`, `final-bc-palettes/`, `fm-frames.log`,
+and `registers.log`. Cartridge: `dist/Side Arms MD v2.1.bin`, 4 MiB, SHA-256
+`d7d1f2ebcc50a81a026608eb8e3b3e3336cb4d5dfa09c6a961b7c903f5a96ac4`.
+
+
+## v2.1 follow-up: BC first-stage visual remaster (October 12; superseded)
+
+Kept BC's stage rather than substituting Normal's map or encounters. BC R1 now
+uses the same original Vivid transform as the restored Normal first stage,
+through a dedicated 32-word palette. Its base palette and the shared LUT remain
+unchanged. The coastal rocks retain their masks and water phase, with Normal
+stone grain, lit upper edges and darker undersides. The cave uses Normal's
+32px central rock texture within the existing BC silhouettes, shaded with the
+existing charcoal/slate/highlight colors. Metal supports use the complete Normal
+arch material so the cross-bracing is visible. Shared BC shape envelopes remain
+identical; larger texture phases intentionally need not repeat at every 16px
+source quadrant.
+
+`tools/qa_bc_r1_remaster.py` verifies 64,512 silhouette pixels, 92 shared cave
+shape quadrants, and 1,947 unchanged water pixels. BC R1 source/collision/event
+bytes and palette are unchanged; all nine other BC backgrounds and 103 linked
+Normal artwork blobs compare equal. The change affects 21 BC R1 cells plus its
+Vivid presentation. The final cartridge passes all 640 native Standard/Vivid
+background palette checks across the ten BC rounds.
+
+A real Developer-menu BC R1 launch with invulnerability, one player and PC Engine
+music reached and defeated the boss through controller-driven shooting. The
+post-upload background audit passed 211 samples, 255,136 visible tile checks,
+and 2,558 resident pattern checks. No audio underruns or forced boss defeats.
+Normal first-stage replay also checks the original Vivid palette and its reset
+at stage 2; its boss defeat is assisted. These are emulator checks, not physical
+console or exhaustive frame coverage.
+
+The Z80 sound bank precedes BC palette metadata in link order to avoid an
+extra 32 KiB alignment gap. The final ROM passes the 4 MiB header/checksum gate.
+
+Evidence: `.local/bc1-remaster/art-checks.json`, `comparison.png`, `final-cart-play/`,
+`final-cart-palettes/`, and `final-cart-normal/`. Updated `dist/Side Arms MD v2.1.bin` SHA-256:
+`997c88b589bea8fc141660cffd9ce657cd2605ad5599ced42d7414b23f3b361b`.
+
+## v2.1 correction: remove rejected BC R1 texture replacements (October 12)
+
+User reported the remaster as more vivid but visually broken. Inspection shows
+excessive white coastal outlines and repeated diagonal cave textures. Reverted
+the cave and water generators to the pre-remaster v2.1 versions, retaining the
+dedicated brighter BC R1 Vivid palette. This is a rollback of those artwork
+substitutions, not a claim that every historical BC art issue is resolved.
+The previous mask-only checks did not establish visual quality.
+
+The corrected ROM matches every resolved background pixel and attribute in all
+ten BC rounds against the pre-remaster baseline. Source/collision bytes, base
+palettes and 103 linked Normal artwork blobs also match. Native Standard/Vivid
+checks pass all 640 palette words. A Developer-menu BC R1 replay clears the boss
+through controller shooting, with 211 background samples, 255,136 visible tile
+checks and no audio underruns. Route captures include the restored cave supports.
+Testing is emulator-only.
+
+Evidence: `.local/bc1-correction/art-checks.json`, `comparison.png`, `play/`,
+and `palettes/`. Release: `dist/Side Arms MD v2.1.bin` (4 MiB). SHA-256:
+`6dd3f5ac54a3f40ffc92734f5163877dc5a616dab15efe3bd8e6bda59c51348a`.
+
+## v2.1 follow-up: correct BC R1 cave donor selection (October 12)
+
+The previous rollback did not fix the wrong donor tiles. The cave composer used
+meta 74 (a rock face) for metal arches, stretching its lower rows into legs. It
+also assigned one lower-left crop of meta 70 to eight distinct source patterns,
+then overwrote sloping edge materials with that same crop.
+
+Use the complete meta 75 arch quadrants without vertical stretching. Select
+distinct Normal rock-face and wall quadrants for the corresponding BC motifs,
+and apply the existing source edge contours to those selected materials. The
+low ridge now uses rock material rather than the prior water-colored donor edge.
+These are visually selected Normal counterparts, not pixel-identity claims to PCE.
+The city and coastal-water mappings are unchanged by this correction.
+
+Compared the PCE quadrant atlas and Normal donor quadrant sheet, then inspected
+native entrance, middle and exit captures (route 008, 010, 013). The Developer
+BC R1 replay clears the boss by controller input with no forced defeat. All
+211 background samples and 640 Standard/Vivid palette words pass. Exact shared
+quadrant checks cover 92 cave quadrants, and their IDs agree with the original
+BC source table. Other BC rounds, source/collision bytes, Normal art, and water
+pixels remain unchanged. This verifies the targeted cave correction, not every
+historical BC tile selection.
+
+Evidence: `.local/bc1-tile-mapping/` (source-patterns.png, normal-cave-quadrants.png,
+art-checks.json, play/, palettes/). Latest v2.1 ROM SHA-256:
+`d33b3ae694335bb131a5fdfc0f7bd46aca1c7082c5feab656d2cdaee76fde233`.
+
+## v2.1: original PCE artwork for BC level 1 (October 12)
+
+User chose the PCE presentation after comparing both versions. BC R1 now
+converts original captured PCE characters directly; the Normal donor recipes
+are no longer used for this round. The existing PCE layout, encounters and
+collision bytes remain intact. `tools/bc_background_r1_pce.py` pins the capture
+hashes and generates native 4bpp resources offline. No runtime PCE emulation.
+Source-derived assets remain in ignored generated directories.
+
+Two Genesis scenery banks fit the original water, cave rock, stone floor and
+red-earth ramps exactly. Other source palettes use consistent nearest-color
+assignments per original palette: 42,350 of 49,319 opaque pixels (85.87%) retain
+exact RGB3 colors in Standard. Vivid uses its own guarded palette to keep shade
+steps distinct. Standard is closest to the original PCE color presentation.
+
+`qa_bc_r1_pce.py` independently decodes all 63 original cells and verifies 64,512
+pixel positions/silhouettes, consistent color correspondence, and protected
+source ramps against the linked ROM. All nine other BC backgrounds and 103
+Normal resources are unchanged. The shared Vivid LUT is unchanged after rebuild.
+
+Original PCE tiles required additional space. Splitting the R5 map from the BC
+palettes and placing four small Normal palettes in the unused pre-sound padding
+keeps the full artwork within the 4 MiB cartridge. Sound still starts at $80000;
+DMA tile blocks retain their 512-byte alignment. No assets were dropped.
+
+Final-ROM checks: real Developer-menu BC1 replay reaches and clears the boss
+through controller input, 211 live background samples, 255,136 visible tile
+checks, 2,744 resident patterns, zero audio underruns. Inspected native opening,
+coast, cave middle and exit captures. All 640 Standard/Vivid palette words pass
+across BC rounds. Normal1 also reaches stage2 and retains its intended palettes
+and audio behavior; its boss defeat is assisted. Emulator checks only.
+
+Evidence: `.local/bc1-pce-art/` (source-checks.json, play/, palettes/, normal/,
+opening.png, cave.png and their Standard counterparts). ROM:
+`dist/Side Arms MD v2.1.bin`, SHA-256 `55a64cd761f02969116be0e094dd16d851be200a372fd5497150d7a69bea7695`.
+
+## v2.1 itch-report fixes (October 14)
+
+Reviewed the current [itch comments](https://rester159.itch.io/side-arms#comments)
+and [v2.0 devlog comments](https://rester159.itch.io/side-arms/devlog/1703356/side-arms-md-20#comments).
+Current actionable reports: quiet PC Engine music/first-stage ending glitch,
+washed-out Normal stage-one scenery and boss, BC rapid fire, and wheel gun
+placement/wrong animation tile/missing lightning. The audio/color reporter
+explicitly identifies Normal (calling it Arcade), not BC. Actual Arcade mode
+continues to use its original soundtrack. The recent PAL-clone reply reports
+v2.0 working; no new startup workaround was added.
+
+Changes:
+
+- The controller mapper now reads the active BC player arena, including allocated
+  peers, instead of interpreting BC storage as Normal players. Both rapid-fire
+  buttons and six-button facing lock use BC state. Disabling turbo retains held
+  fire for charging. Normal AUTO and combined leader/ring behavior is preserved.
+- Original arcade `$71EF/$71F2` initialize both pod startup waits. Restoring the
+  first wait prevents the guns attaching to the background too early.
+- Home cutouts and wheel frames reused numeric extra-metatile IDs for different
+  pixel data. Cache hits now check source identity and upload the correct bank.
+  The first reproduction found two stale resident cells; the fixed replay has none.
+- Wheel health-bar loss now draws original bank-three `$9367..$9F2B` text graphics,
+  five frames held six game ticks each, using existing font graphics. The window
+  replaces stars on occupied text rows while the effect is visible.
+- Stage-one sprites/boss/HUD now receive the original Vivid transform as well as
+  the already-restored v1.2 background. Other Normal stages retain the guarded LUT.
+  BC1 keeps the original PCE artwork selected October 12.
+- Retained the v2.1 +6 dB PC Engine carrier-level adjustment and register ordering
+  fix: instrument/pitch/pan/levels are written before key-on.
+
+Validation on final cartridge `723fbf96...`:
+
+- 2,848 production input-mapper cases under address/undefined-behavior sanitizers:
+  BC 1–4-player slots, dead/inactive slots, facing lock, held fire, Normal AUTO and
+  combined leader/ring. Native physical A/B holds in 1P and 4P BC produce 24 press
+  edges per 96 video frames with turbo enabled, one edge with turbo disabled.
+  Native tests inject settings/protection; they do not bypass the input mapper.
+- Native sections 2, 4 and 9, with Home parallax on/off, plus a four-player wheel
+  run: 292,100 resident pattern comparisons, all three rotation frames and all
+  five lightning frames, source startup-delay checks, and boss exits pass. Boss
+  runs warp before entry and use assisted damage; these are not unassisted clears.
+- Normal1 PC Engine intro/stage/boss/clear/stage2 sequence completes with zero
+  queue underruns or clipped samples (peak 16,236). Native CRAM checks verify all
+  64 background/sprite words and restoration of the later-stage palette policy.
+  Boss defeat is assisted. This does not confirm audio on physical Models 1–3.
+- 524,288 FM-frame cases/3,145,728 voices pass, covering both regions and all
+  65,536 pitch inputs. All 640 Standard/Vivid BC background CRAM checks pass.
+- First-stage tiles, templates, map and base palette match the local v1.2 ROM;
+  both stage-one palettes use its original Vivid transform. All ten BC background
+  resources remain unchanged from the October 12 PCE-art build.
+
+The cartridge remains 4 MiB; no mapper is required. Compact front-end code and
+small crack/palette tables in the pre-sound alignment gap keep the sound bank at
+`$80000`. Gameplay simulation modules retain their existing optimization settings.
+Evidence: `.local/itch-v21-oct14/`. Tests are emulator/host checks; physical-console
+music balance and the reported hardware end-of-stage noise still need retesting.
+
+Release: `dist/Side Arms MD v2.1.bin`. SHA-256:
+`723fbf9661e4fe1799cba381c81673dd0b4d0daf590ebc7d4978fb7e4fef20c3`.

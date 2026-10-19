@@ -40,7 +40,7 @@ with tempfile.TemporaryDirectory() as directory:
                 algorithm=algorithms[(voice.instrument or 1)-1]
                 attenuation=2*(62-voice.volume-max(left,right))
                 assert algorithm & 7 in (5,6,7)
-                levels=[min(127,v+(0 if algorithm & 7 in (5,6) and i==0 else attenuation))
+                levels=[min(127,max(0,v+(0 if algorithm & 7 in (5,6) and i==0 else attenuation-8)))
                         if voice.volume and voice.instrument else 127 for i,v in enumerate(patch[4:])]
                 expected += [voice.instrument,block*8+(fnum>>8),fnum&255,
                              (128 if left else 0)|(64 if right else 0)|algorithm]+patch[:4]+levels

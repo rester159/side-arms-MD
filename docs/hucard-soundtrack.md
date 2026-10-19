@@ -954,3 +954,14 @@ and PAL tracks, packet checks and all12 campaign/regression jobs pass. Bounded
 performance measure because completion ticks differ. See expansion-acceptance.md
 and `.local/hucard-alg5-study/` for scope and the verified test package. This
 does not establish subjective timbre or phase fidelity.
+
+
+## v2.1 mix and instrument transitions (October 12)
+
+The patch templates retain their original fitting headroom; playback now raises
+carrier levels by eight YM TL steps (6 dB). Modulators and PSG effect levels
+stay unchanged. The Z80 applies the new pitch, stereo and carrier levels before
+key-on when an instrument changes. Actual register traces validate that order.
+See `docs/expansion-acceptance.md` for final-ROM Normal/BC first-boss replays and
+all-track NTSC/PAL checks, including the limitation on identifying the user's
+specific reported glitch.

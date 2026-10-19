@@ -64,6 +64,9 @@ static u16 fr_render;                   /* next frame image to render */
 static u16 fr_meta[64];
 static u16 fr_nmeta, fr_next;
 static u16 *fr_img;                     /* nframes x full 64x32 plane images, or NULL */
+/* Home cutouts and wheel frames number their extra cells independently.
+ * A matching numeric metatile ID alone does not identify the resident art. */
+static const u8 *slot_source[BG_SLOTS];
 static u16 *fr_cells;                   /* optional cell cache, all four orientations */
 static u8 *fr_slots;                    /* last shadow slot per wheel cell, when images do not fit */
 static s16 fr_shadow_frame = -1;        /* invalidated by every ordinary shadow writer */
@@ -201,16 +204,25 @@ void bg_set_stage(const Zone *art, const u8 *cells, const u16 *remap,
 
 static u8 acquire(u16 meta)
 {
+    const u8 *src = meta < zone->metas ? (stage_sources ? stage_sources[meta] : zone->tiles + (u32)meta * 512)
+                                       : (fr ? fr->extra_tiles : ext_tiles) + (u32)(meta - zone->metas) * 512;
     u8 s = meta_slot[meta];
-    if (s != NO_SLOT) { slot_refs[s]++; return s; }
+    if (s != NO_SLOT) {
+        slot_refs[s]++;
+        if (slot_source[s] != src) {
+            slot_source[s] = src;
+            DMA_queueDmaFast(DMA_VRAM, (void *)src, (VRAM_BG_TILE + s * 16) * 32, 256, 2);
+            misses++;
+        }
+        return s;
+    }
     for (u16 n = 0; n < BG_SLOTS; n++) {
         u16 i = hand;
         if (++hand == BG_SLOTS) hand = 0;
         if (slot_refs[i]) continue;
         if (slot_meta[i] != 0xFFFF) meta_slot[slot_meta[i]] = NO_SLOT;
         slot_meta[i] = meta; meta_slot[meta] = i; slot_refs[i] = 1;
-        const u8 *src = meta < zone->metas ? (stage_sources ? stage_sources[meta] : zone->tiles + (u32)meta * 512)
-                                           : (fr ? fr->extra_tiles : ext_tiles) + (u32)(meta - zone->metas) * 512;
+        slot_source[i] = src;
         DMA_queueDmaFast(DMA_VRAM, (void *)src, (VRAM_BG_TILE + i * 16) * 32, 256, 2);
         misses++;
         return i;

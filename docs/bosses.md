@@ -162,8 +162,9 @@ runner, the player kept invulnerable by RAM writes, enemy spawns muted (`en_dbg_
 
 * Sprite bosses are drawn 32 px left of the arcade position (see Coordinates).
 * Wheel spawn wipes all enemies (`enemies_clear`); the arcade clears only the big-object area.
-* Wheel bar loss: the arcade's text-layer "crack" animation (task `$365F`, 5 frames of graphics
-  characters over the wheel) is not drawn; only its sound ($15) plays.
+* Wheel bar loss now draws task `$365F`'s five original text-layer crack frames,
+  six gameplay ticks each, together with sound `$15` (v2.1). The Genesis window
+  plane replaces the star plane on occupied text rows during the effect.
 * POW capsules at boss deaths need `item_spawn_pow()` from the items module (not provided yet).
 * The final boss bursts check that all 8 of their bullets are gone; the arcade checks 4 of them.
 * Local boss bullets (final boss bursts, and pod bullets if the enemy module is absent) do not die

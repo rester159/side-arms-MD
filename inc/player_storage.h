@@ -11,6 +11,7 @@ typedef union {
 } PlayerArena;
 extern PlayerArena player_arena;
 extern BcPlayerControl *peers;
+extern u16 players_bc_count; /* zero while the Normal union member is active */
 #define normal_players (player_arena.normal)
 bool players_bc_acquire(u16 count);
 void players_bc_release(void);

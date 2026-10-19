@@ -63,19 +63,29 @@ static u8 map(u16 i, u16 r, u16 pressed)
         if (btn >= PB_COUNT || (btn >= PB_X && !pad_six[i])) btn = a;   /* A / B / C */
         if (r & PB_BIT[btn]) b |= ACT_IN[a];
     }
-    const Player *p = &normal_players[i];
+    bool left, af;
+    if (players_bc_count) {
+        const BcPlayerControl *p = i && i < players_bc_count ? &peers[i - 1] : &player_arena.bc;
+        /* Do not read the inactive Normal view of the shared player arena,
+         * or a BC peer slot that was not allocated for this session. */
+        left = i < players_bc_count && !p->world.weapons.charge.facing;
+        af = i < players_bc_count && p->world.state == 0x80;
+    } else {
+        const Player *p = &normal_players[i];
+        left = p->facing_left;
+        af = p->in_play && p->state == PL_ALIVE && p->weapon != WPN_AUTO &&
+             (!player_is_combined(p) || combined == i + 1);
+    }
     if (pad_six[i])
         for (u16 k = 0; k < 3; k++) {
             u8 x = pad_cfg.extra[k];
             if (x == XB_LOCK) {
-                if (r & XYZ_BIT[k]) b |= p->facing_left ? IN_FIRE_L : IN_FIRE_R;
+                if (r & XYZ_BIT[k]) b |= left ? IN_FIRE_L : IN_FIRE_R;
             } else if (x != XB_NONE && x < XB_COUNT && (pressed & XYZ_BIT[k])) pad_weapon_req[i] = x;
         }
     pad_fire_held[i] = b & (IN_FIRE_L | IN_FIRE_R);
     /* v1.3: the combined leader still needs press edges; the ring uses held fire.
      * Uncombined P3/P4 retain their independent autofire cadence. */
-    bool af = p->in_play && p->state == PL_ALIVE && p->weapon != WPN_AUTO &&
-              (!player_is_combined(p) || combined == i + 1);
     for (u16 k = 0; k < 2; k++) {
         u8 bit = k ? IN_FIRE_R : IN_FIRE_L;
         if (!(b & bit)) { af_t[i][k] = 0; continue; }

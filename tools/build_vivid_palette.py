@@ -18,12 +18,20 @@ def read_words(path):
 
 
 def constraints(gen=GEN):
-    paths = sorted(gen.glob('zone*_pal.bin')) + [gen/name for name in (
+    paths = sorted(p for p in gen.glob('zone*_pal.bin') if p.name != 'zone0_vivid_pal.bin') + [gen/name for name in (
         'sprite_pal.bin', 'bc_sprite_pal.bin', 'organic_belly_pal.bin',
         'bc_r1_material_pal.bin', 'bc_r2_material_pal.bin', 'bc_r3_material_pal.bin', 'bc_r4_material_pal.bin', 'bc_r5_material_pal.bin', 'bc_r6_material_pal.bin', 'bc_r7_material_pal.bin', 'bc_r8_material_pal.bin', 'bc_r9_material_pal.bin', 'bc_r10_material_pal.bin')]
     palettes = {}
     for path in paths:
         values = read_words(path)
+        if path.stem == 'zone0_pal':
+            # Stage 1 uses its dedicated v1.2 Vivid palette. Keep the shared
+            # guard's v2 constraints stable for all other stages and sprites.
+            fit = json.loads((ROOT/'tools/data/normal_zone0_palette_fit.json').read_text())
+            values = [v for bank in fit['banks'] for v in [0] + bank]
+        if path.stem == 'bc_r1_material_pal':
+            values = read_words(gen/'bc_r1_donor_pal.bin')
+            values[31] = 0x0464
         assert len(values) % 16 == 0
         for offset in range(0, len(values), 16):
             palettes[f'{path.stem}:{offset//16}'] = values[offset:offset+16]

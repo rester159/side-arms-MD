@@ -102,7 +102,10 @@ void hucard_fm_frame(const HucardScore *score, unsigned char pal, unsigned char 
             }
             cached[0] = (pan >> 8) | algorithm;
             for (i = 0; i < 4; ++i) {
-                unsigned short level = patch[4+i] + attenuation;
+                /* Eight YM TL steps = +6 dB for carriers. Retain the
+                 * fitted modulator depth below, so timbre stays unchanged. */
+                signed short level = patch[4+i] + attenuation - 8;
+                if (level < 0) level = 0;
                 cached[5+i] = !v->volume || !instrument || level > 127 ? 127 : level;
             }
             /* The supported nonlinear patches (5/6, with optional feedback)

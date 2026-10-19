@@ -54,6 +54,9 @@ class NormalBackgroundAudit:
         mode = r.read('color_mode', 1)[0]
         assert mode in (0, 1)
         expected = [packed(self.lut[packed(w)] if mode else w) for w in palette]
+        if zone == 0 and mode:
+            expected = [packed(w) for w in struct.unpack_from(
+                '>32H', self.rom, r.symbols['zone0_vivid_pal'])]
         # Fade/transition samples are excluded; require verified samples in each
         # requested zone at completion, rather than treating skips as passes.
         if list(self.cram[:32]) != expected:

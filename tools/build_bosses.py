@@ -180,6 +180,35 @@ ss, en = steps(0x4DAB)
 steps_arr('small_explosion_steps', ss, '$4DAB: 1x1 explosion (missiles)')
 
 # ------------------------------------------------------------------ wheel bosses
+# $365F draws five text-layer crack frames from bank 3 ($9367..$9F2B),
+# holding each for six game ticks. Keep only visible nonblank cells; the
+# existing font bank supplies the original graphics without another tile bank.
+from arcade_source import decode_chars
+chars = decode_chars(src.region('fgtiles'))
+cracks, crack_offsets = [], [0]
+for frame in range(5):
+    a = 0x15367 + frame * 0x2F1
+    v, rows, cols, attr = w16(a), M[a+2], M[a+3], M[a+4]
+    assert (rows, cols, attr) == (22, 34, 0x98)
+    codes, pos = [], a + 5
+    while len(codes) < rows * cols:
+        if M[pos] == 255:
+            codes.extend([0x27] * M[pos+1]); pos += 2
+        else:
+            codes.append(M[pos]); pos += 1
+    for i, code in enumerate(codes):
+        y = (v - 0xD000) // 64 - 2 + i // cols
+        x = (v - 0xD000) % 64 - 12 + i % cols
+        if 0 <= x < 40 and 3 <= y < 25 and np.any(chars[code | 0x200] != 3):
+            cracks.extend((x, y, code))
+    crack_offsets.append(len(cracks))
+h += ['extern const u16 wheel_crack_offsets[6];',
+      f'extern const u8 wheel_crack_cells[{len(cracks)}];']
+# Place this small read-only table in the pre-sound alignment gap.
+(GEN / 'wheel_cracks.bin').write_bytes(bytes(cracks))
+(SRC / 'wheel_cracks.s').write_text('.section .rodata\n.align 2\n'
+    '.global wheel_crack_offsets\nwheel_crack_offsets:\n.word ' + ','.join(map(str, crack_offsets)) + '\n'
+    '.global wheel_crack_cells\nwheel_crack_cells:\n.incbin "res/generated/wheel_cracks.bin"\n.align 2\n')
 code_m, color_m, flags_m = bgmap_cells(src.region('bgmap'))
 bgt = decode_bgtiles(src.region('bgtiles'))
 main = M

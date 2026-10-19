@@ -1,8 +1,15 @@
 # Side Arms MD — native Genesis port (SGDK)
 
-**v2.0** includes 1–4-player Home modes, Before Christ, the PC Engine HuCard
+**v2.1** restores the Normal first-level background and Vivid colors from v1.2,
+raises PC Engine music volume, and corrects instrument-change key-on ordering.
+It also fixes BC rapid fire, wheel-boss gun placement and stale animation tiles,
+and restores the wheel's original lightning animation when it loses a health bar.
+BC level 1 now uses the original PCE BC background tiles and layout. Standard
+is closest to the PCE colors; Vivid boosts them while preserving shade detail.
+
+It includes 1–4-player Home modes, Before Christ, the PC Engine HuCard
 soundtrack, Start pause, and the hidden Developer menu described below.
-Release ROM: `dist/Side Arms MD v2.0.bin`.
+Release ROM: `dist/Side Arms MD v2.1.bin`.
 
 The user accepted the existing frame-skipping performance on October 11, 2026.
 The preceding full-campaign build (`5f6aa68a`) reached a minimum rolling five-second

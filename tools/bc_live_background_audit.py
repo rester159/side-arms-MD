@@ -24,6 +24,7 @@ class LiveBackgroundAudit:
             import ctypes as C
             self.palette = struct.unpack_from('>32H', rom, sy[prefix+'_palette'])
             self.vivid = struct.unpack_from('>512H', rom, sy['vivid_lut'])
+            self.classic = struct.unpack_from('>32H', rom, sy['bc_bg_vivid_palette']) if round_number == 1 else None
             self.cram = (C.c_uint16*64).in_dll(runner.lib, 'cram')
             self.palette_checks = 0
             self.color_modes = set()
@@ -41,7 +42,7 @@ class LiveBackgroundAudit:
             def packed(word):
                 return (word >> 1 & 7) | (word >> 5 & 7) << 3 | (word >> 9 & 7) << 6
             for i, source in enumerate(self.palette):
-                expected = packed(self.vivid[packed(source)] if mode else source)
+                expected = packed((self.classic[i] if self.classic else self.vivid[packed(source)]) if mode else source)
                 assert self.cram[i] == expected, ('live background palette mismatch',
                                                  tick, mode, i, expected, self.cram[i])
                 self.palette_checks += 1

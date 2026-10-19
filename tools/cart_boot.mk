@@ -1,5 +1,12 @@
 # Loaded after SGDK's makefile: retain its vectors and interrupt implementation,
 # but remove the controller-port heuristic before assembling the reset entry.
+# Favor compact front-end and mode-management code over unrolled code.
+$(OUT_DIR)/src/flow_menu.o: CFLAGS += -Os
+$(OUT_DIR)/src/flow_menu.o: tools/cart_boot.mk
+$(OUT_DIR)/src/flow_scene.o: CFLAGS += -Os
+$(OUT_DIR)/src/flow_scene.o: tools/cart_boot.mk
+$(OUT_DIR)/src/flow.o $(OUT_DIR)/src/flow_attract.o $(OUT_DIR)/src/flow_rush.o: CFLAGS += -Os
+$(OUT_DIR)/src/flow.o $(OUT_DIR)/src/flow_attract.o $(OUT_DIR)/src/flow_rush.o: tools/cart_boot.mk
 # The final Vivid pass updates this incbin after data.s has been generated.
 $(OUT_DIR)/src/gen/data.o: res/generated/vivid_lut.bin
 
@@ -26,6 +33,6 @@ $(OUT_DIR)/sega.o: tools/cart_boot.py tools/cart_boot.mk $(SRC_LIB)/boot/sega.s
 	python3 tools/cart_boot.py $(SRC_LIB)/boot/sega.s $(OUT_DIR)/sega.s
 	$(CC) $(AFLAGS) -c $(OUT_DIR)/sega.s -o $@
 
-# The 1152-byte BC palette/R5-remap bank fits between code and the aligned
-# Z80 banks. Moving these unchanged words here avoids growing the cartridge.
-OBJS := $(OUT_DIR)/src/gen/bc_background_palettes.o $(OUT_DIR)/src/gen/sound_data.o $(filter-out $(OUT_DIR)/src/gen/bc_background_palettes.o $(OUT_DIR)/src/gen/sound_data.o,$(OBJS))
+# Fill existing pre-sound padding with small palettes. The R5 map remains
+# after sound; grouping it with the palettes would overflow this padding.
+OBJS := $(OUT_DIR)/src/gen/bc_background_palettes.o $(OUT_DIR)/src/gen/early_palettes.o $(OUT_DIR)/src/gen/wheel_cracks.o $(OUT_DIR)/src/gen/sound_data.o $(filter-out $(OUT_DIR)/src/gen/bc_background_palettes.o $(OUT_DIR)/src/gen/early_palettes.o $(OUT_DIR)/src/gen/wheel_cracks.o $(OUT_DIR)/src/gen/sound_data.o,$(OBJS))

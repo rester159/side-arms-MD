@@ -10,6 +10,7 @@
 
 PlayerArena player_arena;
 BcPlayerControl *peers;
+u16 players_bc_count;
 #if defined(__m68k__)
 _Static_assert(sizeof(Player) * MAX_PLAYERS == 1128 && sizeof(BcPlayerControl) == 1144,
                "typed player debugger views");
@@ -21,17 +22,19 @@ extern BcPlayerControl player __attribute__((alias("player_arena"), used, extern
 
 bool players_bc_acquire(u16 count)
 {
-    if (!count || count > MAX_PLAYERS || peers) return FALSE;
+    if (!count || count > MAX_PLAYERS || players_bc_count) return FALSE;
     if (count > 1) {
         peers = MEM_alloc((count-1)*sizeof(*peers));
         if (!peers) return FALSE;
     }
+    players_bc_count = count;
     return TRUE;
 }
 
 void players_bc_release(void)
 {
     if (peers) { MEM_free(peers); peers = NULL; }
+    players_bc_count = 0;
 }
 u32 hi_score = 100000;              /* $E600 default = ranking #1 ($0B34) */
 u16 extend_setting;                  /* DSW0 bits 4-5, 0 = MAME default (100000 once) */

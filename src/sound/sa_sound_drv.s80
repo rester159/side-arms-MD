@@ -1405,6 +1405,7 @@ hucard
             ld      b,6
             ld      c,0               ; channel 0..5
 .voice      push    bc
+            ld      b,0               ; key-on pending only for a new patch
             ld      a,c
             cp      3
             ld      e,0
@@ -1416,6 +1417,7 @@ hucard
             cp      (iy+0)
             jr      z,.levels
             ld      (iy+0),a
+            inc     b
             ; Key off before changing multipliers. Source envelopes are in
             ; carrier TLs; algorithms 5/6 keep their modulator depth fixed.
             call    .keyoff
@@ -1457,14 +1459,6 @@ hucard
             ld      a,c
             add     a,$B0
             call    ymw
-            call    .keycode
-            or      $F0
-            ld      d,a
-            ld      a,$28
-            push    de
-            ld      e,0
-            call    ymw
-            pop     de
 .levels     ld      a,c
             add     a,$A4
             ld      d,(ix+1)
@@ -1491,7 +1485,20 @@ hucard
             add     a,4
             ld      d,(ix+11)
             call    ymw
-            ld      de,12
+            ; A new patch must not sound with the previous patch's pitch or
+            ; carrier levels, especially across boss/clear music changes.
+            ld      a,b
+            or      a
+            jr      z,.nextvoice
+            call    .keycode
+            or      $F0
+            ld      d,a
+            ld      a,$28
+            push    de
+            ld      e,0
+            call    ymw
+            pop     de
+.nextvoice  ld      de,12
             add     ix,de
             inc     iy
             pop     bc

@@ -1,5 +1,6 @@
 #include "boss_int.h"
 #include "bg.h"
+#include "hud.h"
 
 /* BG wheel bosses $7192 / $719C / $71A6 (sections 2, 4, 9; docs/re/levels.md 2,
  * docs/re/objects.md 6.1). The wheel itself is background art. In the arcade it
@@ -34,7 +35,19 @@ static struct {
     u8 core_state;              /* 0 waiting, 1 armouring up, 2 vulnerable, 3 dying */
     u8 c12, bars, hp, score_idx;
     bool immune;
+    u8 crack;                   /* $365F: five text frames, six ticks each */
 } w;
+
+static void crack_frame(void)
+{
+    hud_clear(0x01FFFFF8UL); /* rows 3..24; preserve scores and weapon panels */
+    if (!w.crack) return;
+    u16 f = (30 - w.crack) / 6;
+    for (u16 i = wheel_crack_offsets[f]; i < wheel_crack_offsets[f + 1]; i += 3) {
+        u16 code = wheel_crack_cells[i + 2] | 0x200;
+        hud_codes(wheel_crack_cells[i], wheel_crack_cells[i + 1], 0x18, &code, 1);
+    }
+}
 
 static void obj_load(Obj *o) { const BossStep *s = &o->st[o->i]; o->t = s->frames; o->code = s->code; o->colour = s->colour; }
 static void obj_run(Obj *o, const BossStep *st, u8 n) { o->st = st; o->n = n; o->i = 0; obj_load(o); }
@@ -138,7 +151,8 @@ static void core_bar_lost(void)
     if (w.bars == 1) w.score_idx = 0x60;               /* $747D: 50000 */
     w.hp = game_scale_health(20);
     w.c2 = 0;                                           /* $748F */
-    sound_play(SND_CRACK);                              /* task $365F (text-layer cracks: not drawn) */
+    sound_play(SND_CRACK);
+    w.crack = 30; crack_frame();                       /* task $365F */
     obj_run(&w.core, core_hit_steps, 16);               /* 12 flash frames, then the idle loop */
 }
 
@@ -162,6 +176,7 @@ static void spin(void)
 
 void wboss_reset(void)
 {
+    if (w.crack) { w.crack = 0; crack_frame(); }
     if (w.spinning) bg_frames_end();
     memset(&w, 0, sizeof(w));
 }
@@ -175,7 +190,10 @@ void wboss_start(u8 type)
     boss_shift = 0;
     for (u16 k = 0; k < 8; k++) {                       /* $71C0: template $721C, x $1BF */
         Obj *o = &w.pod[k];
-        o->y = wheel_pod_start[2 * k]; o->x = 0x1BF; o->t = 1; o->delay = wheel_pod_start[2 * k + 1];
+        o->y = wheel_pod_start[2 * k]; o->x = 0x1BF;
+        /* $71EF/$71F2 seed BOTH waits. A one-tick first wait made the pods
+         * attach to the scrolling wheel 123..223 ticks too early. */
+        o->t = o->delay = wheel_pod_start[2 * k + 1];
     }
     w.core.y = 0x70; w.core.x = 0x1BF; w.core.t = 0x7A; w.core.delay = 0x7A;   /* $73DD, $7202 */
     w.bars = 4; w.hp = game_scale_health(20); w.score_idx = 0x38; w.immune = TRUE;
@@ -187,6 +205,7 @@ void wboss_start(u8 type)
 bool wboss_update(void)
 {
     if (!w.on) return FALSE;
+    if (w.crack && !(--w.crack % 6)) crack_frame();
     /* task $3B3A: once the halt lands, start turning ($E0D0 = $61-$63) */
     if (!w.spinning && level.mode == SCROLL_HALT && w.core_state < 3) {
         const WheelInfo *wi = &wheel_info[w.type];

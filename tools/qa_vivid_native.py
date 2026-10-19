@@ -33,6 +33,8 @@ for mode in (1, 0):
         for i, source in enumerate(palette):
             packed = (source >> 1 & 7) | (source >> 5 & 7) << 3 | (source >> 9 & 7) << 6
             displayed = lut[packed] if mode else source
+            if mode and number == 1:
+                displayed = struct.unpack_from('>H', rom, r.symbols['bc_bg_vivid_palette']+i*2)[0]
             # GX stores CRAM as contiguous BBBGGGRRR, unlike the cart's word.
             expected = ((displayed >> 1 & 7) | (displayed >> 5 & 7) << 3 |
                         (displayed >> 9 & 7) << 6)
