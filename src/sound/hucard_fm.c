@@ -102,9 +102,9 @@ void hucard_fm_frame(const HucardScore *score, unsigned char pal, unsigned char 
             }
             cached[0] = (pan >> 8) | algorithm;
             for (i = 0; i < 4; ++i) {
-                /* Eight YM TL steps = +6 dB for carriers. Retain the
+                /* Twelve YM TL steps = +9 dB for carriers. Retain the
                  * fitted modulator depth below, so timbre stays unchanged. */
-                signed short level = patch[4+i] + attenuation - 8;
+                signed short level = patch[4+i] + attenuation - 12;
                 if (level < 0) level = 0;
                 cached[5+i] = !v->volume || !instrument || level > 127 ? 127 : level;
             }

@@ -5592,3 +5592,47 @@ music balance and the reported hardware end-of-stage noise still need retesting.
 
 Release: `dist/Side Arms MD v2.1.bin`. SHA-256:
 `723fbf9661e4fe1799cba381c81673dd0b4d0daf590ebc7d4978fb7e4fef20c3`.
+
+
+## v2.2 itch follow-up (October 20, 2026)
+
+Reports reviewed: [PAL/60 Hz Mega EverDrive Pro crash after about 20 seconds](https://itch.io/post/17657451)
+and [PC Engine music/SFX balance and residual first-boss ending noise](https://itch.io/post/17625345).
+The commenter suggestion about expansion-bus termination is not an established
+cause. No physical console or EverDrive was available to reproduce this failure.
+
+Changes:
+
+- The local SDK DMA adapter requires acknowledged Z80 bus ownership before both
+  queued and immediate DMA. Interrupt protection covers acquiring/releasing the
+  bus, and immediate DMA issues both command words after acquisition. The SDK
+  installation is not modified. Unknown source patterns fail the build. This
+  addresses a bus-contention risk; it is not proof of the reported crash's cause.
+- PC Engine music gains another four carrier TL steps (up to +3 dB versus v2.1),
+  while its PSG effects drop three attenuation steps (6 dB). The effects mix
+  persists across boss-stop/clear preparation. Arcade effects are unchanged.
+- Home and options display v2.2. Existing v2.1 gameplay/art corrections remain.
+
+Validation on SHA-256 `9b4befdf59514a8203bac70c30f512abd5d7c5c3cd5e88cf1403d2ff91fad72b`:
+
+- PAL and NTSC dirty-RAM/I/O boot and reset: 2,000 frames before reset, 2,120
+  after reset each; driver ready and 120/120 final game-loop updates.
+- 4,000-frame boot/attract native DMA audit: 3,435 transfers, descriptor register
+  checks and atomic paired command writes pass. Linked immediate DMA inspection
+  confirms the bus acknowledgement loop precedes both command words.
+- Normal first-stage Home/Developer PCE route passes intro/stage/boss/clear/stage2
+  transitions over 8,443 frames after launch, with assisted boss damage. No music
+  queue underruns or clipped samples; boss-clear peak 12,563. Reduced SFX mix
+  remains active on every tested frame, including stop/clear transitions.
+- Protected four-player BC Home launch reaches stage/boss music naturally with
+  zero queue underruns and maximum track-preparation wait of two frames.
+- 524,288 FM frames / 3,145,728 voices pass all pitch inputs in both regions;
+  512 linked Z80 attenuation cases pass both source mixes and silence clamping.
+- Normal stage-one artwork still matches v1.2; all ten BC background resources
+  and the shared Vivid table are unchanged from v2.1.
+
+Evidence: `.local/v22/`. These checks do not certify hardware compatibility or
+resolve analog output differences between console models. The EverDrive crash
+and remaining physical-console audio complaint require reporter retesting.
+
+Release: `dist/Side Arms MD v2.2.bin`, 4 MiB, source-only Git repository.

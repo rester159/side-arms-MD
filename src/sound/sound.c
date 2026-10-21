@@ -18,6 +18,7 @@
 #define MB_HU_MODE (MB + 0x08)
 #define MB_HU_WR   (MB + 0x09)
 #define MB_HU_RD   (MB + 0x0A)
+#define MB_SFX_ATT (MB + 0x0B)
 #define HU_QUEUE   0x1800
 #define HU_ACTIVE  0x1B06
 #define MB_RING    (MB + 0x10)
@@ -204,6 +205,15 @@ void sound_set_music_source(u8 source)
     source = source ? 1 : 0;
     if (music_source != source) sound_stop_all();
     music_source = source;
+    /* Keep this mix across track stops/restarts: the boss explosion must not
+     * jump back to full PSG volume while the clear tune is being prepared. */
+    if (started) {
+        SYS_disableInts();
+        const bool taken = Z80_getAndRequestBus(TRUE);
+        *(vu8 *)(Z80_RAM + MB_SFX_ATT) = source ? 3 : 0; /* PSG steps: 6 dB */
+        if (!taken) Z80_releaseBus();
+        SYS_enableInts();
+    }
 }
 
 void sound_command(u8 cmd)

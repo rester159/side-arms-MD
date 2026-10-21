@@ -16,6 +16,12 @@ OBJS += $(OUT_DIR)/joy_safe.o
 # Correct every SDK driver upload, including startup before main and the PCM
 # logo driver, rather than waiting for the v1.4 idle hook to repair it later.
 OBJS += $(OUT_DIR)/z80_safe.o
+OBJS += $(OUT_DIR)/dma_safe.o
+$(OUT_DIR)/cmd_: $(OUT_DIR)/dma_safe.o
+$(OUT_DIR)/dma_safe.o: tools/guard_dma_bus.py $(SRC_LIB)/dma.c
+	@$(MKDIR) -p $(dir $@)
+	python3 tools/guard_dma_bus.py $(SRC_LIB)/dma.c $(OUT_DIR)/dma_safe.c
+	$(CC) $(CFLAGS) -c $(OUT_DIR)/dma_safe.c -o $@
 $(OUT_DIR)/cmd_: $(OUT_DIR)/z80_safe.o
 $(OUT_DIR)/z80_safe.o: tools/guard_z80_upload.py $(SRC_LIB)/z80_ctrl.c
 	@$(MKDIR) -p $(dir $@)

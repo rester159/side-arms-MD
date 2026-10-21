@@ -965,3 +965,24 @@ key-on when an instrument changes. Actual register traces validate that order.
 See `docs/expansion-acceptance.md` for final-ROM Normal/BC first-boss replays and
 all-track NTSC/PAL checks, including the limitation on identifying the user's
 specific reported glitch.
+
+
+## v2.2 music/effects balance (October 20)
+
+Following the [v2.1 hardware audio feedback](https://itch.io/post/17625345),
+HuCard carrier attenuation is now reduced by twelve TL steps, four more than
+v2.1 (+3 dB before saturation). Modulator levels and silent voices are preserved.
+When PC Engine music is selected, PSG effects use three additional attenuation
+steps (-6 dB). Arcade-source effects retain their previous levels.
+
+The mix selection lives at Z80 mailbox `$1F0B`, separate from the transient
+HuCard stream handshake. Stopping the boss track and preparing the clear tune
+therefore cannot restore full-volume explosion effects. The Z80 routine saturates
+at attenuation 15, so silent effects cannot wrap around to full volume.
+
+`qa_sfx_mix.py` executes the linked Z80 routine for all 256 input bytes with both
+mix settings (512 cases). `qa_hucard_boss_clear.py` launches through Home and
+Developer, traverses Normal stage 1, assists the boss defeat and reaches stage 2.
+It checks the persistent mix each frame, all 64 first-stage palette words, the
+later palette policy, clipping and queue underruns. Physical-console analog
+balance and the reported residual boss-ending noise remain listening checks.

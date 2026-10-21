@@ -89,6 +89,7 @@ MB_READY    EQU     MBOX+$07
 MB_HU_MODE  EQU     MBOX+$08
 MB_HU_WR    EQU     MBOX+$09
 MB_HU_RD    EQU     MBOX+$0A
+MB_SFX_ATT  EQU     MBOX+$0B         ; PSG attenuation offset; persists between HuCard tracks
 HU_QUEUE    EQU     $1800
 HU_PATCH    EQU     $1B00
 HU_ACTIVE   EQU     $1B06
@@ -1336,7 +1337,11 @@ att         and     $0F                 ; a = SSG volume 0..15 -> PSG attenuatio
             ld      l,a
             jr      nc,.n
             inc     h
-.n          ld      a,(hl)
+.n          ld      a,(MB_SFX_ATT)       ; persistent mix, independent of track handshake
+            add     a,(hl)
+            cp      16
+            ret     c
+            ld      a,15               ; silence stays silent; never wrap loud
             ret
 ATTTAB      DB      15,14,14,14,14,14,14,12,11,9,8,6,5,3,2,0
 
